@@ -8,7 +8,7 @@ declare namespace MusicKit {
     };
   }
 
-  function configure(config: Config): MusicKitInstance;
+  function configure(config: Config): Promise<MusicKitInstance>;
   function getInstance(): MusicKitInstance;
   function formatMediaTime(seconds: number, separator?: string): string;
 

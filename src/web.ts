@@ -109,4 +109,39 @@ export class CapacitorMusicKitWeb
       console.log(error);
     }
   }
+
+  async getLibraryAlbums(options: {
+    limit: number;
+    offset: number;
+  }): Promise<{
+    albums: {
+      title: string;
+      id: string;
+      artworkUrl?: string;
+    }[];
+    hasNext: boolean;
+  }> {
+    const albums: {
+      title: string;
+      id: string;
+      artworkUrl?: string;
+    }[] = [];
+
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/library/albums?limit=${options.limit}&offset=${options.offset}`,
+    );
+
+    response.data.data.map(album => {
+      albums.push({
+        title: album.attributes.name,
+        id: album.id,
+        artworkUrl: album.attributes.artwork?.url,
+      });
+    });
+
+    const hasNext =
+      response.data.meta.total !== options.offset + response.data.data.length;
+
+    return { albums, hasNext };
+  }
 }

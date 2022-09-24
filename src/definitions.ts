@@ -7,6 +7,17 @@ export interface CapacitorMusicKitPlugin {
   hasMusicSubscription(): Promise<{ result: boolean }>;
   authorize(): Promise<void>;
   unauthorize():  Promise<void>;
+  getLibraryAlbums(options: {
+    limit: number;
+    offset: number;
+  }): Promise<{
+    albums: {
+      id: string;
+      title: string;
+      artworkUrl?: string;
+    }[];
+    hasNext: boolean;
+  }>;
   addListener(
     eventName: 'playbackStateDidChange',
     listenerFunc: PlaybackStateDidChangeListener,
