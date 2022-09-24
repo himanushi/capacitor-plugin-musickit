@@ -41,8 +41,20 @@ export class CapacitorMusicKitWeb
   async configure(options: {
     config: MusicKit.Config;
   }): Promise<{ result: boolean }> {
-    let configured = false;
+    let result = false;
     try {
+      const loaded = await new Promise<boolean>((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
+        script.onload = () => resolve(true);
+        script.onerror = () => reject(false);
+        document.head.appendChild(script);
+      });
+
+      if(!loaded) {
+        return { result }
+      }
+
       const musicKit = await MusicKit.configure(options.config);
 
       musicKit.addEventListener(
@@ -55,11 +67,11 @@ export class CapacitorMusicKitWeb
         this.authorizationStatusDidChange,
       );
 
-      configured = true;
+      result = true;
     } catch (error) {
       console.log(error);
     }
-    return { result: configured };
+    return { result };
   }
 
   async isAuthorized(): Promise<{ result: boolean }> {
