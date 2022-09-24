@@ -10,4 +10,91 @@ export class CapacitorMusicKitWeb
     console.log('ECHO', options);
     return options;
   }
+
+  private playbackStateDidChange = (state: {
+    oldState: number;
+    state: number;
+  }) => {
+    const status = MusicKit.PlaybackStates[state.state];
+    const data = { result: status };
+    this.notifyListeners('playbackStateDidChange', data);
+  };
+
+  private authorizationStatusDidChange = (result: {
+    authorizationStatus: number;
+  }) => {
+    let status = '';
+    if (result.authorizationStatus === -1) {
+      status = 'unavailable';
+    } else if (result.authorizationStatus === 0) {
+      status = 'notDetermined';
+    } else if (result.authorizationStatus === 1) {
+      status = 'denied';
+    } else if (result.authorizationStatus === 2) {
+      status = 'restricted';
+    } else if (result.authorizationStatus === 3) {
+      status = 'authorized';
+    }
+    this.notifyListeners('authorizationStatusDidChange', { result: status });
+  };
+
+  async configure(options: {
+    config: MusicKit.Config;
+  }): Promise<{ result: boolean }> {
+    let configured = false;
+    try {
+      const musicKit = await MusicKit.configure(options.config);
+
+      musicKit.addEventListener(
+        'playbackStateDidChange',
+        this.playbackStateDidChange,
+      );
+
+      musicKit.addEventListener(
+        'authorizationStatusDidChange',
+        this.authorizationStatusDidChange,
+      );
+
+      configured = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result: configured };
+  }
+
+  async isAuthorized(): Promise<{ result: boolean }> {
+    let result = false;
+    try {
+      result = Boolean(MusicKit.getInstance()?.isAuthorized);
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async hasMusicSubscription(): Promise<{ result: boolean }> {
+    let result = false;
+    try {
+      result = await MusicKit.getInstance().hasMusicSubscription();
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async authorize(): Promise<void> {
+    try {
+      await MusicKit.getInstance().authorize();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async unauthorize(): Promise<void> {
+    try {
+      await MusicKit.getInstance().unauthorize();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
