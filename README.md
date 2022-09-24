@@ -19,6 +19,7 @@ npx cap sync
 * [`hasMusicSubscription()`](#hasmusicsubscription)
 * [`authorize()`](#authorize)
 * [`unauthorize()`](#unauthorize)
+* [`getLibraryAlbums(...)`](#getlibraryalbums)
 * [`addListener('playbackStateDidChange', ...)`](#addlistenerplaybackstatedidchange)
 * [`addListener('authorizationStatusDidChange', ...)`](#addlistenerauthorizationstatusdidchange)
 * [Interfaces](#interfaces)
@@ -95,6 +96,21 @@ authorize() => Promise<void>
 ```typescript
 unauthorize() => Promise<void>
 ```
+
+--------------------
+
+
+### getLibraryAlbums(...)
+
+```typescript
+getLibraryAlbums(options: { limit: number; offset: number; }) => Promise<{ albums: { id: string; title: string; artworkUrl?: string; }[]; hasNext: boolean; }>
+```
+
+| Param         | Type                                            |
+| ------------- | ----------------------------------------------- |
+| **`options`** | <code>{ limit: number; offset: number; }</code> |
+
+**Returns:** <code>Promise&lt;{ albums: { id: string; title: string; artworkUrl?: string; }[]; hasNext: boolean; }&gt;</code>
 
 --------------------
 
