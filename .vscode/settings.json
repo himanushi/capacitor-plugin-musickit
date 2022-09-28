@@ -1,0 +1,45 @@
+{
+  // svelte, html, css
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "svelte.plugin.css.enable": false,
+  "stylelint.enable": true,
+  "svelte.plugin.svelte.useNewTransformation": false,
+
+  // svelte, javascript, typescript, json
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": [
+    "source.formatDocument",
+    "source.fixAll.eslint",
+    "source.fixAll.stylelint"
+  ],
+  "eslint.validate": ["javascript", "typescript", "svelte"],
+  "stylelint.validate": ["css", "postcss", "svelte", "scss"],
+  "cSpell.words": [
+    "applemusic",
+    "camelcase",
+    "codegen",
+    "conds",
+    "datetime",
+    "dompurify",
+    "Entrypoints",
+    "graphiql",
+    "haptics",
+    "ismobilejs",
+    "isrc",
+    "mergewith",
+    "musickit",
+    "nexttrack",
+    "previoustrack",
+    "routify",
+    "roxi",
+    "smacss",
+    "stylelint",
+    "sveltejs",
+    "Typegen",
+    "upsert",
+    "xstate"
+  ]
+}
