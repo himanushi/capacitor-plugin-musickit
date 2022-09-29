@@ -106,12 +106,12 @@ declare namespace MusicKit {
   interface APIResult {
     data: {
       results: {
-        "library-songs"?: {
+        'library-songs'?: {
           data: APIResultData[];
           href: string;
           next: string;
         };
-        "library-albums"?: {
+        'library-albums'?: {
           data: APIResultData[];
           href: string;
           next: string;
@@ -136,7 +136,7 @@ declare namespace MusicKit {
         id: string;
         purchasedId?: string;
         isLibrary: boolean;
-        kind: "album" | "song";
+        kind: 'album' | 'song';
       };
       previews: { url: string }[];
     };
@@ -147,7 +147,7 @@ declare namespace MusicKit {
         href: string;
         next: string;
       };
-      type: "library-albums";
+      type: 'library-albums';
     };
   }
 
@@ -231,11 +231,11 @@ declare namespace MusicKit {
 
     addEventListener(
       eventName: string,
-      callback: (state: { oldState: number; state: number }) => any
+      callback: (state: { oldState: number; state: number }) => any,
     ): void;
     removeEventListener(
       eventName: string,
-      callback: (state: { oldState: number; state: number }) => any
+      callback: (state: { oldState: number; state: number }) => any,
     ): void;
     changeToMediaAtIndex(index: number): Promise<any>;
     changeToMediaItem(): Promise<any>;
@@ -266,7 +266,10 @@ declare namespace MusicKit {
     previousPlayableItemIndex?: number;
 
     addEventListener(eventName: string, callback: (result: any) => any): void;
-    removeEventListener(eventName: string, callback: (result: any) => any): void;
+    removeEventListener(
+      eventName: string,
+      callback: (result: any) => any,
+    ): void;
     append(song: Song): void;
     indexForItem(e: any): Promise<any>;
     item(e: any): Promise<any>;
