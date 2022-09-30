@@ -12,6 +12,15 @@ declare namespace MusicKit {
   function getInstance(): MusicKitInstance;
   function formatMediaTime(seconds: number, separator?: string): string;
 
+  interface PlaybackStateDidChange {
+    eventName: 'playbackStateDidChange';
+    callback: (state: { oldState: number; state: number }) => void;
+  }
+  interface AuthorizationStatusDidChange {
+    eventName: 'authorizationStatusDidChange';
+    callback: (state: { authorizationStatus: number }) => void;
+  }
+
   interface MusicKitInstance {
     api: API;
     bitrate: number;
@@ -41,8 +50,18 @@ declare namespace MusicKit {
     isPlaying: boolean;
     queue: Queue;
 
-    addEventListener(eventName: string, callback: (result: any) => any): void;
-    removeEventListener(eventName: string, callback: (result: any) => any): void;
+    addEventListener(
+      eventName: PlaybackStateDidChange['eventName'],
+      callback: PlaybackStateDidChange['callback'],
+    ): void;
+    addEventListener(
+      eventName: AuthorizationStatusDidChange['eventName'],
+      callback: AuthorizationStatusDidChange['callback'],
+    ): void;
+    removeEventListener(
+      eventName: string,
+      callback: (result: any) => any,
+    ): void;
     addToLibrary(e: any, t?: any): Promise<any>;
     authorize(): Promise<string>;
     changeToMediaAtIndex(e: any): Promise<any>;
