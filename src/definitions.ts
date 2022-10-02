@@ -26,6 +26,12 @@ export interface CapacitorMusicKitPlugin {
     eventName: 'authorizationStatusDidChange',
     listenerFunc: AuthorizationStatusDidChangeListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
+export interface EchoOptions {
+  value: string;
+}
+
+export interface EchoResult {
+  value: string;
 }
 
 export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
