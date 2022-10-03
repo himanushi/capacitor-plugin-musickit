@@ -1,37 +1,61 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
-export interface CapacitorMusicKitPlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
-  configure(options: { config: MusicKit.Config }): Promise<{ result: boolean }>;
-  isAuthorized(): Promise<{ result: boolean }>;
-  hasMusicSubscription(): Promise<{ result: boolean }>;
-  authorize(): Promise<void>;
-  unauthorize():  Promise<void>;
-  getLibraryAlbums(options: {
-    limit: number;
-    offset: number;
-  }): Promise<{
-    albums: {
-      id: string;
-      title: string;
-      artworkUrl?: string;
-    }[];
-    hasNext: boolean;
-  }>;
-  addListener(
-    eventName: 'playbackStateDidChange',
-    listenerFunc: PlaybackStateDidChangeListener,
-  ): Promise<PluginListenerHandle> & PluginListenerHandle;
-  addListener(
-    eventName: 'authorizationStatusDidChange',
-    listenerFunc: AuthorizationStatusDidChangeListener,
-  ): Promise<PluginListenerHandle> & PluginListenerHandle;
 export interface EchoOptions {
   value: string;
 }
 
 export interface EchoResult {
   value: string;
+}
+
+export interface ConfigureOptions {
+  config: MusicKit.Config;
+}
+
+export interface ConfigureResult {
+  result: boolean;
+}
+
+export interface IsAuthorizedResult {
+  result: boolean;
+}
+
+export interface HasMusicSubscriptionResult {
+  result: boolean;
+}
+
+export interface GetLibraryAlbumsOptions {
+  limit: number;
+  offset: number;
+}
+
+export interface GetLibraryAlbumsResult {
+  albums: {
+    id: string;
+    title: string;
+    artworkUrl?: string;
+  }[];
+  hasNext: boolean;
+}
+
+export interface GetLibraryAlbumOptions {
+  id: string;
+}
+
+export interface GetLibraryAlbumTrackResult {
+  title: string;
+  id: string;
+  discNumber: string;
+  trackNumber: string;
+}
+
+export interface GetLibraryAlbumResult {
+  album?: {
+    id: string;
+    title: string;
+    artworkUrl?: string;
+    tracks: GetLibraryAlbumTrackResult[];
+  };
 }
 
 export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
@@ -50,3 +74,26 @@ export type AuthorizationStatus =
 export type AuthorizationStatusDidChangeListener = (state: {
   result: AuthorizationStatus;
 }) => void;
+
+export interface CapacitorMusicKitPlugin {
+  echo(options: EchoOptions): Promise<EchoResult>;
+  configure(options: ConfigureOptions): Promise<ConfigureResult>;
+  isAuthorized(): Promise<IsAuthorizedResult>;
+  hasMusicSubscription(): Promise<HasMusicSubscriptionResult>;
+  authorize(): Promise<void>;
+  unauthorize(): Promise<void>;
+  getLibraryAlbums(
+    options: GetLibraryAlbumsOptions,
+  ): Promise<GetLibraryAlbumsResult>;
+  getLibraryAlbum(
+    options: GetLibraryAlbumOptions,
+  ): Promise<GetLibraryAlbumResult>;
+  addListener(
+    eventName: MusicKit.PlaybackStateDidChange['eventName'],
+    listenerFunc: PlaybackStateDidChangeListener,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(
+    eventName: MusicKit.AuthorizationStatusDidChange['eventName'],
+    listenerFunc: AuthorizationStatusDidChangeListener,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
+}
