@@ -148,6 +148,8 @@ declare namespace MusicKit {
     href: string;
     attributes: {
       name: string;
+      discNumber: number;
+      trackNumber: number;
       durationInMillis: number;
       artwork?: { url: string };
       albumName: string;
