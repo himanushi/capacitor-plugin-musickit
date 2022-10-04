@@ -7,14 +7,13 @@ import type {
   EchoOptions,
   EchoResult,
   ConfigureOptions,
-  ConfigureResult,
-  IsAuthorizedResult,
-  HasMusicSubscriptionResult,
   GetLibraryAlbumsOptions,
   GetLibraryAlbumsResult,
   GetLibraryAlbumOptions,
   GetLibraryAlbumResult,
   GetLibraryAlbumTrackResult,
+  SetQueueOptions,
+  ActionResult,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -50,7 +49,7 @@ export class CapacitorMusicKitWeb
     this.notifyListeners('authorizationStatusDidChange', { result: status });
   };
 
-  async configure(options: ConfigureOptions): Promise<ConfigureResult> {
+  async configure(options: ConfigureOptions): Promise<ActionResult> {
     let result = false;
     try {
       const loaded = await new Promise<boolean>((resolve, reject) => {
@@ -84,7 +83,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async isAuthorized(): Promise<IsAuthorizedResult> {
+  async isAuthorized(): Promise<ActionResult> {
     let result = false;
     try {
       result = Boolean(MusicKit.getInstance()?.isAuthorized);
@@ -94,7 +93,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async hasMusicSubscription(): Promise<HasMusicSubscriptionResult> {
+  async hasMusicSubscription(): Promise<ActionResult> {
     let result = false;
     try {
       result = await MusicKit.getInstance().hasMusicSubscription();
@@ -219,5 +218,29 @@ export class CapacitorMusicKitWeb
     }
 
     return { album };
+  }
+
+  async setQueue(options: SetQueueOptions): Promise<ActionResult> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().setQueue({
+        songs: options.ids,
+      });
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async play(): Promise<ActionResult> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().play();
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
   }
 }

@@ -1,5 +1,9 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
+export interface ActionResult {
+  result: boolean;
+}
+
 export interface EchoOptions {
   value: string;
 }
@@ -10,18 +14,6 @@ export interface EchoResult {
 
 export interface ConfigureOptions {
   config: MusicKit.Config;
-}
-
-export interface ConfigureResult {
-  result: boolean;
-}
-
-export interface IsAuthorizedResult {
-  result: boolean;
-}
-
-export interface HasMusicSubscriptionResult {
-  result: boolean;
 }
 
 export interface GetLibraryAlbumsOptions {
@@ -58,6 +50,10 @@ export interface GetLibraryAlbumResult {
   };
 }
 
+export interface SetQueueOptions {
+  ids: string[];
+}
+
 export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
 
 export type PlaybackStateDidChangeListener = (state: {
@@ -77,9 +73,9 @@ export type AuthorizationStatusDidChangeListener = (state: {
 
 export interface CapacitorMusicKitPlugin {
   echo(options: EchoOptions): Promise<EchoResult>;
-  configure(options: ConfigureOptions): Promise<ConfigureResult>;
-  isAuthorized(): Promise<IsAuthorizedResult>;
-  hasMusicSubscription(): Promise<HasMusicSubscriptionResult>;
+  configure(options: ConfigureOptions): Promise<ActionResult>;
+  isAuthorized(): Promise<ActionResult>;
+  hasMusicSubscription(): Promise<ActionResult>;
   authorize(): Promise<void>;
   unauthorize(): Promise<void>;
   getLibraryAlbums(
@@ -88,6 +84,8 @@ export interface CapacitorMusicKitPlugin {
   getLibraryAlbum(
     options: GetLibraryAlbumOptions,
   ): Promise<GetLibraryAlbumResult>;
+  setQueue(options: SetQueueOptions): Promise<ActionResult>;
+  play(): Promise<ActionResult>;
   addListener(
     eventName: MusicKit.PlaybackStateDidChange['eventName'],
     listenerFunc: PlaybackStateDidChangeListener,

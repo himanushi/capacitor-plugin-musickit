@@ -76,7 +76,7 @@ declare namespace MusicKit {
     seekBackward(): Promise<any>;
     seekForward(): Promise<any>;
     seekToTime(e: any): Promise<any>;
-    setQueue(e: any): Promise<any>;
+    setQueue(e: any): Promise<Queue>;
     skipToNextItem(): Promise<any>;
     skipToPreviousItem(): Promise<any>;
     stop(): Promise<any>;
