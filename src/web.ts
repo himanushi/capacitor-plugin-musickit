@@ -14,6 +14,7 @@ import type {
   GetLibraryAlbumTrackResult,
   SetQueueOptions,
   ActionResult,
+  PlayOptions,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -171,6 +172,7 @@ export class CapacitorMusicKitWeb
           album = {
             title: resultAlbum.attributes.name,
             id: resultAlbum.id,
+            artworkUrl: resultAlbum.attributes.artwork?.url,
             tracks: [],
           };
           break;
@@ -233,10 +235,36 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async play(): Promise<ActionResult> {
+  async play(options: PlayOptions): Promise<ActionResult> {
     let result = false;
     try {
-      await MusicKit.getInstance().play();
+      if (options.index === undefined) {
+        await MusicKit.getInstance().play();
+      } else {
+        await MusicKit.getInstance().changeToMediaAtIndex(options.index);
+      }
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async pause(): Promise<ActionResult> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().pause();
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async stop(): Promise<ActionResult> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().stop();
       result = true;
     } catch (error) {
       console.log(error);

@@ -54,6 +54,10 @@ export interface SetQueueOptions {
   ids: string[];
 }
 
+export interface PlayOptions {
+  index?: number;
+}
+
 export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
 
 export type PlaybackStateDidChangeListener = (state: {
@@ -85,7 +89,9 @@ export interface CapacitorMusicKitPlugin {
     options: GetLibraryAlbumOptions,
   ): Promise<GetLibraryAlbumResult>;
   setQueue(options: SetQueueOptions): Promise<ActionResult>;
-  play(): Promise<ActionResult>;
+  play(options: PlayOptions): Promise<ActionResult>;
+  pause(): Promise<ActionResult>;
+  stop(): Promise<ActionResult>;
   addListener(
     eventName: MusicKit.PlaybackStateDidChange['eventName'],
     listenerFunc: PlaybackStateDidChangeListener,

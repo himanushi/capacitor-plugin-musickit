@@ -21,6 +21,10 @@ npx cap sync
 * [`unauthorize()`](#unauthorize)
 * [`getLibraryAlbums(...)`](#getlibraryalbums)
 * [`getLibraryAlbum(...)`](#getlibraryalbum)
+* [`setQueue(...)`](#setqueue)
+* [`play(...)`](#play)
+* [`pause()`](#pause)
+* [`stop()`](#stop)
 * [`addListener(any, ...)`](#addlistenerany)
 * [`addListener(any, ...)`](#addlistenerany)
 * [Interfaces](#interfaces)
@@ -49,14 +53,14 @@ echo(options: EchoOptions) => Promise<EchoResult>
 ### configure(...)
 
 ```typescript
-configure(options: ConfigureOptions) => Promise<ConfigureResult>
+configure(options: ConfigureOptions) => Promise<ActionResult>
 ```
 
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
 | **`options`** | <code><a href="#configureoptions">ConfigureOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#configureresult">ConfigureResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -64,10 +68,10 @@ configure(options: ConfigureOptions) => Promise<ConfigureResult>
 ### isAuthorized()
 
 ```typescript
-isAuthorized() => Promise<IsAuthorizedResult>
+isAuthorized() => Promise<ActionResult>
 ```
 
-**Returns:** <code>Promise&lt;<a href="#isauthorizedresult">IsAuthorizedResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -75,10 +79,10 @@ isAuthorized() => Promise<IsAuthorizedResult>
 ### hasMusicSubscription()
 
 ```typescript
-hasMusicSubscription() => Promise<HasMusicSubscriptionResult>
+hasMusicSubscription() => Promise<ActionResult>
 ```
 
-**Returns:** <code>Promise&lt;<a href="#hasmusicsubscriptionresult">HasMusicSubscriptionResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -127,6 +131,58 @@ getLibraryAlbum(options: GetLibraryAlbumOptions) => Promise<GetLibraryAlbumResul
 | **`options`** | <code><a href="#getlibraryalbumoptions">GetLibraryAlbumOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#getlibraryalbumresult">GetLibraryAlbumResult</a>&gt;</code>
+
+--------------------
+
+
+### setQueue(...)
+
+```typescript
+setQueue(options: SetQueueOptions) => Promise<ActionResult>
+```
+
+| Param         | Type                                                        |
+| ------------- | ----------------------------------------------------------- |
+| **`options`** | <code><a href="#setqueueoptions">SetQueueOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+
+--------------------
+
+
+### play(...)
+
+```typescript
+play(options: PlayOptions) => Promise<ActionResult>
+```
+
+| Param         | Type                                                |
+| ------------- | --------------------------------------------------- |
+| **`options`** | <code><a href="#playoptions">PlayOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+
+--------------------
+
+
+### pause()
+
+```typescript
+pause() => Promise<ActionResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+
+--------------------
+
+
+### stop()
+
+```typescript
+stop() => Promise<ActionResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -180,7 +236,7 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | **`value`** | <code>string</code> |
 
 
-#### ConfigureResult
+#### ActionResult
 
 | Prop         | Type                 |
 | ------------ | -------------------- |
@@ -192,20 +248,6 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | Prop         | Type                         |
 | ------------ | ---------------------------- |
 | **`config`** | <code>MusicKit.Config</code> |
-
-
-#### IsAuthorizedResult
-
-| Prop         | Type                 |
-| ------------ | -------------------- |
-| **`result`** | <code>boolean</code> |
-
-
-#### HasMusicSubscriptionResult
-
-| Prop         | Type                 |
-| ------------ | -------------------- |
-| **`result`** | <code>boolean</code> |
 
 
 #### GetLibraryAlbumsResult
@@ -246,6 +288,20 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | Prop     | Type                |
 | -------- | ------------------- |
 | **`id`** | <code>string</code> |
+
+
+#### SetQueueOptions
+
+| Prop      | Type                  |
+| --------- | --------------------- |
+| **`ids`** | <code>string[]</code> |
+
+
+#### PlayOptions
+
+| Prop        | Type                |
+| ----------- | ------------------- |
+| **`index`** | <code>number</code> |
 
 
 #### PluginListenerHandle
