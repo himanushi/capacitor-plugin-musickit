@@ -11,10 +11,12 @@ import type {
   GetLibraryAlbumsResult,
   GetLibraryAlbumOptions,
   GetLibraryAlbumResult,
-  GetLibraryAlbumTrackResult,
   SetQueueOptions,
   ActionResult,
   PlayOptions,
+  TrackResult,
+  GetCurrentTrackResult,
+  GetCurrentIndexResult,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -27,24 +29,42 @@ export class CapacitorMusicKitWeb
   }
 
   private playbackStateDidChange = (
-    state: Parameters<MusicKit.PlaybackStateDidChange['callback']>[0],
+    data: Parameters<MusicKit.PlaybackStateDidChange['callback']>[0],
   ) => {
-    const status = MusicKit.PlaybackStates[state.state] as PlaybackStates;
+    const status = MusicKit.PlaybackStates[data.state] as PlaybackStates;
     this.notifyListeners('playbackStateDidChange', { result: status });
   };
 
+  private nowPlayingItemDidChange = (
+    data: Parameters<MusicKit.NowPlayingItemDidChange['callback']>[0],
+  ) => {
+    let track: TrackResult | undefined;
+    const item = data.item;
+    if (item) {
+      track = {
+        id: item.id,
+        title: item.attributes.name,
+        durationMs: item.attributes.durationInMillis,
+        discNumber: item.attributes.discNumber,
+        trackNumber: item.attributes.trackNumber,
+        artworkUrl: item.attributes.artwork?.url,
+      };
+    }
+    this.notifyListeners('nowPlayingItemDidChange', { result: track });
+  };
+
   private authorizationStatusDidChange = (
-    state: Parameters<MusicKit.AuthorizationStatusDidChange['callback']>[0],
+    data: Parameters<MusicKit.AuthorizationStatusDidChange['callback']>[0],
   ) => {
     // state.authorizationStatus === -1
     let status: AuthorizationStatus = 'unavailable';
-    if (state.authorizationStatus === 0) {
+    if (data.authorizationStatus === 0) {
       status = 'notDetermined';
-    } else if (state.authorizationStatus === 1) {
+    } else if (data.authorizationStatus === 1) {
       status = 'denied';
-    } else if (state.authorizationStatus === 2) {
+    } else if (data.authorizationStatus === 2) {
       status = 'restricted';
-    } else if (state.authorizationStatus === 3) {
+    } else if (data.authorizationStatus === 3) {
       status = 'authorized';
     }
     this.notifyListeners('authorizationStatusDidChange', { result: status });
@@ -70,6 +90,11 @@ export class CapacitorMusicKitWeb
       musicKit.addEventListener(
         'playbackStateDidChange',
         this.playbackStateDidChange,
+      );
+
+      musicKit.addEventListener(
+        'nowPlayingItemDidChange',
+        this.nowPlayingItemDidChange,
       );
 
       musicKit.addEventListener(
@@ -188,7 +213,7 @@ export class CapacitorMusicKitWeb
     if (album) {
       hasNext = false;
       fetchUrl = `/v1/me/library/albums/${album.id}/tracks?limit=100`;
-      const tracks: GetLibraryAlbumTrackResult[] = [];
+      const tracks: TrackResult[] = [];
       count = 0;
 
       do {
@@ -205,8 +230,10 @@ export class CapacitorMusicKitWeb
             tracks.push({
               title: track.attributes.name,
               id: track.id,
-              discNumber: track.attributes.discNumber.toString(),
-              trackNumber: track.attributes.trackNumber.toString(),
+              durationMs: track.attributes.durationInMillis,
+              discNumber: track.attributes.discNumber,
+              trackNumber: track.attributes.trackNumber,
+              artworkUrl: track.attributes.artwork?.url,
             });
           }
           if (data.next) {
@@ -220,6 +247,36 @@ export class CapacitorMusicKitWeb
     }
 
     return { album };
+  }
+
+  async getCurrentTrack(): Promise<GetCurrentTrackResult> {
+    let track: TrackResult | undefined;
+    try {
+      const item = MusicKit.getInstance().queue.currentItem;
+      if (item) {
+        track = {
+          id: item.id,
+          title: item.attributes.name,
+          durationMs: item.attributes.durationInMillis,
+          discNumber: item.attributes.discNumber,
+          trackNumber: item.attributes.trackNumber,
+          artworkUrl: item.attributes.artwork?.url,
+        };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    return { track };
+  }
+
+  async getCurrentIndex(): Promise<GetCurrentIndexResult> {
+    let index = -1;
+    try {
+      index = MusicKit.getInstance().nowPlayingItemIndex;
+    } catch (error) {
+      console.log(error);
+    }
+    return { index };
   }
 
   async setQueue(options: SetQueueOptions): Promise<ActionResult> {

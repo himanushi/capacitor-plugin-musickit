@@ -34,11 +34,13 @@ export interface GetLibraryAlbumOptions {
   id: string;
 }
 
-export interface GetLibraryAlbumTrackResult {
+export interface TrackResult {
   title: string;
   id: string;
-  discNumber: string;
-  trackNumber: string;
+  durationMs: number;
+  discNumber: number;
+  trackNumber: number;
+  artworkUrl?: string;
 }
 
 export interface GetLibraryAlbumResult {
@@ -46,8 +48,16 @@ export interface GetLibraryAlbumResult {
     id: string;
     title: string;
     artworkUrl?: string;
-    tracks: GetLibraryAlbumTrackResult[];
+    tracks: TrackResult[];
   };
+}
+
+export interface GetCurrentTrackResult {
+  track?: TrackResult;
+}
+
+export interface GetCurrentIndexResult {
+  index: number;
 }
 
 export interface SetQueueOptions {
@@ -60,8 +70,12 @@ export interface PlayOptions {
 
 export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
 
-export type PlaybackStateDidChangeListener = (state: {
+export type PlaybackStateDidChangeListener = (data: {
   result: PlaybackStates;
+}) => void;
+
+export type NowPlayingItemDidChangeListener = (data: {
+  result: TrackResult | undefined;
 }) => void;
 
 export type AuthorizationStatus =
@@ -71,7 +85,7 @@ export type AuthorizationStatus =
   | 'restricted'
   | 'authorized';
 
-export type AuthorizationStatusDidChangeListener = (state: {
+export type AuthorizationStatusDidChangeListener = (data: {
   result: AuthorizationStatus;
 }) => void;
 
@@ -88,6 +102,8 @@ export interface CapacitorMusicKitPlugin {
   getLibraryAlbum(
     options: GetLibraryAlbumOptions,
   ): Promise<GetLibraryAlbumResult>;
+  getCurrentTrack(): Promise<GetCurrentTrackResult>;
+  getCurrentIndex(): Promise<GetCurrentIndexResult>;
   setQueue(options: SetQueueOptions): Promise<ActionResult>;
   play(options: PlayOptions): Promise<ActionResult>;
   pause(): Promise<ActionResult>;
@@ -95,6 +111,10 @@ export interface CapacitorMusicKitPlugin {
   addListener(
     eventName: MusicKit.PlaybackStateDidChange['eventName'],
     listenerFunc: PlaybackStateDidChangeListener,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(
+    eventName: MusicKit.NowPlayingItemDidChange['eventName'],
+    listenerFunc: NowPlayingItemDidChangeListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
   addListener(
     eventName: MusicKit.AuthorizationStatusDidChange['eventName'],

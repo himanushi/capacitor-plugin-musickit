@@ -14,11 +14,15 @@ declare namespace MusicKit {
 
   interface PlaybackStateDidChange {
     eventName: 'playbackStateDidChange';
-    callback: (state: { oldState: number; state: number }) => void;
+    callback: (data: { oldState: number; state: number }) => void;
+  }
+  interface NowPlayingItemDidChange {
+    eventName: 'nowPlayingItemDidChange';
+    callback: (data: { item?: CurrentItem }) => void;
   }
   interface AuthorizationStatusDidChange {
     eventName: 'authorizationStatusDidChange';
-    callback: (state: { authorizationStatus: number }) => void;
+    callback: (data: { authorizationStatus: number }) => void;
   }
 
   interface MusicKitInstance {
@@ -49,10 +53,15 @@ declare namespace MusicKit {
     currentPlaybackDuration: number;
     isPlaying: boolean;
     queue: Queue;
+    nowPlayingItemIndex: number;
 
     addEventListener(
       eventName: PlaybackStateDidChange['eventName'],
       callback: PlaybackStateDidChange['callback'],
+    ): void;
+    addEventListener(
+      eventName: NowPlayingItemDidChange['eventName'],
+      callback: NowPlayingItemDidChange['callback'],
     ): void;
     addEventListener(
       eventName: AuthorizationStatusDidChange['eventName'],
@@ -285,6 +294,7 @@ declare namespace MusicKit {
     position: number;
     previousPlayableItem?: MediaItem;
     previousPlayableItemIndex?: number;
+    currentItem?: CurrentItem;
 
     addEventListener(eventName: string, callback: (result: any) => any): void;
     removeEventListener(
@@ -300,6 +310,43 @@ declare namespace MusicKit {
     shuffle(e: any): Promise<any>;
     unshuffle(e: any): Promise<any>;
     reset(): Promise<any>;
+  }
+
+  interface CurrentItem {
+    assetURL: string;
+    attributes: {
+      albumName: string;
+      artistName: string;
+      artwork?: { width: number; height: number; url: string };
+      composerName: string;
+      discNumber: number;
+      durationInMillis: number;
+      genreNames: string[];
+      isrc: string;
+      name: string;
+      playParams: {
+        id: string;
+        kind: 'song';
+        isLibrary: boolean;
+        reporting: boolean;
+        purchasedId?: string;
+      };
+      previews: { url?: string }[];
+      releaseDate: string; //"2022-07-27T12:00:00Z"
+      trackNumber: number;
+    };
+    bingeWatching: boolean;
+    flavor: string;
+    hlsMetadata: any;
+    id: string;
+    keyURLs: {
+      'hls-key-cert-url': string;
+      'hls-key-server-url': string;
+      'widevine-cert-url': string;
+    };
+    playbackType: number;
+    relationships: any;
+    type: 'song';
   }
 
   interface MediaItem {
