@@ -21,10 +21,13 @@ npx cap sync
 * [`unauthorize()`](#unauthorize)
 * [`getLibraryAlbums(...)`](#getlibraryalbums)
 * [`getLibraryAlbum(...)`](#getlibraryalbum)
+* [`getCurrentTrack()`](#getcurrenttrack)
+* [`getCurrentIndex()`](#getcurrentindex)
 * [`setQueue(...)`](#setqueue)
 * [`play(...)`](#play)
 * [`pause()`](#pause)
 * [`stop()`](#stop)
+* [`addListener(any, ...)`](#addlistenerany)
 * [`addListener(any, ...)`](#addlistenerany)
 * [`addListener(any, ...)`](#addlistenerany)
 * [Interfaces](#interfaces)
@@ -135,6 +138,28 @@ getLibraryAlbum(options: GetLibraryAlbumOptions) => Promise<GetLibraryAlbumResul
 --------------------
 
 
+### getCurrentTrack()
+
+```typescript
+getCurrentTrack() => Promise<GetCurrentTrackResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#getcurrenttrackresult">GetCurrentTrackResult</a>&gt;</code>
+
+--------------------
+
+
+### getCurrentIndex()
+
+```typescript
+getCurrentIndex() => Promise<GetCurrentIndexResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#getcurrentindexresult">GetCurrentIndexResult</a>&gt;</code>
+
+--------------------
+
+
 ### setQueue(...)
 
 ```typescript
@@ -206,6 +231,22 @@ addListener(eventName: any, listenerFunc: PlaybackStateDidChangeListener) => Pro
 ### addListener(any, ...)
 
 ```typescript
+addListener(eventName: any, listenerFunc: NowPlayingItemDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+| Param              | Type                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>any</code>                                                                            |
+| **`listenerFunc`** | <code><a href="#nowplayingitemdidchangelistener">NowPlayingItemDidChangeListener</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+--------------------
+
+
+### addListener(any, ...)
+
+```typescript
 addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
@@ -268,19 +309,21 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 
 #### GetLibraryAlbumResult
 
-| Prop        | Type                                                                                                   |
-| ----------- | ------------------------------------------------------------------------------------------------------ |
-| **`album`** | <code>{ id: string; title: string; artworkUrl?: string; tracks: GetLibraryAlbumTrackResult[]; }</code> |
+| Prop        | Type                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------- |
+| **`album`** | <code>{ id: string; title: string; artworkUrl?: string; tracks: TrackResult[]; }</code> |
 
 
-#### GetLibraryAlbumTrackResult
+#### TrackResult
 
 | Prop              | Type                |
 | ----------------- | ------------------- |
 | **`title`**       | <code>string</code> |
 | **`id`**          | <code>string</code> |
-| **`discNumber`**  | <code>string</code> |
-| **`trackNumber`** | <code>string</code> |
+| **`durationMs`**  | <code>number</code> |
+| **`discNumber`**  | <code>number</code> |
+| **`trackNumber`** | <code>number</code> |
+| **`artworkUrl`**  | <code>string</code> |
 
 
 #### GetLibraryAlbumOptions
@@ -288,6 +331,20 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | Prop     | Type                |
 | -------- | ------------------- |
 | **`id`** | <code>string</code> |
+
+
+#### GetCurrentTrackResult
+
+| Prop        | Type                                                |
+| ----------- | --------------------------------------------------- |
+| **`track`** | <code><a href="#trackresult">TrackResult</a></code> |
+
+
+#### GetCurrentIndexResult
+
+| Prop        | Type                |
+| ----------- | ------------------- |
+| **`index`** | <code>number</code> |
 
 
 #### SetQueueOptions
@@ -316,7 +373,7 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 
 #### PlaybackStateDidChangeListener
 
-<code>(state: { result: string | number | symbol; }): void</code>
+<code>(data: { result: string | number | symbol; }): void</code>
 
 
 #### PlaybackStates
@@ -324,9 +381,14 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 <code>keyof typeof MusicKit.<a href="#playbackstates">PlaybackStates</a></code>
 
 
+#### NowPlayingItemDidChangeListener
+
+<code>(data: { result: <a href="#trackresult">TrackResult</a>; }): void</code>
+
+
 #### AuthorizationStatusDidChangeListener
 
-<code>(state: { result: <a href="#authorizationstatus">AuthorizationStatus</a>; }): void</code>
+<code>(data: { result: <a href="#authorizationstatus">AuthorizationStatus</a>; }): void</code>
 
 
 #### AuthorizationStatus
