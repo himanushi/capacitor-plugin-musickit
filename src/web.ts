@@ -295,10 +295,10 @@ export class CapacitorMusicKitWeb
   async play(options: PlayOptions): Promise<ActionResult> {
     let result = false;
     try {
-      if (options.index === undefined) {
-        await MusicKit.getInstance().play();
-      } else {
+      if (Boolean(options.index) || options.index === 0) {
         await MusicKit.getInstance().changeToMediaAtIndex(options.index);
+      } else {
+        await MusicKit.getInstance().play();
       }
       result = true;
     } catch (error) {
