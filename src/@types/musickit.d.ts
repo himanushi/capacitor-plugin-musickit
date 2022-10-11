@@ -54,6 +54,7 @@ declare namespace MusicKit {
     isPlaying: boolean;
     queue: Queue;
     nowPlayingItemIndex: number;
+    repeatMode: number;
 
     addEventListener(
       eventName: PlaybackStateDidChange['eventName'],

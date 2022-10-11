@@ -25,6 +25,8 @@ npx cap sync
 * [`getQueueTracks()`](#getqueuetracks)
 * [`getCurrentIndex()`](#getcurrentindex)
 * [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
+* [`getRepeatMode()`](#getrepeatmode)
+* [`setRepeatMode(...)`](#setrepeatmode)
 * [`setQueue(...)`](#setqueue)
 * [`play(...)`](#play)
 * [`pause()`](#pause)
@@ -191,6 +193,32 @@ getCurrentPlaybackTime() => Promise<GetCurrentPlaybackTimeResult>
 ```
 
 **Returns:** <code>Promise&lt;<a href="#getcurrentplaybacktimeresult">GetCurrentPlaybackTimeResult</a>&gt;</code>
+
+--------------------
+
+
+### getRepeatMode()
+
+```typescript
+getRepeatMode() => Promise<getRepeatModeResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#getrepeatmoderesult">getRepeatModeResult</a>&gt;</code>
+
+--------------------
+
+
+### setRepeatMode(...)
+
+```typescript
+setRepeatMode(options: SetRepeatModeOptions) => Promise<ActionResult>
+```
+
+| Param         | Type                                                                  |
+| ------------- | --------------------------------------------------------------------- |
+| **`options`** | <code><a href="#setrepeatmodeoptions">SetRepeatModeOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -431,6 +459,20 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | Prop       | Type                |
 | ---------- | ------------------- |
 | **`time`** | <code>number</code> |
+
+
+#### getRepeatModeResult
+
+| Prop       | Type                                  |
+| ---------- | ------------------------------------- |
+| **`mode`** | <code>'none' \| 'one' \| 'all'</code> |
+
+
+#### SetRepeatModeOptions
+
+| Prop       | Type                                  |
+| ---------- | ------------------------------------- |
+| **`mode`** | <code>'none' \| 'one' \| 'all'</code> |
 
 
 #### SetQueueOptions

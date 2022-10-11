@@ -68,6 +68,14 @@ export interface GetCurrentPlaybackTimeResult {
   time: number;
 }
 
+export interface getRepeatModeResult {
+  mode: 'none' | 'one' | 'all';
+}
+
+export interface SetRepeatModeOptions {
+  mode: 'none' | 'one' | 'all';
+}
+
 export interface SetQueueOptions {
   ids: string[];
 }
@@ -130,6 +138,8 @@ export interface CapacitorMusicKitPlugin {
   getQueueTracks(): Promise<GetQueueTracksResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
+  getRepeatMode(): Promise<getRepeatModeResult>;
+  setRepeatMode(options: SetRepeatModeOptions): Promise<ActionResult>;
   setQueue(options: SetQueueOptions): Promise<ActionResult>;
   play(options: PlayOptions): Promise<ActionResult>;
   pause(): Promise<ActionResult>;

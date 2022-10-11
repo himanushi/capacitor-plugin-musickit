@@ -20,6 +20,8 @@ import type {
   GetCurrentPlaybackTimeResult,
   SeekToTimeOptions,
   GetQueueTracksResult,
+  SetRepeatModeOptions,
+  getRepeatModeResult,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -309,6 +311,29 @@ export class CapacitorMusicKitWeb
       console.log(error);
     }
     return { time };
+  }
+
+  async getRepeatMode(): Promise<getRepeatModeResult> {
+    const modeArray: getRepeatModeResult['mode'][] = ['none', 'one', 'all'];
+    let mode: getRepeatModeResult['mode'] = 'none';
+    try {
+      mode = modeArray[MusicKit.getInstance().repeatMode] ?? 'none';
+    } catch (error) {
+      console.log(error);
+    }
+    return { mode };
+  }
+
+  async setRepeatMode(options: SetRepeatModeOptions): Promise<ActionResult> {
+    let result = false;
+    const modeMap = { none: 0, one: 1, all: 2 };
+    try {
+      MusicKit.getInstance().repeatMode = modeMap[options.mode];
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
   }
 
   async setQueue(options: SetQueueOptions): Promise<ActionResult> {
