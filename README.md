@@ -22,6 +22,7 @@ npx cap sync
 * [`getLibraryAlbums(...)`](#getlibraryalbums)
 * [`getLibraryAlbum(...)`](#getlibraryalbum)
 * [`getCurrentTrack()`](#getcurrenttrack)
+* [`getQueueTracks()`](#getqueuetracks)
 * [`getCurrentIndex()`](#getcurrentindex)
 * [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
 * [`setQueue(...)`](#setqueue)
@@ -157,6 +158,17 @@ getCurrentTrack() => Promise<GetCurrentTrackResult>
 ```
 
 **Returns:** <code>Promise&lt;<a href="#getcurrenttrackresult">GetCurrentTrackResult</a>&gt;</code>
+
+--------------------
+
+
+### getQueueTracks()
+
+```typescript
+getQueueTracks() => Promise<GetQueueTracksResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#getqueuetracksresult">GetQueueTracksResult</a>&gt;</code>
 
 --------------------
 
@@ -398,6 +410,13 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | Prop        | Type                                                |
 | ----------- | --------------------------------------------------- |
 | **`track`** | <code><a href="#trackresult">TrackResult</a></code> |
+
+
+#### GetQueueTracksResult
+
+| Prop         | Type                       |
+| ------------ | -------------------------- |
+| **`tracks`** | <code>TrackResult[]</code> |
 
 
 #### GetCurrentIndexResult

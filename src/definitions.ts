@@ -56,6 +56,10 @@ export interface GetCurrentTrackResult {
   track?: TrackResult;
 }
 
+export interface GetQueueTracksResult {
+  tracks: TrackResult[];
+}
+
 export interface GetCurrentIndexResult {
   index: number;
 }
@@ -123,6 +127,7 @@ export interface CapacitorMusicKitPlugin {
     options: GetLibraryAlbumOptions,
   ): Promise<GetLibraryAlbumResult>;
   getCurrentTrack(): Promise<GetCurrentTrackResult>;
+  getQueueTracks(): Promise<GetQueueTracksResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
   setQueue(options: SetQueueOptions): Promise<ActionResult>;

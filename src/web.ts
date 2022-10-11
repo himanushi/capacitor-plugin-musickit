@@ -19,6 +19,7 @@ import type {
   GetCurrentIndexResult,
   GetCurrentPlaybackTimeResult,
   SeekToTimeOptions,
+  GetQueueTracksResult,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -262,13 +263,32 @@ export class CapacitorMusicKitWeb
           durationMs: item.attributes.durationInMillis,
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
-          artworkUrl: item.attributes.artwork?.url, // bug
+          artworkUrl: item.attributes.artwork?.url, // bug?
         };
       }
     } catch (error) {
       console.log(error);
     }
     return { track };
+  }
+
+  async getQueueTracks(): Promise<GetQueueTracksResult> {
+    const tracks: TrackResult[] = [];
+    try {
+      MusicKit.getInstance().queue.items.map(item =>
+        tracks.push({
+          id: item.id,
+          title: item.attributes.name,
+          durationMs: item.attributes.durationInMillis,
+          discNumber: item.attributes.discNumber,
+          trackNumber: item.attributes.trackNumber,
+          artworkUrl: item.attributes.artwork?.url, // bug?
+        }),
+      );
+    } catch (error) {
+      console.log(error);
+    }
+    return { tracks };
   }
 
   async getCurrentIndex(): Promise<GetCurrentIndexResult> {
