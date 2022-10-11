@@ -261,7 +261,7 @@ export class CapacitorMusicKitWeb
           durationMs: item.attributes.durationInMillis,
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
-          artworkUrl: item.attributes.artwork?.url ?? item.assetURL,
+          artworkUrl: item.attributes.artwork?.url,
         };
       }
     } catch (error) {
