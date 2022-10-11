@@ -17,6 +17,7 @@ import type {
   TrackResult,
   GetCurrentTrackResult,
   GetCurrentIndexResult,
+  GetCurrentPlaybackTimeResult,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -260,7 +261,7 @@ export class CapacitorMusicKitWeb
           durationMs: item.attributes.durationInMillis,
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
-          artworkUrl: item.attributes.artwork?.url,
+          artworkUrl: item.attributes.artwork?.url ?? item.assetURL,
         };
       }
     } catch (error) {
@@ -277,6 +278,16 @@ export class CapacitorMusicKitWeb
       console.log(error);
     }
     return { index };
+  }
+
+  async getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult> {
+    let time = 0;
+    try {
+      time = MusicKit.getInstance().currentPlaybackTime;
+    } catch (error) {
+      console.log(error);
+    }
+    return { time };
   }
 
   async setQueue(options: SetQueueOptions): Promise<ActionResult> {
@@ -322,6 +333,28 @@ export class CapacitorMusicKitWeb
     let result = false;
     try {
       await MusicKit.getInstance().stop();
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async nextPlay(): Promise<ActionResult> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().skipToNextItem();
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async previousPlay(): Promise<ActionResult> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().skipToPreviousItem();
       result = true;
     } catch (error) {
       console.log(error);
