@@ -23,6 +23,9 @@ npx cap sync
 * [`getLibraryAlbum(...)`](#getlibraryalbum)
 * [`getCurrentTrack()`](#getcurrenttrack)
 * [`getCurrentIndex()`](#getcurrentindex)
+* [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
+* [`nextPlay()`](#nextplay)
+* [`previousPlay()`](#previousplay)
 * [`setQueue(...)`](#setqueue)
 * [`play(...)`](#play)
 * [`pause()`](#pause)
@@ -156,6 +159,39 @@ getCurrentIndex() => Promise<GetCurrentIndexResult>
 ```
 
 **Returns:** <code>Promise&lt;<a href="#getcurrentindexresult">GetCurrentIndexResult</a>&gt;</code>
+
+--------------------
+
+
+### getCurrentPlaybackTime()
+
+```typescript
+getCurrentPlaybackTime() => Promise<GetCurrentPlaybackTimeResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#getcurrentplaybacktimeresult">GetCurrentPlaybackTimeResult</a>&gt;</code>
+
+--------------------
+
+
+### nextPlay()
+
+```typescript
+nextPlay() => Promise<ActionResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+
+--------------------
+
+
+### previousPlay()
+
+```typescript
+previousPlay() => Promise<ActionResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -345,6 +381,13 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | Prop        | Type                |
 | ----------- | ------------------- |
 | **`index`** | <code>number</code> |
+
+
+#### GetCurrentPlaybackTimeResult
+
+| Prop       | Type                |
+| ---------- | ------------------- |
+| **`time`** | <code>number</code> |
 
 
 #### SetQueueOptions
