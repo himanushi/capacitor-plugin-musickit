@@ -73,7 +73,7 @@ declare namespace MusicKit {
     ): void;
     addToLibrary(e: any, t?: any): Promise<any>;
     authorize(): Promise<string>;
-    changeToMediaAtIndex(e: any): Promise<any>;
+    changeToMediaAtIndex(index: number): Promise<any>;
     cleanup(): Promise<any>;
     clearQueue(): Promise<any>;
     deferPlayback(): Promise<any>;
@@ -84,7 +84,7 @@ declare namespace MusicKit {
     playNext(e: any, t: any): Promise<any>;
     seekBackward(): Promise<any>;
     seekForward(): Promise<any>;
-    seekToTime(e: any): Promise<any>;
+    seekToTime(playbackTime: number): Promise<any>;
     setQueue(e: any): Promise<Queue>;
     skipToNextItem(): Promise<any>;
     skipToPreviousItem(): Promise<any>;

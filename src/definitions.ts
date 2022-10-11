@@ -72,6 +72,10 @@ export interface PlayOptions {
   index?: number;
 }
 
+export interface SeekToTimeOptions {
+  time: number;
+}
+
 export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
 
 export type PlaybackStateDidChangeListener = (data: {
@@ -94,9 +98,21 @@ export type AuthorizationStatusDidChangeListener = (data: {
 }) => void;
 
 export interface CapacitorMusicKitPlugin {
+  /**
+   * For testing.
+   */
   echo(options: EchoOptions): Promise<EchoResult>;
+  /**
+   * Required for web, if executed outside of web, nothing will be done.
+   */
   configure(options: ConfigureOptions): Promise<ActionResult>;
+  /**
+   * True if authenticated.
+   */
   isAuthorized(): Promise<ActionResult>;
+  /**
+   * True if you have an Apple Music subscription, not true if you have Apple Music Voice.
+   */
   hasMusicSubscription(): Promise<ActionResult>;
   authorize(): Promise<void>;
   unauthorize(): Promise<void>;
@@ -109,12 +125,13 @@ export interface CapacitorMusicKitPlugin {
   getCurrentTrack(): Promise<GetCurrentTrackResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
-  nextPlay(): Promise<ActionResult>;
-  previousPlay(): Promise<ActionResult>;
   setQueue(options: SetQueueOptions): Promise<ActionResult>;
   play(options: PlayOptions): Promise<ActionResult>;
   pause(): Promise<ActionResult>;
   stop(): Promise<ActionResult>;
+  nextPlay(): Promise<ActionResult>;
+  previousPlay(): Promise<ActionResult>;
+  seekToTime(options: SeekToTimeOptions): Promise<ActionResult>;
   addListener(
     eventName: MusicKit.PlaybackStateDidChange['eventName'],
     listenerFunc: PlaybackStateDidChangeListener,

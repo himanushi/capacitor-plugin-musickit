@@ -18,6 +18,7 @@ import type {
   GetCurrentTrackResult,
   GetCurrentIndexResult,
   GetCurrentPlaybackTimeResult,
+  SeekToTimeOptions,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -261,7 +262,7 @@ export class CapacitorMusicKitWeb
           durationMs: item.attributes.durationInMillis,
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
-          artworkUrl: item.attributes.artwork?.url,
+          artworkUrl: item.attributes.artwork?.url, // bug
         };
       }
     } catch (error) {
@@ -306,10 +307,10 @@ export class CapacitorMusicKitWeb
   async play(options: PlayOptions): Promise<ActionResult> {
     let result = false;
     try {
-      if (Boolean(options.index) || options.index === 0) {
-        await MusicKit.getInstance().changeToMediaAtIndex(options.index);
-      } else {
+      if (options.index === undefined) {
         await MusicKit.getInstance().play();
+      } else {
+        await MusicKit.getInstance().changeToMediaAtIndex(options.index);
       }
       result = true;
     } catch (error) {
@@ -355,6 +356,17 @@ export class CapacitorMusicKitWeb
     let result = false;
     try {
       await MusicKit.getInstance().skipToPreviousItem();
+      result = true;
+    } catch (error) {
+      console.log(error);
+    }
+    return { result };
+  }
+
+  async seekToTime(options: SeekToTimeOptions): Promise<ActionResult> {
+    let result = false;
+    try {
+      await MusicKit.getInstance().seekToTime(options.time);
       result = true;
     } catch (error) {
       console.log(error);

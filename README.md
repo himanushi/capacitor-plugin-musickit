@@ -24,12 +24,13 @@ npx cap sync
 * [`getCurrentTrack()`](#getcurrenttrack)
 * [`getCurrentIndex()`](#getcurrentindex)
 * [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
-* [`nextPlay()`](#nextplay)
-* [`previousPlay()`](#previousplay)
 * [`setQueue(...)`](#setqueue)
 * [`play(...)`](#play)
 * [`pause()`](#pause)
 * [`stop()`](#stop)
+* [`nextPlay()`](#nextplay)
+* [`previousPlay()`](#previousplay)
+* [`seekToTime(...)`](#seektotime)
 * [`addListener(any, ...)`](#addlistenerany)
 * [`addListener(any, ...)`](#addlistenerany)
 * [`addListener(any, ...)`](#addlistenerany)
@@ -47,6 +48,8 @@ npx cap sync
 echo(options: EchoOptions) => Promise<EchoResult>
 ```
 
+For testing.
+
 | Param         | Type                                                |
 | ------------- | --------------------------------------------------- |
 | **`options`** | <code><a href="#echooptions">EchoOptions</a></code> |
@@ -61,6 +64,8 @@ echo(options: EchoOptions) => Promise<EchoResult>
 ```typescript
 configure(options: ConfigureOptions) => Promise<ActionResult>
 ```
+
+Required for web, if executed outside of web, nothing will be done.
 
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
@@ -77,6 +82,8 @@ configure(options: ConfigureOptions) => Promise<ActionResult>
 isAuthorized() => Promise<ActionResult>
 ```
 
+True if authenticated.
+
 **Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
@@ -87,6 +94,8 @@ isAuthorized() => Promise<ActionResult>
 ```typescript
 hasMusicSubscription() => Promise<ActionResult>
 ```
+
+True if you have an Apple Music subscription, not true if you have Apple Music Voice.
 
 **Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
@@ -174,28 +183,6 @@ getCurrentPlaybackTime() => Promise<GetCurrentPlaybackTimeResult>
 --------------------
 
 
-### nextPlay()
-
-```typescript
-nextPlay() => Promise<ActionResult>
-```
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
-
---------------------
-
-
-### previousPlay()
-
-```typescript
-previousPlay() => Promise<ActionResult>
-```
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
-
---------------------
-
-
 ### setQueue(...)
 
 ```typescript
@@ -242,6 +229,43 @@ pause() => Promise<ActionResult>
 ```typescript
 stop() => Promise<ActionResult>
 ```
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+
+--------------------
+
+
+### nextPlay()
+
+```typescript
+nextPlay() => Promise<ActionResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+
+--------------------
+
+
+### previousPlay()
+
+```typescript
+previousPlay() => Promise<ActionResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+
+--------------------
+
+
+### seekToTime(...)
+
+```typescript
+seekToTime(options: SeekToTimeOptions) => Promise<ActionResult>
+```
+
+| Param         | Type                                                            |
+| ------------- | --------------------------------------------------------------- |
+| **`options`** | <code><a href="#seektotimeoptions">SeekToTimeOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
@@ -402,6 +426,13 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | Prop        | Type                |
 | ----------- | ------------------- |
 | **`index`** | <code>number</code> |
+
+
+#### SeekToTimeOptions
+
+| Prop       | Type                |
+| ---------- | ------------------- |
+| **`time`** | <code>number</code> |
 
 
 #### PluginListenerHandle
