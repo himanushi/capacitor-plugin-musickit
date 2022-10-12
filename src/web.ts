@@ -40,24 +40,6 @@ export class CapacitorMusicKitWeb
     this.notifyListeners('playbackStateDidChange', { result: status });
   };
 
-  private nowPlayingItemDidChange = (
-    data: Parameters<MusicKit.NowPlayingItemDidChange['callback']>[0],
-  ) => {
-    let track: TrackResult | undefined;
-    const item = data.item;
-    if (item) {
-      track = {
-        id: item.id,
-        title: item.attributes.name,
-        durationMs: item.attributes.durationInMillis,
-        discNumber: item.attributes.discNumber,
-        trackNumber: item.attributes.trackNumber,
-        artworkUrl: item.attributes.artwork?.url,
-      };
-    }
-    this.notifyListeners('nowPlayingItemDidChange', { result: track });
-  };
-
   private authorizationStatusDidChange = (
     data: Parameters<MusicKit.AuthorizationStatusDidChange['callback']>[0],
   ) => {
@@ -95,11 +77,6 @@ export class CapacitorMusicKitWeb
       musicKit.addEventListener(
         'playbackStateDidChange',
         this.playbackStateDidChange,
-      );
-
-      musicKit.addEventListener(
-        'nowPlayingItemDidChange',
-        this.nowPlayingItemDidChange,
       );
 
       musicKit.addEventListener(

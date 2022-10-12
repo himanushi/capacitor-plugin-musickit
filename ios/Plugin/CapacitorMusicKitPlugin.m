@@ -5,4 +5,24 @@
 // each method the plugin supports using the CAP_PLUGIN_METHOD macro.
 CAP_PLUGIN(CapacitorMusicKitPlugin, "CapacitorMusicKit",
            CAP_PLUGIN_METHOD(echo, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(configure, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(isAuthorized, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(hasMusicSubscription, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(authorize, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(unauthorize, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getLibraryAlbum, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getLibraryAlbums, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getCurrentTrack, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getQueueTracks, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getCurrentIndex, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getCurrentPlaybackTime, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getRepeatMode, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(setRepeatMode, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(setQueue, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(play, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(pause, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(stop, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(nextPlay, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(previousPlay, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(seekToTime, CAPPluginReturnPromise);
 )

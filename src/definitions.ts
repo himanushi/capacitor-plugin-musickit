@@ -21,12 +21,23 @@ export interface GetLibraryAlbumsOptions {
   offset: number;
 }
 
+export interface AlbumResult {
+  id: string;
+  title: string;
+  artworkUrl?: string;
+}
+
+export interface TrackResult {
+  id: string;
+  title: string;
+  durationMs: number;
+  discNumber: number;
+  trackNumber: number;
+  artworkUrl?: string;
+}
+
 export interface GetLibraryAlbumsResult {
-  albums: {
-    id: string;
-    title: string;
-    artworkUrl?: string;
-  }[];
+  albums: AlbumResult[];
   hasNext: boolean;
 }
 
@@ -34,20 +45,8 @@ export interface GetLibraryAlbumOptions {
   id: string;
 }
 
-export interface TrackResult {
-  title: string;
-  id: string;
-  durationMs: number;
-  discNumber: number;
-  trackNumber: number;
-  artworkUrl?: string;
-}
-
 export interface GetLibraryAlbumResult {
-  album?: {
-    id: string;
-    title: string;
-    artworkUrl?: string;
+  album?: AlbumResult & {
     tracks: TrackResult[];
   };
 }
@@ -92,10 +91,6 @@ export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
 
 export type PlaybackStateDidChangeListener = (data: {
   result: PlaybackStates;
-}) => void;
-
-export type NowPlayingItemDidChangeListener = (data: {
-  result: TrackResult | undefined;
 }) => void;
 
 export type AuthorizationStatus =
@@ -150,10 +145,6 @@ export interface CapacitorMusicKitPlugin {
   addListener(
     eventName: MusicKit.PlaybackStateDidChange['eventName'],
     listenerFunc: PlaybackStateDidChangeListener,
-  ): Promise<PluginListenerHandle> & PluginListenerHandle;
-  addListener(
-    eventName: MusicKit.NowPlayingItemDidChange['eventName'],
-    listenerFunc: NowPlayingItemDidChangeListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
   addListener(
     eventName: MusicKit.AuthorizationStatusDidChange['eventName'],
