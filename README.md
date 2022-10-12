@@ -36,7 +36,6 @@ npx cap sync
 * [`seekToTime(...)`](#seektotime)
 * [`addListener(any, ...)`](#addlistenerany)
 * [`addListener(any, ...)`](#addlistenerany)
-* [`addListener(any, ...)`](#addlistenerany)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -331,22 +330,6 @@ addListener(eventName: any, listenerFunc: PlaybackStateDidChangeListener) => Pro
 ### addListener(any, ...)
 
 ```typescript
-addListener(eventName: any, listenerFunc: NowPlayingItemDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
-```
-
-| Param              | Type                                                                                        |
-| ------------------ | ------------------------------------------------------------------------------------------- |
-| **`eventName`**    | <code>any</code>                                                                            |
-| **`listenerFunc`** | <code><a href="#nowplayingitemdidchangelistener">NowPlayingItemDidChangeListener</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
-
---------------------
-
-
-### addListener(any, ...)
-
-```typescript
 addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
@@ -393,10 +376,19 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 
 #### GetLibraryAlbumsResult
 
-| Prop          | Type                                                               |
-| ------------- | ------------------------------------------------------------------ |
-| **`albums`**  | <code>{ id: string; title: string; artworkUrl?: string; }[]</code> |
-| **`hasNext`** | <code>boolean</code>                                               |
+| Prop          | Type                       |
+| ------------- | -------------------------- |
+| **`albums`**  | <code>AlbumResult[]</code> |
+| **`hasNext`** | <code>boolean</code>       |
+
+
+#### AlbumResult
+
+| Prop             | Type                |
+| ---------------- | ------------------- |
+| **`id`**         | <code>string</code> |
+| **`title`**      | <code>string</code> |
+| **`artworkUrl`** | <code>string</code> |
 
 
 #### GetLibraryAlbumsOptions
@@ -409,17 +401,17 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 
 #### GetLibraryAlbumResult
 
-| Prop        | Type                                                                                    |
-| ----------- | --------------------------------------------------------------------------------------- |
-| **`album`** | <code>{ id: string; title: string; artworkUrl?: string; tracks: TrackResult[]; }</code> |
+| Prop        | Type                                                                               |
+| ----------- | ---------------------------------------------------------------------------------- |
+| **`album`** | <code>(<a href="#albumresult">AlbumResult</a> & { tracks: TrackResult[]; })</code> |
 
 
 #### TrackResult
 
 | Prop              | Type                |
 | ----------------- | ------------------- |
-| **`title`**       | <code>string</code> |
 | **`id`**          | <code>string</code> |
+| **`title`**       | <code>string</code> |
 | **`durationMs`**  | <code>number</code> |
 | **`discNumber`**  | <code>number</code> |
 | **`trackNumber`** | <code>number</code> |
@@ -514,11 +506,6 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 #### PlaybackStates
 
 <code>keyof typeof MusicKit.<a href="#playbackstates">PlaybackStates</a></code>
-
-
-#### NowPlayingItemDidChangeListener
-
-<code>(data: { result: <a href="#trackresult">TrackResult</a>; }): void</code>
 
 
 #### AuthorizationStatusDidChangeListener
