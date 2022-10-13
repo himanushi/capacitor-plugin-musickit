@@ -83,7 +83,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     
     func toBase64Image(_ artwork: Artwork?) async -> String? {
         do {
-            guard let url = artwork?.url(width: 500, height: 500) else {
+            guard let url = artwork?.url(width: 600, height: 600) else {
                 return nil
             }
             
