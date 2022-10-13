@@ -11,6 +11,7 @@ import MusicKit
 @objc(CapacitorMusicKitPlugin)
 public class CapacitorMusicKitPlugin: CAPPlugin {
     let player = MPMusicPlayerController.applicationMusicPlayer
+    var queueTracks: [Song] = []
     
     override public func load() {
         NotificationCenter.default.addObserver(
@@ -76,6 +77,27 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             if let data = image?.jpegData(compressionQuality: 0.1) {
                 return data.base64EncodedString()
             }
+        }
+        return nil
+    }
+    
+    func toBase64Image(_ artwork: Artwork?) async -> String? {
+        do {
+            guard let url = artwork?.url(width: 500, height: 500) else {
+                return nil
+            }
+            
+            let imageRequest = URLRequest (url: url)
+            let (data, _) = try await URLSession.shared.data(for: imageRequest)
+            guard let image = UIImage(data: data) else {
+                return nil
+            }
+            
+            if let imageData = image.jpegData(compressionQuality: 0.1) {
+                return imageData.base64EncodedString()
+            }
+        } catch {
+            return nil
         }
         return nil
     }
@@ -181,35 +203,42 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             if MusicAuthorization.currentStatus == .authorized {
                 reason = reason + ",ログイン済み"
                 
-                let query = MPMediaQuery.songs()
-                query.filterPredicates = [MPMediaPropertyPredicate(
-                    value: id,
-                    forProperty: MPMediaItemPropertyAlbumPersistentID,
-                    comparisonType: .equalTo)]
-                
-                if let tracks = query.items {
-                    if tracks.count > 0 {
+                if let albumId = id {
+                    var requestAlbum = MusicLibraryRequest<Album>()
+                    requestAlbum.filter(matching: \.id, equalTo: MusicItemID(albumId))
+                    let responseAlbum = try await requestAlbum.response()
+                    if let album = responseAlbum.items.first {
                         reason = reason + ",アルバムあり"
-                        tracks.forEach {
-                            resultAlbumId = String($0.albumPersistentID)
-                            resultAlbumTitle = $0.albumTitle
-                            let artworkUrl = toBase64Image($0.artwork)
-                            resultAlbumArtworkUrl = artworkUrl
+                        
+                        var requestSong = MusicLibraryRequest<Track>()
+                        requestSong.filter(matching: \.albums, contains: album)
+                        requestSong.sort(by: \.discNumber, ascending: true)
+                        requestSong.sort(by: \.trackNumber, ascending: true)
+                        let responseSong = try await requestSong.response()
+                        
+                        if responseSong.items.count > 0 {
+                            reason = reason + ",曲あり"
                             
-                            resultTracks.append([
-                                "id": String($0.persistentID),
-                                "title": $0.title,
-                                "discNumber": $0.discNumber,
-                                "trackNumber": $0.albumTrackNumber,
-                                "durationMs": $0.playbackDuration,
-                                "artworkUrl": artworkUrl
-                            ])
+                            resultAlbumId = id
+                            resultAlbumTitle = String(album.title)
+                            resultAlbumArtworkUrl = await toBase64Image(album.artwork)
+
+                            responseSong.items.forEach {
+                                resultTracks.append([
+                                    "id": $0.id.rawValue,
+                                    "title": $0.title,
+                                    "discNumber": $0.discNumber,
+                                    "trackNumber": $0.trackNumber,
+                                    "durationMs": $0.duration,
+                                    "artworkUrl": resultAlbumArtworkUrl
+                                ])
+                            }
+                        } else {
+                            reason = reason + ",曲なし"
                         }
                     } else {
                         reason = reason + ",アルバムなし"
                     }
-                } else {
-                    reason = reason + ",アルバムなし"
                 }
             } else {
                 reason = reason + ",未ログイン"
@@ -218,6 +247,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             if(resultAlbumId == nil) {
                 call.resolve(["reason": reason, "album": nil])
             } else {
+                print(resultTracks)
                 call.resolve([
                     "reason": reason,
                     "album": [
@@ -236,11 +266,28 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
     
     @objc func getQueueTracks(_ call: CAPPluginCall) {
-        call.resolve(["tracks": []])
+        
+        Task {
+            var resultTracks: [[String: Any?]] = []
+            
+            for track in queueTracks {
+                let artworkUrl = await toBase64Image(track.artwork)
+                resultTracks.append([
+                    "id": track.id.rawValue,
+                    "title": track.title,
+                    "discNumber": track.discNumber,
+                    "trackNumber": track.trackNumber,
+                    "durationMs": track.duration,
+                    "artworkUrl": artworkUrl
+                ])
+            }
+            
+            call.resolve(["tracks": resultTracks])
+        }
     }
     
     @objc func getCurrentIndex(_ call: CAPPluginCall) {
-        call.resolve(["index": -1])
+        call.resolve(["index": player.indexOfNowPlayingItem])
     }
     
     @objc func getCurrentPlaybackTime(_ call: CAPPluginCall) {
@@ -256,13 +303,36 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
     
     @objc func setQueue(_ call: CAPPluginCall) {
-        call.resolve(["result": true])
+        let ids: [String] = call.getArray("ids", String.self) ?? []
+
+        Task {
+            var request = MusicLibraryRequest<Song>()
+            request.filter(matching: \.id, memberOf: ids.map {MusicItemID($0)})
+            let response = try await request.response()
+            // sort tracks
+            var tracks: [Song] = []
+            ids.forEach { id in
+                let item = response.items.first(where: { $0.id.rawValue == id })
+                if let track = item {
+                    tracks.append(track)
+                }
+            }
+            ApplicationMusicPlayer.shared.queue = .init(for: tracks)
+            queueTracks = tracks
+            call.resolve(["result": true])
+        }
     }
     
     @objc func play(_ call: CAPPluginCall) {
+        let index = call.getInt("index")
+        
         Task {
             var result = false
             do {
+                if let startIndex = index {
+                    let trackIndex = queueTracks.count > startIndex ? startIndex : queueTracks.count
+                    ApplicationMusicPlayer.shared.queue = .init(for: queueTracks, startingAt: queueTracks[trackIndex])
+                }
                 try await ApplicationMusicPlayer.shared.play()
                 result = true
             } catch {
@@ -287,11 +357,29 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
     
     @objc func nextPlay(_ call: CAPPluginCall) {
-        call.resolve(["result": true])
+        Task {
+            var result = false
+            do {
+                try await ApplicationMusicPlayer.shared.skipToNextEntry()
+                result = true
+            } catch {
+                print(error)
+            }
+            call.resolve(["result": result])
+        }
     }
     
     @objc func previousPlay(_ call: CAPPluginCall) {
-        call.resolve(["result": true])
+        Task {
+            var result = false
+            do {
+                try await ApplicationMusicPlayer.shared.skipToPreviousEntry()
+                result = true
+            } catch {
+                print(error)
+            }
+            call.resolve(["result": result])
+        }
     }
     
     @objc func seekToTime(_ call: CAPPluginCall) {
