@@ -175,8 +175,8 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             for collection in collections[offset..<rangeEnd] {
                 if let album = collection.representativeItem {
                     resultAlbums.append([
-                        "title": album.albumTitle,
                         "id": String(album.albumPersistentID),
+                        "name": album.albumTitle,
                         "artworkUrl": toBase64Image(album.artwork),
                     ])
                 }
@@ -196,7 +196,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         Task {
             var reason = "開始"
             var resultAlbumId: String? = nil
-            var resultAlbumTitle: String? = nil
+            var resultAlbumName: String? = nil
             var resultAlbumArtworkUrl: String? = nil
             var resultTracks: [[String: Any?]] = []
 
@@ -220,17 +220,17 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                             reason = reason + ",曲あり"
                             
                             resultAlbumId = id
-                            resultAlbumTitle = String(album.title)
+                            resultAlbumName = String(album.title)
                             resultAlbumArtworkUrl = await toBase64Image(album.artwork)
 
                             responseSong.items.forEach {
                                 resultTracks.append([
                                     "id": $0.id.rawValue,
-                                    "title": $0.title,
+                                    "name": $0.title,
                                     "discNumber": $0.discNumber,
                                     "trackNumber": $0.trackNumber,
                                     "durationMs": $0.duration,
-                                    "artworkUrl": resultAlbumArtworkUrl
+                                    "artworkUrl": resultAlbumArtworkUrl,
                                 ])
                             }
                         } else {
@@ -252,7 +252,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                     "reason": reason,
                     "album": [
                         "id": resultAlbumId,
-                        "title": resultAlbumTitle,
+                        "name": resultAlbumName,
                         "artworkUrl": resultAlbumArtworkUrl,
                         "tracks": resultTracks,
                     ],
@@ -274,7 +274,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 let artworkUrl = await toBase64Image(track.artwork)
                 resultTracks.append([
                     "id": track.id.rawValue,
-                    "title": track.title,
+                    "name": track.title,
                     "discNumber": track.discNumber,
                     "trackNumber": track.trackNumber,
                     "durationMs": track.duration,
