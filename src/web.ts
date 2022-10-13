@@ -138,8 +138,8 @@ export class CapacitorMusicKitWeb
 
     response.data.data.map(album => {
       albums.push({
-        title: album.attributes.name,
         id: album.id,
+        name: album.attributes.name,
         artworkUrl: album.attributes.artwork?.url,
       });
     });
@@ -177,8 +177,8 @@ export class CapacitorMusicKitWeb
         resultAlbum = albums.data.find(abm => abm.id === options.id);
         if (resultAlbum) {
           album = {
-            title: resultAlbum.attributes.name,
             id: resultAlbum.id,
+            name: resultAlbum.attributes.name,
             artworkUrl: resultAlbum.attributes.artwork?.url,
             tracks: [],
           };
@@ -210,8 +210,8 @@ export class CapacitorMusicKitWeb
         if (data) {
           for (const track of data.data) {
             tracks.push({
-              title: track.attributes.name,
               id: track.id,
+              name: track.attributes.name,
               durationMs: track.attributes.durationInMillis,
               discNumber: track.attributes.discNumber,
               trackNumber: track.attributes.trackNumber,
@@ -240,7 +240,7 @@ export class CapacitorMusicKitWeb
       if (item) {
         track = {
           id: item.id,
-          title: item.attributes.name,
+          name: item.attributes.name,
           durationMs: item.attributes.durationInMillis,
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
@@ -261,11 +261,13 @@ export class CapacitorMusicKitWeb
       MusicKit.getInstance().queue.items.map(item =>
         tracks.push({
           id: item.id,
-          title: item.attributes.name,
+          name: item.attributes.name,
           durationMs: item.attributes.durationInMillis,
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
           artworkUrl: item.attributes.artwork?.url, // bug?
+          catalogId: item.attributes.playParams.catalogId,
+          purchasedId: item.attributes.playParams.purchasedId,
         }),
       );
     } catch (error) {

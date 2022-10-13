@@ -23,7 +23,7 @@ export interface GetLibraryAlbumsOptions {
 
 export interface AlbumResult {
   id: string;
-  title: string;
+  name: string;
   artworkUrl?: string;
 }
 
@@ -31,7 +31,7 @@ export interface TrackResult {
   id: string;
   catalogId?: string;
   purchasedId?: string;
-  title: string;
+  name: string;
   durationMs: number;
   discNumber: number;
   trackNumber: number;

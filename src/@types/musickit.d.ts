@@ -163,13 +163,7 @@ declare namespace MusicKit {
       durationInMillis: number;
       artwork?: { url: string };
       albumName: string;
-      playParams: {
-        id: string;
-        catalogId?: string;
-        purchasedId?: string;
-        isLibrary: boolean;
-        kind: 'album' | 'song';
-      };
+      playParams: PlayParams;
       previews: { url: string }[];
     };
     relationships: {
@@ -213,10 +207,7 @@ declare namespace MusicKit {
     hasLyrics: boolean;
     isrc: string;
     name: string;
-    playParams: {
-      id: string;
-      kind: string;
-    };
+    playParams: PlayParams;
     previews: {
       url: string;
     }[];
@@ -314,6 +305,15 @@ declare namespace MusicKit {
     reset(): Promise<any>;
   }
 
+  interface PlayParams {
+    id: string;
+    kind: 'album' | 'song';
+    isLibrary: boolean;
+    reporting: boolean;
+    catalogId?: string;
+    purchasedId?: string;
+  }
+
   interface CurrentItem {
     assetURL: string;
     attributes: {
@@ -326,14 +326,7 @@ declare namespace MusicKit {
       genreNames: string[];
       isrc: string;
       name: string;
-      playParams: {
-        id: string;
-        kind: 'song';
-        isLibrary: boolean;
-        reporting: boolean;
-        catalogId?: string;
-        purchasedId?: string;
-      };
+      playParams: PlayParams;
       previews: { url?: string }[];
       releaseDate: string; //"2022-07-27T12:00:00Z"
       trackNumber: number;
@@ -386,10 +379,7 @@ declare namespace MusicKit {
     isRestricted: boolean;
     isUnavailable: boolean;
     isrc: string;
-    playParams: {
-      id: string;
-      kind: string;
-    };
+    playParams: PlayParams;
     playRawAssetURL: boolean;
     playbackDuration: number;
     playlistArtworkURL: string;
