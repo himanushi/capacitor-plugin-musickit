@@ -29,6 +29,8 @@ export interface AlbumResult {
 
 export interface TrackResult {
   id: string;
+  catalogId?: string;
+  purchasedId?: string;
   title: string;
   durationMs: number;
   discNumber: number;

@@ -216,6 +216,8 @@ export class CapacitorMusicKitWeb
               discNumber: track.attributes.discNumber,
               trackNumber: track.attributes.trackNumber,
               artworkUrl: track.attributes.artwork?.url,
+              catalogId: track.attributes.playParams.catalogId,
+              purchasedId: track.attributes.playParams.purchasedId,
             });
           }
           if (data.next) {
@@ -243,6 +245,8 @@ export class CapacitorMusicKitWeb
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
           artworkUrl: item.attributes.artwork?.url, // bug?
+          catalogId: item.attributes.playParams.catalogId,
+          purchasedId: item.attributes.playParams.purchasedId,
         };
       }
     } catch (error) {

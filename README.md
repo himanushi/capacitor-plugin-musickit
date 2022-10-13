@@ -411,6 +411,8 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 | Prop              | Type                |
 | ----------------- | ------------------- |
 | **`id`**          | <code>string</code> |
+| **`catalogId`**   | <code>string</code> |
+| **`purchasedId`** | <code>string</code> |
 | **`title`**       | <code>string</code> |
 | **`durationMs`**  | <code>number</code> |
 | **`discNumber`**  | <code>number</code> |

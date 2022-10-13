@@ -165,6 +165,7 @@ declare namespace MusicKit {
       albumName: string;
       playParams: {
         id: string;
+        catalogId?: string;
         purchasedId?: string;
         isLibrary: boolean;
         kind: 'album' | 'song';
@@ -330,6 +331,7 @@ declare namespace MusicKit {
         kind: 'song';
         isLibrary: boolean;
         reporting: boolean;
+        catalogId?: string;
         purchasedId?: string;
       };
       previews: { url?: string }[];
