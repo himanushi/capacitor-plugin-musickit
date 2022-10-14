@@ -9,7 +9,6 @@ import type {
   ConfigureOptions,
   GetLibraryAlbumsOptions,
   GetLibraryAlbumsResult,
-  GetLibraryAlbumOptions,
   GetLibraryAlbumResult,
   SetQueueOptions,
   ActionResult,
@@ -22,6 +21,9 @@ import type {
   GetQueueTracksResult,
   SetRepeatModeOptions,
   getRepeatModeResult,
+  GetLibraryTrackResult,
+  GetLibraryTrackOptions,
+  GetLibraryAlbumOptions,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -231,6 +233,32 @@ export class CapacitorMusicKitWeb
     }
 
     return { album };
+  }
+
+  async getLibraryTrack(
+    options: GetLibraryTrackOptions,
+  ): Promise<GetLibraryTrackResult> {
+    let track: TrackResult | undefined;
+    try {
+      const fetchUrl = `/v1/me/library/songs/${options.id}`;
+      const response = await MusicKit.getInstance().api.music(fetchUrl);
+      const resultTrack = response.data.data[0];
+      if (resultTrack) {
+        track = {
+          id: resultTrack.id,
+          name: resultTrack.attributes.name,
+          durationMs: resultTrack.attributes.durationInMillis,
+          discNumber: resultTrack.attributes.discNumber,
+          trackNumber: resultTrack.attributes.trackNumber,
+          artworkUrl: resultTrack.attributes.artwork?.url, // bug?
+          catalogId: resultTrack.attributes.playParams.catalogId,
+          purchasedId: resultTrack.attributes.playParams.purchasedId,
+        };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    return { track };
   }
 
   async getCurrentTrack(): Promise<GetCurrentTrackResult> {

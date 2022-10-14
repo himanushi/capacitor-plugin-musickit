@@ -13,6 +13,10 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     let player = MPMusicPlayerController.applicationMusicPlayer
     var queueTracks: [Song] = []
     
+    let sSize = 200
+    let mSize = 400
+    let lSize = 600
+    
     override public func load() {
         NotificationCenter.default.addObserver(
             self,
@@ -71,9 +75,9 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         }
     }
     
-    func toBase64Image(_ artwork: MPMediaItemArtwork?) -> String? {
+    func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {
         if let artworkItem = artwork {
-            let image = artworkItem.image(at: CGSize(width: 100, height: 100))
+            let image = artworkItem.image(at: CGSize(width: size, height: size))
             if let data = image?.jpegData(compressionQuality: 0.1) {
                 return data.base64EncodedString()
             }
@@ -81,9 +85,9 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         return nil
     }
     
-    func toBase64Image(_ artwork: Artwork?) async -> String? {
+    func toBase64Image(_ artwork: Artwork?, _ size: Int) async -> String? {
         do {
-            guard let url = artwork?.url(width: 600, height: 600) else {
+            guard let url = artwork?.url(width: size, height: size) else {
                 return nil
             }
             
@@ -166,28 +170,34 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     @objc func getLibraryAlbums(_ call: CAPPluginCall) {
         let limit = call.getInt("limit") ?? 0
         let offset = call.getInt("offset") ?? 0
-        var hasNext = false
-        var resultAlbums: [[String: String?]] = []
-
-        let query = MPMediaQuery.albums()
-        if let collections = query.collections {
-            let rangeEnd = collections.count > offset + limit ? offset + limit : collections.count
-            for collection in collections[offset..<rangeEnd] {
-                if let album = collection.representativeItem {
-                    resultAlbums.append([
-                        "id": String(album.albumPersistentID),
-                        "name": album.albumTitle,
-                        "artworkUrl": toBase64Image(album.artwork),
-                    ])
-                }
+        
+        Task {
+            var hasNext = false
+            var resultAlbums: [[String: String?]] = []
+            
+            var request = MusicLibraryRequest<Album>()
+            request.sort(by: \.title, ascending: true)
+            request.limit = limit
+            request.offset = offset
+            let response = try await request.response()
+            
+            for album in response.items {
+                resultAlbums.append([
+                    "id": album.id.rawValue,
+                    "name": album.title,
+                    "artworkUrl": await toBase64Image(album.artwork, sSize),
+                ])
             }
-            hasNext = collections.count != rangeEnd
-        }
 
-        call.resolve([
-            "albums": resultAlbums,
-            "hasNext": hasNext,
-        ])
+            if response.items.count == limit {
+                hasNext = true
+            }
+
+            call.resolve([
+                "albums": resultAlbums,
+                "hasNext": hasNext,
+            ])
+        }
     }
     
     @objc func getLibraryAlbum(_ call: CAPPluginCall) {
@@ -221,7 +231,8 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                             
                             resultAlbumId = id
                             resultAlbumName = String(album.title)
-                            resultAlbumArtworkUrl = await toBase64Image(album.artwork)
+                            resultAlbumArtworkUrl = await toBase64Image(album.artwork, lSize)
+                            let artworkUrl = await toBase64Image(album.artwork, sSize)
 
                             responseSong.items.forEach {
                                 resultTracks.append([
@@ -229,8 +240,8 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                                     "name": $0.title,
                                     "discNumber": $0.discNumber,
                                     "trackNumber": $0.trackNumber,
-                                    "durationMs": $0.duration,
-                                    "artworkUrl": resultAlbumArtworkUrl,
+                                    "durationMs": Double($0.duration ?? 0) * 1000,
+                                    "artworkUrl": artworkUrl,
                                 ])
                             }
                         } else {
@@ -262,26 +273,41 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
     
     @objc func getCurrentTrack(_ call: CAPPluginCall) {
-        call.resolve(["track": nil])
+        Task {
+            var resultTrack: [String: Any?]? = nil
+            let index = player.indexOfNowPlayingItem
+            
+            if index >= 0 && queueTracks.count >= index {
+                let track = queueTracks[index]
+                resultTrack = [
+                    "id": track.id.rawValue,
+                    "name": track.title,
+                    "discNumber": track.discNumber,
+                    "trackNumber": track.trackNumber,
+                    "durationMs": Double(track.duration ?? 0) * 1000,
+                    "artworkUrl": await toBase64Image(track.artwork, lSize)
+                ]
+            }
+
+            call.resolve(["track": resultTrack])
+        }
     }
     
     @objc func getQueueTracks(_ call: CAPPluginCall) {
-        
         Task {
             var resultTracks: [[String: Any?]] = []
             
             for track in queueTracks {
-                let artworkUrl = await toBase64Image(track.artwork)
+                let artworkUrl = await toBase64Image(track.artwork, sSize)
                 resultTracks.append([
                     "id": track.id.rawValue,
                     "name": track.title,
                     "discNumber": track.discNumber,
                     "trackNumber": track.trackNumber,
-                    "durationMs": track.duration,
+                    "durationMs": Double(track.duration ?? 0) * 1000,
                     "artworkUrl": artworkUrl
                 ])
             }
-            
             call.resolve(["tracks": resultTracks])
         }
     }
@@ -291,14 +317,28 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
     
     @objc func getCurrentPlaybackTime(_ call: CAPPluginCall) {
-        call.resolve(["time": 0])
+        call.resolve(["time": ApplicationMusicPlayer.shared.playbackTime])
     }
     
     @objc func getRepeatMode(_ call: CAPPluginCall) {
-        call.resolve(["mode": "none"])
+        var mode = "none"
+        if(ApplicationMusicPlayer.shared.state.repeatMode == .all) {
+            mode = "all"
+        } else if (ApplicationMusicPlayer.shared.state.repeatMode == .one) {
+            mode = "one"
+        }
+        call.resolve(["mode": mode])
     }
     
     @objc func setRepeatMode(_ call: CAPPluginCall) {
+        let mode = call.getString("mode") ?? "none"
+        if (mode == "none") {
+            ApplicationMusicPlayer.shared.state.repeatMode = MusicPlayer.RepeatMode.none
+        } else if (mode == "one") {
+            ApplicationMusicPlayer.shared.state.repeatMode = MusicPlayer.RepeatMode.none
+        } else if (mode == "all") {
+            ApplicationMusicPlayer.shared.state.repeatMode = MusicPlayer.RepeatMode.all
+        }
         call.resolve(["result": true])
     }
     

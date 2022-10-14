@@ -47,10 +47,18 @@ export interface GetLibraryAlbumOptions {
   id: string;
 }
 
+export interface GetLibraryTrackOptions {
+  id: string;
+}
+
 export interface GetLibraryAlbumResult {
   album?: AlbumResult & {
     tracks: TrackResult[];
   };
+}
+
+export interface GetLibraryTrackResult {
+  track?: TrackResult;
 }
 
 export interface GetCurrentTrackResult {
@@ -131,6 +139,9 @@ export interface CapacitorMusicKitPlugin {
   getLibraryAlbum(
     options: GetLibraryAlbumOptions,
   ): Promise<GetLibraryAlbumResult>;
+  getLibraryTrack(
+    options: GetLibraryTrackOptions,
+  ): Promise<GetLibraryTrackResult>;
   getCurrentTrack(): Promise<GetCurrentTrackResult>;
   getQueueTracks(): Promise<GetQueueTracksResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;

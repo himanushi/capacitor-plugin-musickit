@@ -21,6 +21,7 @@ npx cap sync
 * [`unauthorize()`](#unauthorize)
 * [`getLibraryAlbums(...)`](#getlibraryalbums)
 * [`getLibraryAlbum(...)`](#getlibraryalbum)
+* [`getLibraryTrack(...)`](#getlibrarytrack)
 * [`getCurrentTrack()`](#getcurrenttrack)
 * [`getQueueTracks()`](#getqueuetracks)
 * [`getCurrentIndex()`](#getcurrentindex)
@@ -148,6 +149,21 @@ getLibraryAlbum(options: GetLibraryAlbumOptions) => Promise<GetLibraryAlbumResul
 | **`options`** | <code><a href="#getlibraryalbumoptions">GetLibraryAlbumOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#getlibraryalbumresult">GetLibraryAlbumResult</a>&gt;</code>
+
+--------------------
+
+
+### getLibraryTrack(...)
+
+```typescript
+getLibraryTrack(options: GetLibraryTrackOptions) => Promise<GetLibraryTrackResult>
+```
+
+| Param         | Type                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#getlibrarytrackoptions">GetLibraryTrackOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#getlibrarytrackresult">GetLibraryTrackResult</a>&gt;</code>
 
 --------------------
 
@@ -421,6 +437,20 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 
 
 #### GetLibraryAlbumOptions
+
+| Prop     | Type                |
+| -------- | ------------------- |
+| **`id`** | <code>string</code> |
+
+
+#### GetLibraryTrackResult
+
+| Prop        | Type                                                |
+| ----------- | --------------------------------------------------- |
+| **`track`** | <code><a href="#trackresult">TrackResult</a></code> |
+
+
+#### GetLibraryTrackOptions
 
 | Prop     | Type                |
 | -------- | ------------------- |
