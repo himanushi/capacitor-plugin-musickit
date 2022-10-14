@@ -35,9 +35,9 @@ npx cap sync
 * [`nextPlay()`](#nextplay)
 * [`previousPlay()`](#previousplay)
 * [`seekToTime(...)`](#seektotime)
-* [`addListener(any, ...)`](#addlistenerany)
-* [`addListener(any, ...)`](#addlistenerany)
-* [`addListener(any, ...)`](#addlistenerany)
+* [`addListener('playbackStateDidChange', ...)`](#addlistenerplaybackstatedidchange)
+* [`addListener('nowPlayingItemDidChange', ...)`](#addlistenernowplayingitemdidchange)
+* [`addListener('authorizationStatusDidChange', ...)`](#addlistenerauthorizationstatusdidchange)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -328,15 +328,15 @@ seekToTime(options: SeekToTimeOptions) => Promise<ActionResult>
 --------------------
 
 
-### addListener(any, ...)
+### addListener('playbackStateDidChange', ...)
 
 ```typescript
-addListener(eventName: any, listenerFunc: PlaybackStateDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+addListener(eventName: 'playbackStateDidChange', listenerFunc: PlaybackStateDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
 | Param              | Type                                                                                      |
 | ------------------ | ----------------------------------------------------------------------------------------- |
-| **`eventName`**    | <code>any</code>                                                                          |
+| **`eventName`**    | <code>'playbackStateDidChange'</code>                                                     |
 | **`listenerFunc`** | <code><a href="#playbackstatedidchangelistener">PlaybackStateDidChangeListener</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
@@ -344,15 +344,15 @@ addListener(eventName: any, listenerFunc: PlaybackStateDidChangeListener) => Pro
 --------------------
 
 
-### addListener(any, ...)
+### addListener('nowPlayingItemDidChange', ...)
 
 ```typescript
-addListener(eventName: any, listenerFunc: NowPlayingItemDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+addListener(eventName: 'nowPlayingItemDidChange', listenerFunc: NowPlayingItemDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
 | Param              | Type                                                                                        |
 | ------------------ | ------------------------------------------------------------------------------------------- |
-| **`eventName`**    | <code>any</code>                                                                            |
+| **`eventName`**    | <code>'nowPlayingItemDidChange'</code>                                                      |
 | **`listenerFunc`** | <code><a href="#nowplayingitemdidchangelistener">NowPlayingItemDidChangeListener</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
@@ -360,15 +360,15 @@ addListener(eventName: any, listenerFunc: NowPlayingItemDidChangeListener) => Pr
 --------------------
 
 
-### addListener(any, ...)
+### addListener('authorizationStatusDidChange', ...)
 
 ```typescript
-addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+addListener(eventName: 'authorizationStatusDidChange', listenerFunc: AuthorizationStatusDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
 | Param              | Type                                                                                                  |
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
-| **`eventName`**    | <code>any</code>                                                                                      |
+| **`eventName`**    | <code>'authorizationStatusDidChange'</code>                                                           |
 | **`listenerFunc`** | <code><a href="#authorizationstatusdidchangelistener">AuthorizationStatusDidChangeListener</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
@@ -549,7 +549,12 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 
 #### PlaybackStateDidChangeListener
 
-<code>(data: { result: string | number | symbol; }): void</code>
+<code>(data: <a href="#playbackstatedidchangeresult">PlaybackStateDidChangeResult</a>): void</code>
+
+
+#### PlaybackStateDidChangeResult
+
+<code>{ state: <a href="#playbackstates">PlaybackStates</a>; }</code>
 
 
 #### PlaybackStates
@@ -559,12 +564,22 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 
 #### NowPlayingItemDidChangeListener
 
-<code>(data: { result: <a href="#trackresult">TrackResult</a>; }): void</code>
+<code>(data: <a href="#nowplayingitemdidchangeresult">NowPlayingItemDidChangeResult</a>): void</code>
+
+
+#### NowPlayingItemDidChangeResult
+
+<code>{ track: <a href="#trackresult">TrackResult</a>; index: number; }</code>
 
 
 #### AuthorizationStatusDidChangeListener
 
-<code>(data: { result: <a href="#authorizationstatus">AuthorizationStatus</a>; }): void</code>
+<code>(data: <a href="#authorizationstatusdidchangeresult">AuthorizationStatusDidChangeResult</a>): void</code>
+
+
+#### AuthorizationStatusDidChangeResult
+
+<code>{ status: <a href="#authorizationstatus">AuthorizationStatus</a>; }</code>
 
 
 #### AuthorizationStatus

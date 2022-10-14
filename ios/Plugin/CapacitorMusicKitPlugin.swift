@@ -56,7 +56,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         }
 
         if result != "" {
-            notifyListeners("playbackStateDidChange", data: ["result": result])
+            notifyListeners("playbackStateDidChange", data: ["state": result])
         }
     }
     
@@ -77,7 +77,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 ]
             }
             
-            notifyListeners("nowPlayingItemDidChange", data: ["result": resultTrack])
+            notifyListeners("nowPlayingItemDidChange", data: ["track": resultTrack, "index": player.indexOfNowPlayingItem])
         }
     }
 
@@ -97,7 +97,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             }
             
             if result != "" {
-                notifyListeners("authorizationStatusDidChange", data: ["result": result])
+                notifyListeners("authorizationStatusDidChange", data: ["status": result])
             }
         }
     }
