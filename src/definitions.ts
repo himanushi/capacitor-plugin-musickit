@@ -103,6 +103,10 @@ export type PlaybackStateDidChangeListener = (data: {
   result: PlaybackStates;
 }) => void;
 
+export type NowPlayingItemDidChangeListener = (data: {
+  result: TrackResult | undefined;
+}) => void;
+
 export type AuthorizationStatus =
   | 'unavailable'
   | 'notDetermined'
@@ -158,6 +162,10 @@ export interface CapacitorMusicKitPlugin {
   addListener(
     eventName: MusicKit.PlaybackStateDidChange['eventName'],
     listenerFunc: PlaybackStateDidChangeListener,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
+  addListener(
+    eventName: MusicKit.NowPlayingItemDidChange['eventName'],
+    listenerFunc: NowPlayingItemDidChangeListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
   addListener(
     eventName: MusicKit.AuthorizationStatusDidChange['eventName'],

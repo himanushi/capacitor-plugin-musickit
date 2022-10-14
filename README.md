@@ -37,6 +37,7 @@ npx cap sync
 * [`seekToTime(...)`](#seektotime)
 * [`addListener(any, ...)`](#addlistenerany)
 * [`addListener(any, ...)`](#addlistenerany)
+* [`addListener(any, ...)`](#addlistenerany)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -346,6 +347,22 @@ addListener(eventName: any, listenerFunc: PlaybackStateDidChangeListener) => Pro
 ### addListener(any, ...)
 
 ```typescript
+addListener(eventName: any, listenerFunc: NowPlayingItemDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
+```
+
+| Param              | Type                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| **`eventName`**    | <code>any</code>                                                                            |
+| **`listenerFunc`** | <code><a href="#nowplayingitemdidchangelistener">NowPlayingItemDidChangeListener</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#pluginlistenerhandle">PluginListenerHandle</a>&gt; & <a href="#pluginlistenerhandle">PluginListenerHandle</a></code>
+
+--------------------
+
+
+### addListener(any, ...)
+
+```typescript
 addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) => Promise<PluginListenerHandle> & PluginListenerHandle
 ```
 
@@ -538,6 +555,11 @@ addListener(eventName: any, listenerFunc: AuthorizationStatusDidChangeListener) 
 #### PlaybackStates
 
 <code>keyof typeof MusicKit.<a href="#playbackstates">PlaybackStates</a></code>
+
+
+#### NowPlayingItemDidChangeListener
+
+<code>(data: { result: <a href="#trackresult">TrackResult</a>; }): void</code>
 
 
 #### AuthorizationStatusDidChangeListener

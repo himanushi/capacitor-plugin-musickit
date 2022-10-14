@@ -42,6 +42,24 @@ export class CapacitorMusicKitWeb
     this.notifyListeners('playbackStateDidChange', { result: status });
   };
 
+  private nowPlayingItemDidChange = (
+    data: Parameters<MusicKit.NowPlayingItemDidChange['callback']>[0],
+  ) => {
+    let track: TrackResult | undefined;
+    const item = data.item;
+    if (item) {
+      track = {
+        id: item.id,
+        name: item.attributes.name,
+        durationMs: item.attributes.durationInMillis,
+        discNumber: item.attributes.discNumber,
+        trackNumber: item.attributes.trackNumber,
+        artworkUrl: item.attributes.artwork?.url,
+      };
+    }
+    this.notifyListeners('nowPlayingItemDidChange', { result: track });
+  };
+
   private authorizationStatusDidChange = (
     data: Parameters<MusicKit.AuthorizationStatusDidChange['callback']>[0],
   ) => {
@@ -79,6 +97,11 @@ export class CapacitorMusicKitWeb
       musicKit.addEventListener(
         'playbackStateDidChange',
         this.playbackStateDidChange,
+      );
+
+      musicKit.addEventListener(
+        'nowPlayingItemDidChange',
+        this.nowPlayingItemDidChange,
       );
 
       musicKit.addEventListener(
@@ -218,8 +241,6 @@ export class CapacitorMusicKitWeb
               discNumber: track.attributes.discNumber,
               trackNumber: track.attributes.trackNumber,
               artworkUrl: track.attributes.artwork?.url,
-              catalogId: track.attributes.playParams.catalogId,
-              purchasedId: track.attributes.playParams.purchasedId,
             });
           }
           if (data.next) {
@@ -251,8 +272,6 @@ export class CapacitorMusicKitWeb
           discNumber: resultTrack.attributes.discNumber,
           trackNumber: resultTrack.attributes.trackNumber,
           artworkUrl: resultTrack.attributes.artwork?.url, // bug?
-          catalogId: resultTrack.attributes.playParams.catalogId,
-          purchasedId: resultTrack.attributes.playParams.purchasedId,
         };
       }
     } catch (error) {
@@ -273,8 +292,6 @@ export class CapacitorMusicKitWeb
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
           artworkUrl: item.attributes.artwork?.url, // bug?
-          catalogId: item.attributes.playParams.catalogId,
-          purchasedId: item.attributes.playParams.purchasedId,
         };
       }
     } catch (error) {
@@ -294,8 +311,6 @@ export class CapacitorMusicKitWeb
           discNumber: item.attributes.discNumber,
           trackNumber: item.attributes.trackNumber,
           artworkUrl: item.attributes.artwork?.url, // bug?
-          catalogId: item.attributes.playParams.catalogId,
-          purchasedId: item.attributes.playParams.purchasedId,
         }),
       );
     } catch (error) {
