@@ -23,6 +23,12 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             selector: #selector(self.playbackStateDidChange),
             name: .MPMusicPlayerControllerPlaybackStateDidChange,
             object: nil)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.nowPlayingItemDidChange),
+            name: .MPMusicPlayerControllerNowPlayingItemDidChange,
+            object: nil)
 
         NotificationCenter.default.addObserver(
             self,
@@ -51,6 +57,27 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
         if result != "" {
             notifyListeners("playbackStateDidChange", data: ["result": result])
+        }
+    }
+    
+    @objc private func nowPlayingItemDidChange() {
+        Task {
+            var resultTrack: [String: Any?]? = nil
+            let index = player.indexOfNowPlayingItem
+            
+            if index >= 0 && queueTracks.count >= index {
+                let track = queueTracks[index]
+                resultTrack = [
+                    "id": track.id.rawValue,
+                    "name": track.title,
+                    "discNumber": track.discNumber,
+                    "trackNumber": track.trackNumber,
+                    "durationMs": Double(track.duration ?? 0) * 1000,
+                    "artworkUrl": await toBase64Image(track.artwork, lSize)
+                ]
+            }
+            
+            notifyListeners("nowPlayingItemDidChange", data: ["result": resultTrack])
         }
     }
 
