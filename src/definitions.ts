@@ -99,13 +99,22 @@ export interface SeekToTimeOptions {
 
 export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
 
-export type PlaybackStateDidChangeListener = (data: {
-  result: PlaybackStates;
-}) => void;
+export type PlaybackStateDidChangeResult = {
+  state: PlaybackStates;
+};
 
-export type NowPlayingItemDidChangeListener = (data: {
-  result: TrackResult | undefined;
-}) => void;
+export type PlaybackStateDidChangeListener = (
+  data: PlaybackStateDidChangeResult,
+) => void;
+
+export type NowPlayingItemDidChangeResult = {
+  track: TrackResult | undefined;
+  index: number;
+};
+
+export type NowPlayingItemDidChangeListener = (
+  data: NowPlayingItemDidChangeResult,
+) => void;
 
 export type AuthorizationStatus =
   | 'unavailable'
@@ -114,9 +123,13 @@ export type AuthorizationStatus =
   | 'restricted'
   | 'authorized';
 
-export type AuthorizationStatusDidChangeListener = (data: {
-  result: AuthorizationStatus;
-}) => void;
+export type AuthorizationStatusDidChangeResult = {
+  status: AuthorizationStatus;
+};
+
+export type AuthorizationStatusDidChangeListener = (
+  data: AuthorizationStatusDidChangeResult,
+) => void;
 
 export interface CapacitorMusicKitPlugin {
   /**
@@ -160,15 +173,15 @@ export interface CapacitorMusicKitPlugin {
   previousPlay(): Promise<ActionResult>;
   seekToTime(options: SeekToTimeOptions): Promise<ActionResult>;
   addListener(
-    eventName: MusicKit.PlaybackStateDidChange['eventName'],
+    eventName: 'playbackStateDidChange',
     listenerFunc: PlaybackStateDidChangeListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
   addListener(
-    eventName: MusicKit.NowPlayingItemDidChange['eventName'],
+    eventName: 'nowPlayingItemDidChange',
     listenerFunc: NowPlayingItemDidChangeListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
   addListener(
-    eventName: MusicKit.AuthorizationStatusDidChange['eventName'],
+    eventName: 'authorizationStatusDidChange',
     listenerFunc: AuthorizationStatusDidChangeListener,
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
 }

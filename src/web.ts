@@ -24,6 +24,9 @@ import type {
   GetLibraryTrackResult,
   GetLibraryTrackOptions,
   GetLibraryAlbumOptions,
+  PlaybackStateDidChangeResult,
+  NowPlayingItemDidChangeResult,
+  AuthorizationStatusDidChangeResult,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -38,8 +41,9 @@ export class CapacitorMusicKitWeb
   private playbackStateDidChange = (
     data: Parameters<MusicKit.PlaybackStateDidChange['callback']>[0],
   ) => {
-    const status = MusicKit.PlaybackStates[data.state] as PlaybackStates;
-    this.notifyListeners('playbackStateDidChange', { result: status });
+    const state = MusicKit.PlaybackStates[data.state] as PlaybackStates;
+    const result: PlaybackStateDidChangeResult = { state };
+    this.notifyListeners('playbackStateDidChange', result);
   };
 
   private nowPlayingItemDidChange = (
@@ -57,7 +61,9 @@ export class CapacitorMusicKitWeb
         artworkUrl: item.attributes.artwork?.url,
       };
     }
-    this.notifyListeners('nowPlayingItemDidChange', { result: track });
+    const index = MusicKit.getInstance().nowPlayingItemIndex;
+    const result: NowPlayingItemDidChangeResult = { track, index };
+    this.notifyListeners('nowPlayingItemDidChange', result);
   };
 
   private authorizationStatusDidChange = (
@@ -74,7 +80,8 @@ export class CapacitorMusicKitWeb
     } else if (data.authorizationStatus === 3) {
       status = 'authorized';
     }
-    this.notifyListeners('authorizationStatusDidChange', { result: status });
+    const result: AuthorizationStatusDidChangeResult = { status };
+    this.notifyListeners('authorizationStatusDidChange', result);
   };
 
   async configure(options: ConfigureOptions): Promise<ActionResult> {
