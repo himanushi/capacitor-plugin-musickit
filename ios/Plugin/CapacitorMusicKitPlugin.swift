@@ -68,7 +68,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
             notifyListeners(
                 "nowPlayingItemDidChange",
-                data: ["track": resultSong, "index": player.indexOfNowPlayingItem])
+                data: ["track": resultSong as Any, "index": player.indexOfNowPlayingItem])
         }
     }
 
@@ -128,7 +128,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
 
     func toResultAlbum(_ album: Album, _ artworkUrl: String?) -> [String: Any?] {
-        var resultAlbum: [String: Any?] = [
+        let resultAlbum: [String: Any?] = [
             "id": album.id.rawValue,
             "name": album.title,
             "artworkUrl": artworkUrl,
@@ -260,7 +260,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         let id = call.getString("id")
 
         Task {
-            var reason = "開始"
+            var reason: String = "開始"
             var resultAlbum: Album?
             var resultSongs: [[String: Any?]] = []
 
@@ -323,7 +323,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 resultTrack = toResultSong(song, await toBase64Image(song.artwork, lSize))
             }
 
-            call.resolve(["track": resultTrack])
+            call.resolve(["track": resultTrack!])
         }
     }
 
@@ -393,6 +393,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 }
             }
             ApplicationMusicPlayer.shared.queue = .init(for: songs)
+            try await ApplicationMusicPlayer.shared.prepareToPlay()
             preQueueSongs = songs
             call.resolve(["result": true])
         }
@@ -410,9 +411,29 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                     let trackIndex = songs.count > startIndex ? startIndex : songs.count
                     ApplicationMusicPlayer.shared.queue = .init(
                         for: songs, startingAt: songs[trackIndex])
+
+                    // Await prepare
+                    for time in [1, 1, 1] {
+                        sleep(UInt32(time))
+                        try await ApplicationMusicPlayer.shared.prepareToPlay()
+                        if ApplicationMusicPlayer.shared.isPreparedToPlay {
+                            try await ApplicationMusicPlayer.shared.play()
+                            result = true
+                            break
+                        }
+                    }
+                } else {
+
+                    // Await prepare
+                    for time in [0, 1, 1] {
+                        sleep(UInt32(time))
+                        if ApplicationMusicPlayer.shared.isPreparedToPlay {
+                            try await ApplicationMusicPlayer.shared.play()
+                            result = true
+                            break
+                        }
+                    }
                 }
-                try await ApplicationMusicPlayer.shared.play()
-                result = true
             } catch {
                 print(error)
             }
