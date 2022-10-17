@@ -42,7 +42,7 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "lint:ios": "swift-format format ios/Plugin/CapacitorMusicKitPlugin.swift --configuration ios/.swift-format --recursive --in-place"
+    "ios:lint": "swift-format format ios/Plugin/CapacitorMusicKitPlugin.swift --configuration ios/.swift-format --recursive --in-place"
   },
   "devDependencies": {
     "@capacitor/android": "^4.0.0",
