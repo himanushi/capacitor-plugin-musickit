@@ -11,6 +11,7 @@ import MusicKit
 @objc(CapacitorMusicKitPlugin)
 public class CapacitorMusicKitPlugin: CAPPlugin {
     let player = MPMusicPlayerController.applicationMusicPlayer
+    var preQueueSongs: [Song] = []
     
     let sSize = 200
     let mSize = 400
@@ -91,8 +92,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
     
     func queueSongs() -> [Song] {
-        let songs = ApplicationMusicPlayer.shared.queue.entries.map { toSong($0.item) }
-        return songs.compactMap { $0 }
+        return  ApplicationMusicPlayer.shared.queue.entries.map { toSong($0.item) }.compactMap { $0 }
     }
     
     func currentSong() -> Song? {
@@ -379,17 +379,18 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             let responseCatalog = try await requestCatalog.response()
             
             // sort tracks
-            var tracks: [Song] = []
+            var songs: [Song] = []
             ids.forEach { id in
                 let libraryItem = responseLibrary.items.first(where: { $0.id.rawValue == id })
                 let catalogItem = responseCatalog.items.first(where: { $0.id.rawValue == id })
                 if let track = libraryItem {
-                    tracks.append(track)
+                    songs.append(track)
                 } else if let track = catalogItem {
-                    tracks.append(track)
+                    songs.append(track)
                 }
             }
-            ApplicationMusicPlayer.shared.queue = .init(for: tracks)
+            ApplicationMusicPlayer.shared.queue = .init(for: songs)
+            preQueueSongs = songs
             call.resolve(["result": true])
         }
     }
@@ -401,12 +402,8 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             var result = false
             do {
                 if let startIndex = index {
-                    let songs = queueSongs()
-                    let trackIndex =
-                        ApplicationMusicPlayer.shared.queue.entries.count > startIndex ?
-                            startIndex :
-                            ApplicationMusicPlayer.shared.queue.entries.count
-                    
+                    let songs = preQueueSongs
+                    let trackIndex = songs.count > startIndex ? startIndex : songs.count
                     ApplicationMusicPlayer.shared.queue = .init(for: songs, startingAt: songs[trackIndex])
                 }
                 try await ApplicationMusicPlayer.shared.play()
@@ -464,3 +461,4 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         call.resolve(["result": true])
     }
 }
+t
