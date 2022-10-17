@@ -378,7 +378,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             let requestCatalog = MusicCatalogResourceRequest<Song>(matching: \.id, memberOf: ids.map {MusicItemID($0)})
             let responseCatalog = try await requestCatalog.response()
             
-            // sort tracks
+            // sort songs
             var songs: [Song] = []
             ids.forEach { id in
                 let libraryItem = responseLibrary.items.first(where: { $0.id.rawValue == id })
@@ -402,6 +402,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             var result = false
             do {
                 if let startIndex = index {
+                    // Use preQueueSongs because there is no data in the ApplicationMusicPlayer.shared.queue before playback.
                     let songs = preQueueSongs
                     let trackIndex = songs.count > startIndex ? startIndex : songs.count
                     ApplicationMusicPlayer.shared.queue = .init(for: songs, startingAt: songs[trackIndex])
@@ -461,4 +462,3 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         call.resolve(["result": true])
     }
 }
-t
