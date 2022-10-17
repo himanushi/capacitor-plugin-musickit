@@ -11,7 +11,6 @@ import MusicKit
 @objc(CapacitorMusicKitPlugin)
 public class CapacitorMusicKitPlugin: CAPPlugin {
     let player = MPMusicPlayerController.applicationMusicPlayer
-    var queueTracks: [Song] = []
     
     let sSize = 200
     let mSize = 400
@@ -62,44 +61,80 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     
     @objc private func nowPlayingItemDidChange() {
         Task {
-            var resultTrack: [String: Any?]? = nil
-            let index = player.indexOfNowPlayingItem
-            
-            if index >= 0 && queueTracks.count >= index {
-                let track = queueTracks[index]
-                resultTrack = [
-                    "id": track.id.rawValue,
-                    "name": track.title,
-                    "discNumber": track.discNumber,
-                    "trackNumber": track.trackNumber,
-                    "durationMs": Double(track.duration ?? 0) * 1000,
-                    "artworkUrl": await toBase64Image(track.artwork, lSize)
-                ]
+            var resultSong: [String: Any?]? = nil
+
+            if let song = currentSong() {
+                resultSong = toResultSong(song, await toBase64Image(song.artwork, lSize))
             }
-            
-            notifyListeners("nowPlayingItemDidChange", data: ["track": resultTrack, "index": player.indexOfNowPlayingItem])
+        
+            notifyListeners("nowPlayingItemDidChange", data: ["track": resultSong, "index": player.indexOfNowPlayingItem])
         }
     }
 
     @objc private func authorizationStatusDidChange() {
-        Task {
-            var result = ""
-            let status = MusicAuthorization.currentStatus
-            
-            if status == .notDetermined {
-                result = "notDetermined"
-            } else if status == .denied {
-                result = "denied"
-            } else if status == .restricted {
-                result = "restricted"
-            } else if status == .authorized {
-                result = "authorized"
-            }
-            
-            if result != "" {
-                notifyListeners("authorizationStatusDidChange", data: ["status": result])
-            }
+        var result = ""
+        let status = MusicAuthorization.currentStatus
+        
+        if status == .notDetermined {
+            result = "notDetermined"
+        } else if status == .denied {
+            result = "denied"
+        } else if status == .restricted {
+            result = "restricted"
+        } else if status == .authorized {
+            result = "authorized"
         }
+        
+        if result != "" {
+            notifyListeners("authorizationStatusDidChange", data: ["status": result])
+        }
+    }
+    
+    func queueSongs() -> [Song] {
+        let songs = ApplicationMusicPlayer.shared.queue.entries.map { toSong($0.item) }
+        return songs.compactMap { $0 }
+    }
+    
+    func currentSong() -> Song? {
+        return toSong(ApplicationMusicPlayer.shared.queue.currentEntry?.item)
+    }
+    
+    func toSong(_ item: MusicKit.MusicPlayer.Queue.Entry.Item?) -> Song? {
+        switch item {
+        case let .song(song):
+            return song
+        default:
+            return nil
+        }
+    }
+    
+    func toResultSong(_ optionalSong: Song?, _ artworkUrl: String?) -> [String: Any?]? {
+        var resultSong: [String: Any?]? = nil
+        
+        guard let song = optionalSong else {
+            return nil
+        }
+        
+        resultSong = [
+            "id": song.id.rawValue,
+            "name": song.title,
+            "discNumber": song.discNumber,
+            "trackNumber": song.trackNumber,
+            "durationMs": Double(song.duration ?? 0) * 1000,
+            "artworkUrl": artworkUrl
+        ]
+        
+        return resultSong
+    }
+    
+    func toResultAlbum(_ album: Album, _ artworkUrl: String?) -> [String: Any?] {
+        var resultAlbum: [String: Any?] = [
+            "id": album.id.rawValue,
+            "name": album.title,
+            "artworkUrl": artworkUrl
+        ]
+        
+        return resultAlbum
     }
     
     func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {
@@ -171,10 +206,8 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             if status == .authorized {
                 result = true
             } else {
-                guard let settingsURL = await URL(string: UIApplication.openSettingsURLString)
-                else {
-                    call.resolve(["result": result])
-                    return
+                guard let settingsURL = await URL(string: UIApplication.openSettingsURLString) else {
+                    return call.resolve(["result": result])
                 }
                 await UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
             }
@@ -186,8 +219,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         Task {
             // 設定アプリに遷移するだけなので authorizationStatusDidChange は発火させない
             guard let settingsURL = await URL(string: UIApplication.openSettingsURLString) else {
-                call.resolve(["result": false])
-                return
+                return call.resolve(["result": false])
             }
             await UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
             call.resolve(["result": true])
@@ -200,7 +232,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         
         Task {
             var hasNext = false
-            var resultAlbums: [[String: String?]] = []
+            var resultAlbums: [[String: Any?]] = []
             
             var request = MusicLibraryRequest<Album>()
             request.sort(by: \.title, ascending: true)
@@ -209,11 +241,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             let response = try await request.response()
             
             for album in response.items {
-                resultAlbums.append([
-                    "id": album.id.rawValue,
-                    "name": album.title,
-                    "artworkUrl": await toBase64Image(album.artwork, sSize),
-                ])
+                resultAlbums.append(toResultAlbum(album, await toBase64Image(album.artwork, sSize)))
             }
 
             if response.items.count == limit {
@@ -232,10 +260,8 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
         Task {
             var reason = "開始"
-            var resultAlbumId: String? = nil
-            var resultAlbumName: String? = nil
-            var resultAlbumArtworkUrl: String? = nil
-            var resultTracks: [[String: Any?]] = []
+            var resultAlbum: Album?
+            var resultSongs: [[String: Any?]] = []
 
             if MusicAuthorization.currentStatus == .authorized {
                 reason = reason + ",ログイン済み"
@@ -247,7 +273,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                     if let album = responseAlbum.items.first {
                         reason = reason + ",アルバムあり"
                         
-                        var requestSong = MusicLibraryRequest<Track>()
+                        var requestSong = MusicLibraryRequest<Song>()
                         requestSong.filter(matching: \.albums, contains: album)
                         requestSong.sort(by: \.discNumber, ascending: true)
                         requestSong.sort(by: \.trackNumber, ascending: true)
@@ -255,22 +281,10 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                         
                         if responseSong.items.count > 0 {
                             reason = reason + ",曲あり"
-                            
-                            resultAlbumId = id
-                            resultAlbumName = String(album.title)
-                            resultAlbumArtworkUrl = await toBase64Image(album.artwork, lSize)
-                            let artworkUrl = await toBase64Image(album.artwork, sSize)
 
-                            responseSong.items.forEach {
-                                resultTracks.append([
-                                    "id": $0.id.rawValue,
-                                    "name": $0.title,
-                                    "discNumber": $0.discNumber,
-                                    "trackNumber": $0.trackNumber,
-                                    "durationMs": Double($0.duration ?? 0) * 1000,
-                                    "artworkUrl": artworkUrl,
-                                ])
-                            }
+                            resultAlbum = album
+                            let artworkUrl = await toBase64Image(album.artwork, sSize)
+                            responseSong.items.forEach { resultSongs.append(toResultSong($0, artworkUrl)!) }
                         } else {
                             reason = reason + ",曲なし"
                         }
@@ -282,18 +296,17 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 reason = reason + ",未ログイン"
             }
 
-            if(resultAlbumId == nil) {
-                call.resolve(["reason": reason, "album": nil])
-            } else {
-                print(resultTracks)
+            if let album = resultAlbum {
+                var albumHash = toResultAlbum(album, await toBase64Image(album.artwork, lSize))
+                albumHash["tracks"] = resultSongs
                 call.resolve([
                     "reason": reason,
-                    "album": [
-                        "id": resultAlbumId,
-                        "name": resultAlbumName,
-                        "artworkUrl": resultAlbumArtworkUrl,
-                        "tracks": resultTracks,
-                    ],
+                    "album": albumHash,
+                ])
+            } else {
+                call.resolve([
+                    "reason": reason,
+                    "album": nil
                 ])
             }
         }
@@ -302,40 +315,24 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     @objc func getCurrentTrack(_ call: CAPPluginCall) {
         Task {
             var resultTrack: [String: Any?]? = nil
-            let index = player.indexOfNowPlayingItem
             
-            if index >= 0 && queueTracks.count >= index {
-                let track = queueTracks[index]
-                resultTrack = [
-                    "id": track.id.rawValue,
-                    "name": track.title,
-                    "discNumber": track.discNumber,
-                    "trackNumber": track.trackNumber,
-                    "durationMs": Double(track.duration ?? 0) * 1000,
-                    "artworkUrl": await toBase64Image(track.artwork, lSize)
-                ]
+            if let song = currentSong() {
+                resultTrack = toResultSong(song, await toBase64Image(song.artwork, lSize))
             }
-
+            
             call.resolve(["track": resultTrack])
         }
     }
     
     @objc func getQueueTracks(_ call: CAPPluginCall) {
         Task {
-            var resultTracks: [[String: Any?]] = []
-            
-            for track in queueTracks {
-                let artworkUrl = await toBase64Image(track.artwork, sSize)
-                resultTracks.append([
-                    "id": track.id.rawValue,
-                    "name": track.title,
-                    "discNumber": track.discNumber,
-                    "trackNumber": track.trackNumber,
-                    "durationMs": Double(track.duration ?? 0) * 1000,
-                    "artworkUrl": artworkUrl
-                ])
+            var resultSongs: [[String: Any?]] = []
+
+            for song in queueSongs() {
+                resultSongs.append(toResultSong(song, await toBase64Image(song.artwork, sSize))!)
             }
-            call.resolve(["tracks": resultTracks])
+            
+            call.resolve(["tracks": resultSongs])
         }
     }
     
@@ -373,19 +370,26 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         let ids: [String] = call.getArray("ids", String.self) ?? []
 
         Task {
-            var request = MusicLibraryRequest<Song>()
-            request.filter(matching: \.id, memberOf: ids.map {MusicItemID($0)})
-            let response = try await request.response()
+            var requestLibrary = MusicLibraryRequest<Song>()
+            requestLibrary.filter(matching: \.id, memberOf: ids.map {MusicItemID($0)})
+            let responseLibrary = try await requestLibrary.response()
+
+            // only online
+            let requestCatalog = MusicCatalogResourceRequest<Song>(matching: \.id, memberOf: ids.map {MusicItemID($0)})
+            let responseCatalog = try await requestCatalog.response()
+            
             // sort tracks
             var tracks: [Song] = []
             ids.forEach { id in
-                let item = response.items.first(where: { $0.id.rawValue == id })
-                if let track = item {
+                let libraryItem = responseLibrary.items.first(where: { $0.id.rawValue == id })
+                let catalogItem = responseCatalog.items.first(where: { $0.id.rawValue == id })
+                if let track = libraryItem {
+                    tracks.append(track)
+                } else if let track = catalogItem {
                     tracks.append(track)
                 }
             }
             ApplicationMusicPlayer.shared.queue = .init(for: tracks)
-            queueTracks = tracks
             call.resolve(["result": true])
         }
     }
@@ -397,8 +401,13 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             var result = false
             do {
                 if let startIndex = index {
-                    let trackIndex = queueTracks.count > startIndex ? startIndex : queueTracks.count
-                    ApplicationMusicPlayer.shared.queue = .init(for: queueTracks, startingAt: queueTracks[trackIndex])
+                    let songs = queueSongs()
+                    let trackIndex =
+                        ApplicationMusicPlayer.shared.queue.entries.count > startIndex ?
+                            startIndex :
+                            ApplicationMusicPlayer.shared.queue.entries.count
+                    
+                    ApplicationMusicPlayer.shared.queue = .init(for: songs, startingAt: songs[trackIndex])
                 }
                 try await ApplicationMusicPlayer.shared.play()
                 result = true
