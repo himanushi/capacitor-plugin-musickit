@@ -377,7 +377,6 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             requestLibrary.filter(matching: \.id, memberOf: ids.map { MusicItemID($0) })
             let responseLibrary = try await requestLibrary.response()
 
-            // only online
             let requestCatalog = MusicCatalogResourceRequest<Song>(
                 matching: \.id, memberOf: ids.map { MusicItemID($0) })
             let responseCatalog = try await requestCatalog.response()
