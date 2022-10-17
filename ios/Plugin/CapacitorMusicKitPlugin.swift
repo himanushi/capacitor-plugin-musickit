@@ -377,19 +377,28 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             requestLibrary.filter(matching: \.id, memberOf: ids.map { MusicItemID($0) })
             let responseLibrary = try await requestLibrary.response()
 
-            let requestCatalog = MusicCatalogResourceRequest<Song>(
-                matching: \.id, memberOf: ids.map { MusicItemID($0) })
-            let responseCatalog = try await requestCatalog.response()
+            let libraryIds = responseLibrary.items.map { $0.id.rawValue }
+            let catalogIds = ids.filter { !libraryIds.contains($0) }
+
+            var responseCatalog: MusicCatalogResourceResponse<Song>? = nil
+            if catalogIds.count > 0 {
+                let requestCatalog = MusicCatalogResourceRequest<Song>(
+                    matching: \.id, memberOf: catalogIds.map { MusicItemID($0) })
+                responseCatalog = try await requestCatalog.response()
+            }
 
             // sort songs
             var songs: [Song] = []
             ids.forEach { id in
                 let libraryItem = responseLibrary.items.first(where: { $0.id.rawValue == id })
-                let catalogItem = responseCatalog.items.first(where: { $0.id.rawValue == id })
                 if let track = libraryItem {
                     songs.append(track)
-                } else if let track = catalogItem {
-                    songs.append(track)
+                }
+
+                if let catalog = responseCatalog {
+                    if let track = catalog.items.first(where: { $0.id.rawValue == id }) {
+                        songs.append(track)
+                    }
                 }
             }
             ApplicationMusicPlayer.shared.queue = .init(for: songs)
