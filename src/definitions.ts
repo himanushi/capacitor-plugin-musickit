@@ -1,5 +1,44 @@
 import type { PluginListenerHandle } from '@capacitor/core';
 
+export interface PlayParameters {
+  id: string;
+  isLibrary: boolean;
+  kind: string;
+  catalogId?: string;
+  purchasedId?: string;
+  globalId?: string;
+}
+
+export interface ArtistResult {
+  id: string;
+  name: string;
+  artworkUrl?: string;
+}
+
+export interface AlbumResult {
+  id: string;
+  name: string;
+  artworkUrl?: string;
+}
+
+export interface TrackResult {
+  id: string;
+  name: string;
+  durationMs: number;
+  discNumber: number;
+  trackNumber: number;
+  artworkUrl?: string;
+}
+
+export interface PlaylistResult {
+  id: string;
+  name: string;
+  description?: string;
+  artworkUrl?: string;
+}
+
+export type Relation = 'artists' | 'albums' | 'tracks';
+
 export interface ActionResult {
   result: boolean;
 }
@@ -16,50 +55,60 @@ export interface ConfigureOptions {
   config: MusicKit.Config;
 }
 
-export interface GetLibraryAlbumsOptions {
+export interface GetSingleDataOptions {
+  id: string;
+  include?: Relation[];
+}
+
+export interface GetMultiDataOptions {
+  ids?: string[];
   limit: number;
   offset: number;
 }
 
-export interface AlbumResult {
-  id: string;
-  name: string;
-  artworkUrl?: string;
-}
-
-export interface TrackResult {
-  id: string;
-  catalogId?: string;
-  purchasedId?: string;
-  name: string;
-  durationMs: number;
-  discNumber: number;
-  trackNumber: number;
-  artworkUrl?: string;
-}
-
-export interface GetLibraryAlbumsResult {
-  albums: AlbumResult[];
+export interface GetMultiDataResult {
+  total: number;
   hasNext: boolean;
 }
 
-export interface GetLibraryAlbumOptions {
-  id: string;
+export interface GetLibraryArtistResult {
+  artist?: ArtistResult;
+  albums?: AlbumResult[];
+  tracks?: TrackResult[];
 }
 
-export interface GetLibraryTrackOptions {
-  id: string;
-}
+export type GetLibraryArtistsResult = {
+  artists: ArtistResult[];
+} & GetMultiDataResult;
 
 export interface GetLibraryAlbumResult {
-  album?: AlbumResult & {
-    tracks: TrackResult[];
-  };
+  album?: AlbumResult;
+  tracks?: TrackResult[];
+  artists?: ArtistResult[];
 }
+
+export type GetLibraryAlbumsResult = {
+  albums: AlbumResult[];
+} & GetMultiDataResult;
 
 export interface GetLibraryTrackResult {
   track?: TrackResult;
+  artists?: ArtistResult[];
+  albums?: AlbumResult[];
 }
+
+export type GetLibraryTracksResult = {
+  tracks: TrackResult[];
+} & GetMultiDataResult;
+
+export interface GetLibraryPlaylistResult {
+  playlist?: PlaylistResult;
+  tracks?: TrackResult[];
+}
+
+export type GetLibraryPlaylistsResult = {
+  playlists: PlaylistResult[];
+} & GetMultiDataResult;
 
 export interface GetCurrentTrackResult {
   track?: TrackResult;
@@ -150,15 +199,30 @@ export interface CapacitorMusicKitPlugin {
   hasMusicSubscription(): Promise<ActionResult>;
   authorize(): Promise<void>;
   unauthorize(): Promise<void>;
-  getLibraryAlbums(
-    options: GetLibraryAlbumsOptions,
-  ): Promise<GetLibraryAlbumsResult>;
+  getLibraryArtist(
+    options: GetSingleDataOptions,
+  ): Promise<GetLibraryArtistResult>;
+  getLibraryArtists(
+    options: GetMultiDataOptions,
+  ): Promise<GetLibraryArtistsResult>;
   getLibraryAlbum(
-    options: GetLibraryAlbumOptions,
+    options: GetSingleDataOptions,
   ): Promise<GetLibraryAlbumResult>;
+  getLibraryAlbums(
+    options: GetMultiDataOptions,
+  ): Promise<GetLibraryAlbumsResult>;
   getLibraryTrack(
-    options: GetLibraryTrackOptions,
+    options: GetSingleDataOptions,
   ): Promise<GetLibraryTrackResult>;
+  getLibraryTracks(
+    options: GetMultiDataOptions,
+  ): Promise<GetLibraryTracksResult>;
+  getLibraryPlaylist(
+    options: GetSingleDataOptions,
+  ): Promise<GetLibraryPlaylistResult>;
+  getLibraryPlaylists(
+    options: GetMultiDataOptions,
+  ): Promise<GetLibraryPlaylistsResult>;
   getCurrentTrack(): Promise<GetCurrentTrackResult>;
   getQueueTracks(): Promise<GetQueueTracksResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;

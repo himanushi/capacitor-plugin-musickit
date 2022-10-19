@@ -1,13 +1,13 @@
 import { WebPlugin } from '@capacitor/core';
 
 import type {
+  Relation,
   CapacitorMusicKitPlugin,
   PlaybackStates,
   AuthorizationStatus,
   EchoOptions,
   EchoResult,
   ConfigureOptions,
-  GetLibraryAlbumsOptions,
   GetLibraryAlbumsResult,
   GetLibraryAlbumResult,
   SetQueueOptions,
@@ -22,11 +22,19 @@ import type {
   SetRepeatModeOptions,
   getRepeatModeResult,
   GetLibraryTrackResult,
-  GetLibraryTrackOptions,
-  GetLibraryAlbumOptions,
   PlaybackStateDidChangeResult,
   NowPlayingItemDidChangeResult,
   AuthorizationStatusDidChangeResult,
+  GetMultiDataOptions,
+  GetSingleDataOptions,
+  ArtistResult,
+  AlbumResult,
+  GetLibraryTracksResult,
+  GetLibraryArtistResult,
+  GetLibraryArtistsResult,
+  GetLibraryPlaylistResult,
+  PlaylistResult,
+  GetLibraryPlaylistsResult,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -52,14 +60,7 @@ export class CapacitorMusicKitWeb
     let track: TrackResult | undefined;
     const item = data.item;
     if (item) {
-      track = {
-        id: item.id,
-        name: item.attributes.name,
-        durationMs: item.attributes.durationInMillis,
-        discNumber: item.attributes.discNumber,
-        trackNumber: item.attributes.trackNumber,
-        artworkUrl: item.attributes.artwork?.url,
-      };
+      track = this.toResultTrack(item);
     }
     const index = MusicKit.getInstance().nowPlayingItemIndex;
     const result: NowPlayingItemDidChangeResult = { track, index };
@@ -83,6 +84,101 @@ export class CapacitorMusicKitWeb
     const result: AuthorizationStatusDidChangeResult = { status };
     this.notifyListeners('authorizationStatusDidChange', result);
   };
+
+  toResultArtist = (artist: MusicKit.APIResultData): ArtistResult => ({
+    id: artist.id,
+    name: artist.attributes.name,
+    artworkUrl: artist.attributes.artwork?.url,
+  });
+
+  toResultAlbum = (album: MusicKit.APIResultData): AlbumResult => ({
+    id: album.id,
+    name: album.attributes.name,
+    artworkUrl: album.attributes.artwork?.url,
+  });
+
+  toResultTrack = (track: MusicKit.APIResultData): TrackResult => ({
+    id: track.id,
+    name: track.attributes.name,
+    durationMs: track.attributes.durationInMillis,
+    discNumber: track.attributes.discNumber,
+    trackNumber: track.attributes.trackNumber,
+    artworkUrl: track.attributes.artwork?.url,
+  });
+
+  toResultPlaylist = (playlist: MusicKit.APIResultData): PlaylistResult => ({
+    id: playlist.id,
+    name: playlist.attributes.name,
+    description: playlist.attributes.description?.standard,
+    artworkUrl: playlist.attributes.artwork?.url,
+  });
+
+  include = (options: { include?: Relation[] }, relation: Relation): boolean =>
+    options.include?.includes(relation) ?? false;
+
+  relationParams(
+    options: { include?: Relation[] },
+    relations: Relation[],
+  ): { include: Relation[] } {
+    const include: Relation[] = [];
+    relations.forEach(relation => {
+      this.include(options, relation) && include.push(relation);
+    });
+    return { include };
+  }
+
+  selectionArtists(item: MusicKit.APIResultData): ArtistResult[] {
+    const items: ArtistResult[] = [];
+    item.relationships.artists?.data.forEach(artist => {
+      items.push(this.toResultArtist(artist));
+    });
+    return items;
+  }
+
+  selectionAlbums(item: MusicKit.APIResultData): AlbumResult[] {
+    const items: AlbumResult[] = [];
+    item.relationships.albums?.data.forEach(album => {
+      items.push(this.toResultAlbum(album));
+    });
+    return items;
+  }
+
+  selectionTracks(item: MusicKit.APIResultData): TrackResult[] {
+    const items: TrackResult[] = [];
+    item.relationships.tracks?.data.forEach(track => {
+      items.push(this.toResultTrack(track));
+    });
+    return items;
+  }
+
+  async nextTracks(
+    options: { include?: Relation[] },
+    nextTrackUrl: string | undefined,
+  ): Promise<TrackResult[]> {
+    const tracks: TrackResult[] = [];
+
+    if (options.include?.includes('tracks') && nextTrackUrl) {
+      let hasNext = false;
+      let fetchUrl = `${nextTrackUrl}&limit=100`;
+
+      do {
+        hasNext = false;
+        const response = await MusicKit.getInstance().api.music(fetchUrl);
+        const data = response.data;
+        if (data) {
+          data.data.forEach(track => {
+            tracks.push(this.toResultTrack(track));
+          });
+          if (data.next) {
+            hasNext = true;
+            fetchUrl = `${data.next}&limit=100`;
+          }
+        }
+      } while (hasNext);
+    }
+
+    return tracks;
+  }
 
   async configure(options: ConfigureOptions): Promise<ActionResult> {
     let result = false;
@@ -159,132 +255,252 @@ export class CapacitorMusicKitWeb
     }
   }
 
-  async getLibraryAlbums(
-    options: GetLibraryAlbumsOptions,
-  ): Promise<GetLibraryAlbumsResult> {
-    const albums: GetLibraryAlbumsResult['albums'] = [];
+  async getLibraryArtist(
+    options: GetSingleDataOptions,
+  ): Promise<GetLibraryArtistResult> {
+    let artist: ArtistResult | undefined;
+    let albums: AlbumResult[] | undefined;
+    let tracks: TrackResult[] | undefined;
 
-    const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/albums?limit=${options.limit}&offset=${options.offset}`,
-    );
+    let nextTrackUrl: string | undefined;
+    const fetchUrl = `/v1/me/library/artists/${options.id}`;
+    const params = this.relationParams(options, ['albums', 'tracks']);
 
-    response.data.data.map(album => {
-      albums.push({
-        id: album.id,
-        name: album.attributes.name,
-        artworkUrl: album.attributes.artwork?.url,
-      });
-    });
-
-    const hasNext =
-      response.data.meta.total !== options.offset + response.data.data.length;
-
-    return { albums, hasNext };
-  }
-
-  async getLibraryAlbum(
-    options: GetLibraryAlbumOptions,
-  ): Promise<GetLibraryAlbumResult> {
-    let album: GetLibraryAlbumResult['album'];
-    let hasNext = false;
-    let resultAlbum: MusicKit.APIResultData | undefined;
-    let fetchUrl = `/v1/me/library/albums/${options.id}`;
-
-    // アルバム検索
-    const limit = 10;
-    let count = 0;
-    do {
-      // 無限ループの可能性を排除
-      count += 1;
-      if (count > limit) {
-        break;
-      }
-      hasNext = false;
-      const response = await MusicKit.getInstance().api.music(fetchUrl);
-      const albums = options.id
-        ? { data: response.data.data, next: false }
-        : response.data.results['library-albums'];
-
-      if (albums) {
-        resultAlbum = albums.data.find(abm => abm.id === options.id);
-        if (resultAlbum) {
-          album = {
-            id: resultAlbum.id,
-            name: resultAlbum.attributes.name,
-            artworkUrl: resultAlbum.attributes.artwork?.url,
-            tracks: [],
-          };
-          break;
-        }
-        if (albums.next) {
-          hasNext = true;
-          fetchUrl = `${albums.next}&limit=25`;
-        }
-      }
-    } while (hasNext);
-
-    // 曲一覧
-    if (album) {
-      hasNext = false;
-      fetchUrl = `/v1/me/library/albums/${album.id}/tracks?limit=100`;
-      const tracks: TrackResult[] = [];
-      count = 0;
-
-      do {
-        // 無限ループの可能性を排除
-        count += 1;
-        if (count > limit) {
-          break;
-        }
-        hasNext = false;
-        const response = await MusicKit.getInstance().api.music(fetchUrl);
-        const data = response.data;
-        if (data) {
-          for (const track of data.data) {
-            tracks.push({
-              id: track.id,
-              name: track.attributes.name,
-              durationMs: track.attributes.durationInMillis,
-              discNumber: track.attributes.discNumber,
-              trackNumber: track.attributes.trackNumber,
-              artworkUrl: track.attributes.artwork?.url,
-            });
-          }
-          if (data.next) {
-            hasNext = true;
-            fetchUrl = `${data.next}&limit=100`;
-          }
-        }
-      } while (hasNext);
-
-      album.tracks = tracks;
-    }
-
-    return { album };
-  }
-
-  async getLibraryTrack(
-    options: GetLibraryTrackOptions,
-  ): Promise<GetLibraryTrackResult> {
-    let track: TrackResult | undefined;
     try {
-      const fetchUrl = `/v1/me/library/songs/${options.id}`;
-      const response = await MusicKit.getInstance().api.music(fetchUrl);
-      const resultTrack = response.data.data[0];
-      if (resultTrack) {
-        track = {
-          id: resultTrack.id,
-          name: resultTrack.attributes.name,
-          durationMs: resultTrack.attributes.durationInMillis,
-          discNumber: resultTrack.attributes.discNumber,
-          trackNumber: resultTrack.attributes.trackNumber,
-          artworkUrl: resultTrack.attributes.artwork?.url, // bug?
-        };
+      // Artist
+      const response = await MusicKit.getInstance().api.music(fetchUrl, params);
+      const item = response.data.data.find(itm => itm.id === options.id);
+      if (item) {
+        artist = this.toResultArtist(item);
+
+        // Albums
+        if (this.include(options, 'albums')) {
+          albums = this.selectionAlbums(item);
+        }
+
+        // Tracks
+        if (this.include(options, 'tracks')) {
+          nextTrackUrl = item.relationships.tracks?.next;
+          tracks = this.selectionTracks(item);
+        }
+      }
+
+      // Next tracks
+      if (artist && tracks) {
+        tracks = tracks.concat(await this.nextTracks(options, nextTrackUrl));
       }
     } catch (error) {
       console.log(error);
     }
-    return { track };
+
+    return { artist, albums, tracks };
+  }
+
+  async getLibraryArtists(
+    options: GetMultiDataOptions,
+  ): Promise<GetLibraryArtistsResult> {
+    const idsOption = options.ids ? { ids: options.ids } : {};
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/library/artists`,
+      {
+        limit: options.limit,
+        offset: options.offset,
+        ...idsOption,
+      },
+    );
+
+    const artists: ArtistResult[] = response.data.data.map(item =>
+      this.toResultArtist(item),
+    );
+
+    const hasNext =
+      response.data.meta.total !== options.offset + response.data.data.length;
+
+    return { artists, hasNext, total: response.data.meta.total };
+  }
+
+  async getLibraryAlbum(
+    options: GetSingleDataOptions,
+  ): Promise<GetLibraryAlbumResult> {
+    let album: AlbumResult | undefined;
+    let artists: ArtistResult[] | undefined;
+    let tracks: TrackResult[] | undefined;
+
+    let nextTracksUrl: string | undefined;
+    const fetchUrl = `/v1/me/library/albums/${options.id}`;
+    const params = this.relationParams(options, ['artists', 'tracks']);
+
+    try {
+      // Album
+      const response = await MusicKit.getInstance().api.music(fetchUrl, params);
+      const item = response.data.data.find(itm => itm.id === options.id);
+      if (item) {
+        album = this.toResultAlbum(item);
+
+        // Tracks
+        if (options.include?.includes('tracks')) {
+          nextTracksUrl = item.relationships.tracks?.next;
+          tracks = this.selectionTracks(item);
+        }
+
+        // Artists
+        if (options.include?.includes('artists')) {
+          artists = this.selectionArtists(item);
+        }
+      }
+
+      // Next tracks
+      if (album) {
+        tracks = tracks?.concat(await this.nextTracks(options, nextTracksUrl));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    return { album, artists, tracks };
+  }
+
+  async getLibraryAlbums(
+    options: GetMultiDataOptions,
+  ): Promise<GetLibraryAlbumsResult> {
+    const idsOption = options.ids ? { ids: options.ids } : {};
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/library/albums`,
+      {
+        limit: options.limit,
+        offset: options.offset,
+        ...idsOption,
+      },
+    );
+
+    const albums: AlbumResult[] = response.data.data.map(item =>
+      this.toResultAlbum(item),
+    );
+
+    const hasNext =
+      response.data.meta.total !== options.offset + response.data.data.length;
+
+    return { albums, hasNext, total: response.data.meta.total };
+  }
+
+  async getLibraryTrack(
+    options: GetSingleDataOptions,
+  ): Promise<GetLibraryTrackResult> {
+    let track: TrackResult | undefined;
+    let artists: ArtistResult[] | undefined;
+    let albums: AlbumResult[] | undefined;
+
+    try {
+      const fetchUrl = `/v1/me/library/songs/${options.id}`;
+      const params = this.relationParams(options, ['albums', 'artists']);
+      const response = await MusicKit.getInstance().api.music(fetchUrl, params);
+      const resultTrack = response.data.data[0];
+
+      if (resultTrack) {
+        track = this.toResultTrack(resultTrack);
+
+        // Artists
+        if (options.include?.includes('artists')) {
+          artists = [];
+          resultTrack.relationships.artists?.data.forEach(artist => {
+            artists?.push(this.toResultArtist(artist));
+          });
+        }
+
+        // Albums
+        if (options.include?.includes('albums')) {
+          albums = [];
+          resultTrack.relationships.albums?.data.forEach(album => {
+            albums?.push(this.toResultAlbum(album));
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    return { track, artists, albums };
+  }
+
+  async getLibraryTracks(
+    options: GetMultiDataOptions,
+  ): Promise<GetLibraryTracksResult> {
+    const idsOption = options.ids ? { ids: options.ids } : {};
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/library/tracks`,
+      {
+        limit: options.limit,
+        offset: options.offset,
+        ...idsOption,
+      },
+    );
+
+    const tracks: TrackResult[] = response.data.data.map(item =>
+      this.toResultTrack(item),
+    );
+
+    const hasNext =
+      response.data.meta.total !== options.offset + response.data.data.length;
+
+    return { tracks, hasNext, total: response.data.meta.total };
+  }
+
+  async getLibraryPlaylist(
+    options: GetSingleDataOptions,
+  ): Promise<GetLibraryPlaylistResult> {
+    let playlist: PlaylistResult | undefined;
+    let tracks: TrackResult[] | undefined;
+
+    let nextTracksUrl: string | undefined;
+    const fetchUrl = `/v1/me/library/playlists/${options.id}`;
+    const params = this.relationParams(options, ['tracks']);
+
+    try {
+      // Playlist
+      const response = await MusicKit.getInstance().api.music(fetchUrl, params);
+      const item = response.data.data.find(itm => itm.id === options.id);
+      if (item) {
+        playlist = this.toResultPlaylist(item);
+
+        // Tracks
+        if (options.include?.includes('tracks')) {
+          nextTracksUrl = item.relationships.tracks?.next;
+          tracks = this.selectionTracks(item);
+        }
+      }
+
+      // Next tracks
+      if (playlist) {
+        tracks = tracks?.concat(await this.nextTracks(options, nextTracksUrl));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    return { playlist, tracks };
+  }
+
+  async getLibraryPlaylists(
+    options: GetMultiDataOptions,
+  ): Promise<GetLibraryPlaylistsResult> {
+    const idsOption = options.ids ? { ids: options.ids } : {};
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/library/albums`,
+      {
+        limit: options.limit,
+        offset: options.offset,
+        ...idsOption,
+      },
+    );
+
+    const playlists: PlaylistResult[] = response.data.data.map(item =>
+      this.toResultAlbum(item),
+    );
+
+    const hasNext =
+      response.data.meta.total !== options.offset + response.data.data.length;
+
+    return { playlists, hasNext, total: response.data.meta.total };
   }
 
   async getCurrentTrack(): Promise<GetCurrentTrackResult> {
@@ -292,14 +508,7 @@ export class CapacitorMusicKitWeb
     try {
       const item = MusicKit.getInstance().queue.currentItem;
       if (item) {
-        track = {
-          id: item.id,
-          name: item.attributes.name,
-          durationMs: item.attributes.durationInMillis,
-          discNumber: item.attributes.discNumber,
-          trackNumber: item.attributes.trackNumber,
-          artworkUrl: item.attributes.artwork?.url, // bug?
-        };
+        track = this.toResultTrack(item);
       }
     } catch (error) {
       console.log(error);
@@ -311,14 +520,7 @@ export class CapacitorMusicKitWeb
     const tracks: TrackResult[] = [];
     try {
       MusicKit.getInstance().queue.items.map(item =>
-        tracks.push({
-          id: item.id,
-          name: item.attributes.name,
-          durationMs: item.attributes.durationInMillis,
-          discNumber: item.attributes.discNumber,
-          trackNumber: item.attributes.trackNumber,
-          artworkUrl: item.attributes.artwork?.url, // bug?
-        }),
+        tracks.push(this.toResultTrack(item)),
       );
     } catch (error) {
       console.log(error);

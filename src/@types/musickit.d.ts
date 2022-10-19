@@ -18,7 +18,7 @@ declare namespace MusicKit {
   }
   interface NowPlayingItemDidChange {
     eventName: 'nowPlayingItemDidChange';
-    callback: (data: { item?: CurrentItem }) => void;
+    callback: (data: { item?: APIResultData }) => void;
   }
   interface AuthorizationStatusDidChange {
     eventName: 'authorizationStatusDidChange';
@@ -165,11 +165,22 @@ declare namespace MusicKit {
       albumName: string;
       playParams: PlayParams;
       previews: { url: string }[];
+      description?: { standard: string };
     };
     relationships: {
-      tracks: {
+      albums?: {
+        data: APIResultData[];
+        href: string;
+        next: string;
+      };
+      tracks?: {
         data: APIResultData[];
         meta: { total: number };
+        href: string;
+        next: string;
+      };
+      artists?: {
+        data: APIResultData[];
         href: string;
         next: string;
       };
@@ -280,14 +291,14 @@ declare namespace MusicKit {
   interface Queue {
     isEmpty: boolean;
     isRestricted: boolean;
-    items: MediaItem[];
+    items: APIResultData[];
     length: number;
     nextPlayableItem?: MediaItem;
     nextPlayableItemIndex?: number;
     position: number;
     previousPlayableItem?: MediaItem;
     previousPlayableItemIndex?: number;
-    currentItem?: CurrentItem;
+    currentItem?: APIResultData;
 
     addEventListener(eventName: string, callback: (result: any) => any): void;
     removeEventListener(
