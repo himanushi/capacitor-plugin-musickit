@@ -114,7 +114,11 @@ declare namespace MusicKit {
   }
 
   interface API {
-    music(endpoint: string, params?: Record<string, any>): Promise<APIResult>;
+    music(
+      endpoint: string,
+      params?: Record<string, any>,
+      options?: any,
+    ): Promise<APIResult>;
     developerToken: string;
     enablePlayEquivalencies: boolean;
     headers: any;
@@ -166,6 +170,7 @@ declare namespace MusicKit {
       playParams: PlayParams;
       previews: { url: string }[];
       description?: { standard: string };
+      value: -1 | 1;
     };
     relationships: {
       albums?: {

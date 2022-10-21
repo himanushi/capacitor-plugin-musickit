@@ -35,6 +35,11 @@ import type {
   GetLibraryPlaylistResult,
   PlaylistResult,
   GetLibraryPlaylistsResult,
+  RatingsResult,
+  GetRatingsOptions,
+  AddRatingOptions,
+  ActionRatingsResult,
+  DeleteRatingOptions,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -501,6 +506,62 @@ export class CapacitorMusicKitWeb
       response.data.meta.total !== options.offset + response.data.data.length;
 
     return { playlists, hasNext, total: response.data.meta.total };
+  }
+
+  async getRatings(options: GetRatingsOptions): Promise<ActionRatingsResult> {
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/ratings/${options.type}`,
+      { ids: options.ids },
+    );
+
+    const ratings: RatingsResult = {};
+    response.data.data.forEach(rating => {
+      ratings[rating.id] = rating.attributes.value;
+    });
+
+    return { ratings };
+  }
+
+  async addRating(options: AddRatingOptions): Promise<ActionRatingsResult> {
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/ratings/${options.type}/${options.id}`,
+      {},
+      {
+        fetchOptions: {
+          method: 'PUT',
+          body: JSON.stringify({
+            attributes: {
+              value: options.value,
+            },
+            type: 'ratings',
+          }),
+        },
+      },
+    );
+
+    const ratings: RatingsResult = {};
+    response.data.data.forEach(rating => {
+      ratings[rating.id] = rating.attributes.value;
+    });
+
+    return { ratings };
+  }
+
+  async deleteRating(
+    options: DeleteRatingOptions,
+  ): Promise<ActionRatingsResult> {
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/ratings/${options.type}/${options.id}`,
+      {},
+      { fetchOptions: { method: 'DELETE' } },
+    );
+
+    const ratings: RatingsResult = {};
+    response.data.data.forEach(rating => {
+      ratings[rating.id] = rating.attributes.value;
+    });
+
+    return { ratings };
   }
 
   async getCurrentTrack(): Promise<GetCurrentTrackResult> {

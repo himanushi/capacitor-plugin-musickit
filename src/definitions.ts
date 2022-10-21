@@ -37,6 +37,17 @@ export interface PlaylistResult {
   artworkUrl?: string;
 }
 
+/*
+ *  likes (1)
+ *  dislikes (-1)
+ */
+export type RatingsResult = {
+  [key: string]: -1 | 1;
+};
+
+export type CategoryType = 'artists' | 'albums' | 'songs' | 'playlists';
+export type RatingType = CategoryType | `library-${CategoryType}`;
+
 export type Relation = 'artists' | 'albums' | 'tracks';
 
 export interface ActionResult {
@@ -109,6 +120,26 @@ export interface GetLibraryPlaylistResult {
 export type GetLibraryPlaylistsResult = {
   playlists: PlaylistResult[];
 } & GetMultiDataResult;
+
+export type GetRatingsOptions = {
+  type: RatingType;
+  ids: string[];
+};
+
+export type ActionRatingsResult = {
+  ratings: RatingsResult;
+};
+
+export type AddRatingOptions = {
+  type: RatingType;
+  id: string;
+  value: -1 | 1;
+};
+
+export type DeleteRatingOptions = {
+  type: RatingType;
+  id: string;
+};
 
 export interface GetCurrentTrackResult {
   track?: TrackResult;
@@ -223,6 +254,9 @@ export interface CapacitorMusicKitPlugin {
   getLibraryPlaylists(
     options: GetMultiDataOptions,
   ): Promise<GetLibraryPlaylistsResult>;
+  getRatings(options: GetRatingsOptions): Promise<ActionRatingsResult>;
+  addRating(options: AddRatingOptions): Promise<ActionRatingsResult>;
+  deleteRating(options: DeleteRatingOptions): Promise<ActionRatingsResult>;
   getCurrentTrack(): Promise<GetCurrentTrackResult>;
   getQueueTracks(): Promise<GetQueueTracksResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
