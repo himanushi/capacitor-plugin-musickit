@@ -41,13 +41,13 @@ export interface PlaylistResult {
  *  likes (1)
  *  dislikes (-1)
  */
+export type Rating = -1 | 1;
 export type RatingsResult = {
-  [key: string]: -1 | 1;
+  [key: string]: Rating;
 };
 
 export type CategoryType = 'artists' | 'albums' | 'songs' | 'playlists';
 export type RatingType = CategoryType | `library-${CategoryType}`;
-
 export type Relation = 'artists' | 'albums' | 'songs';
 
 export interface ActionResult {
@@ -212,21 +212,9 @@ export type AuthorizationStatusDidChangeListener = (
 ) => void;
 
 export interface CapacitorMusicKitPlugin {
-  /**
-   * For testing.
-   */
   echo(options: EchoOptions): Promise<EchoResult>;
-  /**
-   * Required for web, if executed outside of web, nothing will be done.
-   */
   configure(options: ConfigureOptions): Promise<ActionResult>;
-  /**
-   * True if authenticated.
-   */
   isAuthorized(): Promise<ActionResult>;
-  /**
-   * True if you have an Apple Music subscription, not true if you have Apple Music Voice.
-   */
   hasMusicSubscription(): Promise<ActionResult>;
   authorize(): Promise<void>;
   unauthorize(): Promise<void>;
