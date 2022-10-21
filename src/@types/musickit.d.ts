@@ -189,6 +189,11 @@ declare namespace MusicKit {
         href: string;
         next: string;
       };
+      catalog?: {
+        data: APIResultData[];
+        href: string;
+        next: string;
+      };
       type: 'library-albums';
     };
   }

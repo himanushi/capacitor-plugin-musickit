@@ -9,19 +9,31 @@ export interface PlayParameters {
   globalId?: string;
 }
 
-export interface ArtistResult {
+export interface CatalogArtist {
+  id: string;
+  name: string;
+  artworkUrl?: string;
+  genreNames: string[];
+}
+
+export interface LibraryArtist {
+  id: string;
+  name: string;
+}
+
+export interface CatalogAlbum {
   id: string;
   name: string;
   artworkUrl?: string;
 }
 
-export interface AlbumResult {
+export interface LibraryAlbum {
   id: string;
   name: string;
   artworkUrl?: string;
 }
 
-export interface TrackResult {
+export interface CatalogTrack {
   id: string;
   name: string;
   durationMs: number;
@@ -30,7 +42,16 @@ export interface TrackResult {
   artworkUrl?: string;
 }
 
-export interface PlaylistResult {
+export interface LibraryTrack {
+  id: string;
+  name: string;
+  durationMs: number;
+  discNumber: number;
+  trackNumber: number;
+  artworkUrl?: string;
+}
+
+export interface LibraryPlaylist {
   id: string;
   name: string;
   description?: string;
@@ -86,12 +107,12 @@ export type GetLibraryArtistOptions = GetSingleDataOptions<
 >;
 
 export interface GetLibraryArtistResult {
-  artist?: ArtistResult;
-  albums?: AlbumResult[];
+  artist?: LibraryArtist;
+  albums?: LibraryAlbum[];
 }
 
 export type GetLibraryArtistsResult = {
-  artists: ArtistResult[];
+  artists: LibraryArtist[];
 } & GetMultiDataResult;
 
 export type GetLibraryAlbumOptions = GetSingleDataOptions<
@@ -99,13 +120,13 @@ export type GetLibraryAlbumOptions = GetSingleDataOptions<
 >;
 
 export interface GetLibraryAlbumResult {
-  album?: AlbumResult;
-  tracks?: TrackResult[];
-  artists?: ArtistResult[];
+  album?: LibraryAlbum;
+  tracks?: LibraryTrack[];
+  artists?: LibraryArtist[];
 }
 
 export type GetLibraryAlbumsResult = {
-  albums: AlbumResult[];
+  albums: LibraryAlbum[];
 } & GetMultiDataResult;
 
 export type GetLibraryTrackOptions = GetSingleDataOptions<
@@ -113,13 +134,13 @@ export type GetLibraryTrackOptions = GetSingleDataOptions<
 >;
 
 export interface GetLibraryTrackResult {
-  track?: TrackResult;
-  artists?: ArtistResult[];
-  albums?: AlbumResult[];
+  track?: LibraryTrack;
+  artists?: LibraryArtist[];
+  albums?: LibraryAlbum[];
 }
 
 export type GetLibraryTracksResult = {
-  tracks: TrackResult[];
+  tracks: LibraryTrack[];
 } & GetMultiDataResult;
 
 export type GetLibraryPlaylistOptions = GetSingleDataOptions<
@@ -127,12 +148,12 @@ export type GetLibraryPlaylistOptions = GetSingleDataOptions<
 >;
 
 export interface GetLibraryPlaylistResult {
-  playlist?: PlaylistResult;
-  tracks?: TrackResult[];
+  playlist?: LibraryPlaylist;
+  tracks?: LibraryTrack[];
 }
 
 export type GetLibraryPlaylistsResult = {
-  playlists: PlaylistResult[];
+  playlists: LibraryPlaylist[];
 } & GetMultiDataResult;
 
 export type GetRatingsOptions = {
@@ -156,11 +177,11 @@ export type DeleteRatingOptions = {
 };
 
 export interface GetCurrentTrackResult {
-  track?: TrackResult;
+  track?: LibraryTrack;
 }
 
 export interface GetQueueTracksResult {
-  tracks: TrackResult[];
+  tracks: LibraryTrack[];
 }
 
 export interface GetCurrentIndexResult {
@@ -202,7 +223,7 @@ export type PlaybackStateDidChangeListener = (
 ) => void;
 
 export type NowPlayingItemDidChangeResult = {
-  track: TrackResult | undefined;
+  track: LibraryTrack | undefined;
   index: number;
 };
 
