@@ -23,15 +23,15 @@ npx cap sync
 * [`getLibraryArtists(...)`](#getlibraryartists)
 * [`getLibraryAlbum(...)`](#getlibraryalbum)
 * [`getLibraryAlbums(...)`](#getlibraryalbums)
-* [`getLibraryTrack(...)`](#getlibrarytrack)
-* [`getLibraryTracks(...)`](#getlibrarytracks)
+* [`getLibrarySong(...)`](#getlibrarysong)
+* [`getLibrarySongs(...)`](#getlibrarysongs)
 * [`getLibraryPlaylist(...)`](#getlibraryplaylist)
 * [`getLibraryPlaylists(...)`](#getlibraryplaylists)
 * [`getRatings(...)`](#getratings)
 * [`addRating(...)`](#addrating)
 * [`deleteRating(...)`](#deleterating)
-* [`getCurrentTrack()`](#getcurrenttrack)
-* [`getQueueTracks()`](#getqueuetracks)
+* [`getCurrentSong()`](#getcurrentsong)
+* [`getQueueSongs()`](#getqueuesongs)
 * [`getCurrentIndex()`](#getcurrentindex)
 * [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
 * [`getRepeatMode()`](#getrepeatmode)
@@ -192,32 +192,32 @@ getLibraryAlbums(options: GetMultiDataOptions) => Promise<GetLibraryAlbumsResult
 --------------------
 
 
-### getLibraryTrack(...)
+### getLibrarySong(...)
 
 ```typescript
-getLibraryTrack(options: GetSingleDataOptions) => Promise<GetLibraryTrackResult>
+getLibrarySong(options: GetSingleDataOptions) => Promise<GetLibrarySongResult>
 ```
 
 | Param         | Type                                                                  |
 | ------------- | --------------------------------------------------------------------- |
 | **`options`** | <code><a href="#getsingledataoptions">GetSingleDataOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#getlibrarytrackresult">GetLibraryTrackResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getlibrarysongresult">GetLibrarySongResult</a>&gt;</code>
 
 --------------------
 
 
-### getLibraryTracks(...)
+### getLibrarySongs(...)
 
 ```typescript
-getLibraryTracks(options: GetMultiDataOptions) => Promise<GetLibraryTracksResult>
+getLibrarySongs(options: GetMultiDataOptions) => Promise<GetLibrarySongsResult>
 ```
 
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
 | **`options`** | <code><a href="#getmultidataoptions">GetMultiDataOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#getlibrarytracksresult">GetLibraryTracksResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getlibrarysongsresult">GetLibrarySongsResult</a>&gt;</code>
 
 --------------------
 
@@ -270,14 +270,14 @@ getRatings(options: GetRatingsOptions) => Promise<ActionRatingsResult>
 ### addRating(...)
 
 ```typescript
-addRating(options: AddRatingOptions) => Promise<ActionRatingsResult>
+addRating(options: AddRatingOptions) => Promise<ActionResult>
 ```
 
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
 | **`options`** | <code><a href="#addratingoptions">AddRatingOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#actionratingsresult">ActionRatingsResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -285,36 +285,36 @@ addRating(options: AddRatingOptions) => Promise<ActionRatingsResult>
 ### deleteRating(...)
 
 ```typescript
-deleteRating(options: DeleteRatingOptions) => Promise<ActionRatingsResult>
+deleteRating(options: DeleteRatingOptions) => Promise<ActionResult>
 ```
 
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
 | **`options`** | <code><a href="#deleteratingoptions">DeleteRatingOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#actionratingsresult">ActionRatingsResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
 
-### getCurrentTrack()
+### getCurrentSong()
 
 ```typescript
-getCurrentTrack() => Promise<GetCurrentTrackResult>
+getCurrentSong() => Promise<GetCurrentSongResult>
 ```
 
-**Returns:** <code>Promise&lt;<a href="#getcurrenttrackresult">GetCurrentTrackResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getcurrentsongresult">GetCurrentSongResult</a>&gt;</code>
 
 --------------------
 
 
-### getQueueTracks()
+### getQueueSongs()
 
 ```typescript
-getQueueTracks() => Promise<GetQueueTracksResult>
+getQueueSongs() => Promise<GetQueueSongsResult>
 ```
 
-**Returns:** <code>Promise&lt;<a href="#getqueuetracksresult">GetQueueTracksResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getqueuesongsresult">GetQueueSongsResult</a>&gt;</code>
 
 --------------------
 
@@ -541,7 +541,7 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 | ------------ | ----------------------------------------------------- |
 | **`artist`** | <code><a href="#artistresult">ArtistResult</a></code> |
 | **`albums`** | <code>AlbumResult[]</code>                            |
-| **`tracks`** | <code>TrackResult[]</code>                            |
+| **`songs`**  | <code>SongResult[]</code>                             |
 
 
 #### ArtistResult
@@ -562,7 +562,7 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 | **`artworkUrl`** | <code>string</code> |
 
 
-#### TrackResult
+#### SongResult
 
 | Prop              | Type                |
 | ----------------- | ------------------- |
@@ -604,17 +604,17 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 | Prop          | Type                                                |
 | ------------- | --------------------------------------------------- |
 | **`album`**   | <code><a href="#albumresult">AlbumResult</a></code> |
-| **`tracks`**  | <code>TrackResult[]</code>                          |
+| **`songs`**   | <code>SongResult[]</code>                           |
 | **`artists`** | <code>ArtistResult[]</code>                         |
 
 
-#### GetLibraryTrackResult
+#### GetLibrarySongResult
 
-| Prop          | Type                                                |
-| ------------- | --------------------------------------------------- |
-| **`track`**   | <code><a href="#trackresult">TrackResult</a></code> |
-| **`artists`** | <code>ArtistResult[]</code>                         |
-| **`albums`**  | <code>AlbumResult[]</code>                          |
+| Prop          | Type                                              |
+| ------------- | ------------------------------------------------- |
+| **`song`**    | <code><a href="#songresult">SongResult</a></code> |
+| **`artists`** | <code>ArtistResult[]</code>                       |
+| **`albums`**  | <code>AlbumResult[]</code>                        |
 
 
 #### GetLibraryPlaylistResult
@@ -622,7 +622,7 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 | Prop           | Type                                                      |
 | -------------- | --------------------------------------------------------- |
 | **`playlist`** | <code><a href="#playlistresult">PlaylistResult</a></code> |
-| **`tracks`**   | <code>TrackResult[]</code>                                |
+| **`songs`**    | <code>SongResult[]</code>                                 |
 
 
 #### PlaylistResult
@@ -635,18 +635,18 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 | **`artworkUrl`**  | <code>string</code> |
 
 
-#### GetCurrentTrackResult
+#### GetCurrentSongResult
 
-| Prop        | Type                                                |
-| ----------- | --------------------------------------------------- |
-| **`track`** | <code><a href="#trackresult">TrackResult</a></code> |
+| Prop       | Type                                              |
+| ---------- | ------------------------------------------------- |
+| **`song`** | <code><a href="#songresult">SongResult</a></code> |
 
 
-#### GetQueueTracksResult
+#### GetQueueSongsResult
 
-| Prop         | Type                       |
-| ------------ | -------------------------- |
-| **`tracks`** | <code>TrackResult[]</code> |
+| Prop        | Type                      |
+| ----------- | ------------------------- |
+| **`songs`** | <code>SongResult[]</code> |
 
 
 #### GetCurrentIndexResult
@@ -710,7 +710,7 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 
 #### Relation
 
-<code>'artists' | 'albums' | 'tracks'</code>
+<code>'artists' | 'albums' | 'songs'</code>
 
 
 #### GetLibraryArtistsResult
@@ -723,9 +723,9 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 <code>{ albums: AlbumResult[]; } & <a href="#getmultidataresult">GetMultiDataResult</a></code>
 
 
-#### GetLibraryTracksResult
+#### GetLibrarySongsResult
 
-<code>{ tracks: TrackResult[]; } & <a href="#getmultidataresult">GetMultiDataResult</a></code>
+<code>{ songs: SongResult[]; } & <a href="#getmultidataresult">GetMultiDataResult</a></code>
 
 
 #### GetLibraryPlaylistsResult
@@ -790,7 +790,7 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 
 #### NowPlayingItemDidChangeResult
 
-<code>{ track: <a href="#trackresult">TrackResult</a>; index: number; }</code>
+<code>{ song: <a href="#songresult">SongResult</a>; index: number; }</code>
 
 
 #### AuthorizationStatusDidChangeListener

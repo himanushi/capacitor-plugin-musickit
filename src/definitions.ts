@@ -21,7 +21,7 @@ export interface AlbumResult {
   artworkUrl?: string;
 }
 
-export interface TrackResult {
+export interface SongResult {
   id: string;
   name: string;
   durationMs: number;
@@ -48,7 +48,7 @@ export type RatingsResult = {
 export type CategoryType = 'artists' | 'albums' | 'songs' | 'playlists';
 export type RatingType = CategoryType | `library-${CategoryType}`;
 
-export type Relation = 'artists' | 'albums' | 'tracks';
+export type Relation = 'artists' | 'albums' | 'songs';
 
 export interface ActionResult {
   result: boolean;
@@ -85,7 +85,7 @@ export interface GetMultiDataResult {
 export interface GetLibraryArtistResult {
   artist?: ArtistResult;
   albums?: AlbumResult[];
-  tracks?: TrackResult[];
+  songs?: SongResult[];
 }
 
 export type GetLibraryArtistsResult = {
@@ -94,7 +94,7 @@ export type GetLibraryArtistsResult = {
 
 export interface GetLibraryAlbumResult {
   album?: AlbumResult;
-  tracks?: TrackResult[];
+  songs?: SongResult[];
   artists?: ArtistResult[];
 }
 
@@ -102,19 +102,19 @@ export type GetLibraryAlbumsResult = {
   albums: AlbumResult[];
 } & GetMultiDataResult;
 
-export interface GetLibraryTrackResult {
-  track?: TrackResult;
+export interface GetLibrarySongResult {
+  song?: SongResult;
   artists?: ArtistResult[];
   albums?: AlbumResult[];
 }
 
-export type GetLibraryTracksResult = {
-  tracks: TrackResult[];
+export type GetLibrarySongsResult = {
+  songs: SongResult[];
 } & GetMultiDataResult;
 
 export interface GetLibraryPlaylistResult {
   playlist?: PlaylistResult;
-  tracks?: TrackResult[];
+  songs?: SongResult[];
 }
 
 export type GetLibraryPlaylistsResult = {
@@ -141,12 +141,12 @@ export type DeleteRatingOptions = {
   id: string;
 };
 
-export interface GetCurrentTrackResult {
-  track?: TrackResult;
+export interface GetCurrentSongResult {
+  song?: SongResult;
 }
 
-export interface GetQueueTracksResult {
-  tracks: TrackResult[];
+export interface GetQueueSongsResult {
+  songs: SongResult[];
 }
 
 export interface GetCurrentIndexResult {
@@ -188,7 +188,7 @@ export type PlaybackStateDidChangeListener = (
 ) => void;
 
 export type NowPlayingItemDidChangeResult = {
-  track: TrackResult | undefined;
+  song: SongResult | undefined;
   index: number;
 };
 
@@ -242,12 +242,8 @@ export interface CapacitorMusicKitPlugin {
   getLibraryAlbums(
     options: GetMultiDataOptions,
   ): Promise<GetLibraryAlbumsResult>;
-  getLibraryTrack(
-    options: GetSingleDataOptions,
-  ): Promise<GetLibraryTrackResult>;
-  getLibraryTracks(
-    options: GetMultiDataOptions,
-  ): Promise<GetLibraryTracksResult>;
+  getLibrarySong(options: GetSingleDataOptions): Promise<GetLibrarySongResult>;
+  getLibrarySongs(options: GetMultiDataOptions): Promise<GetLibrarySongsResult>;
   getLibraryPlaylist(
     options: GetSingleDataOptions,
   ): Promise<GetLibraryPlaylistResult>;
@@ -257,8 +253,8 @@ export interface CapacitorMusicKitPlugin {
   getRatings(options: GetRatingsOptions): Promise<ActionRatingsResult>;
   addRating(options: AddRatingOptions): Promise<ActionResult>;
   deleteRating(options: DeleteRatingOptions): Promise<ActionResult>;
-  getCurrentTrack(): Promise<GetCurrentTrackResult>;
-  getQueueTracks(): Promise<GetQueueTracksResult>;
+  getCurrentSong(): Promise<GetCurrentSongResult>;
+  getQueueSongs(): Promise<GetQueueSongsResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
   getRepeatMode(): Promise<getRepeatModeResult>;
