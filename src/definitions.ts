@@ -23,8 +23,19 @@ export interface LibraryArtist {
 
 export interface CatalogAlbum {
   id: string;
-  name: string;
+  artistName: string;
   artworkUrl?: string;
+  copyright: string;
+  genreNames: string[];
+  isCompilation: boolean;
+  isComplete: boolean;
+  isMasteredForItunes: boolean;
+  isSingle: boolean;
+  name: string;
+  recordLabel: string;
+  releaseDate: string;
+  trackCount: number;
+  upc: string;
 }
 
 export interface LibraryAlbum {
@@ -35,11 +46,20 @@ export interface LibraryAlbum {
 
 export interface CatalogTrack {
   id: string;
-  name: string;
-  durationMs: number;
-  discNumber: number;
-  trackNumber: number;
+  albumName: string;
+  artistName: string;
   artworkUrl?: string;
+  composerName: string;
+  discNumber: number;
+  durationMs: number;
+  genreNames: string[];
+  hasLyrics: boolean;
+  isAppleDigitalMaster: boolean;
+  isrc: string;
+  name: string;
+  previews: string[];
+  releaseDate: string;
+  trackNumber: number;
 }
 
 export interface LibraryTrack {
@@ -49,6 +69,18 @@ export interface LibraryTrack {
   discNumber: number;
   trackNumber: number;
   artworkUrl?: string;
+}
+
+export interface CatalogPlaylist {
+  id: string;
+  artworkUrl?: string;
+  curatorName: string;
+  description: string;
+  shortDescription: string;
+  isChart: boolean;
+  lastModifiedDate: string;
+  name: string;
+  playlistType: string;
 }
 
 export interface LibraryPlaylist {
