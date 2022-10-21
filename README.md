@@ -60,8 +60,6 @@ npx cap sync
 echo(options: EchoOptions) => Promise<EchoResult>
 ```
 
-For testing.
-
 | Param         | Type                                                |
 | ------------- | --------------------------------------------------- |
 | **`options`** | <code><a href="#echooptions">EchoOptions</a></code> |
@@ -76,8 +74,6 @@ For testing.
 ```typescript
 configure(options: ConfigureOptions) => Promise<ActionResult>
 ```
-
-Required for web, if executed outside of web, nothing will be done.
 
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
@@ -94,8 +90,6 @@ Required for web, if executed outside of web, nothing will be done.
 isAuthorized() => Promise<ActionResult>
 ```
 
-True if authenticated.
-
 **Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
@@ -106,8 +100,6 @@ True if authenticated.
 ```typescript
 hasMusicSubscription() => Promise<ActionResult>
 ```
-
-True if you have an Apple Music subscription, not true if you have Apple Music Voice.
 
 **Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
@@ -740,7 +732,12 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 
 #### RatingsResult
 
-<code>{ [key: string]: -1 | 1; }</code>
+<code>{ [key: string]: <a href="#rating">Rating</a>; }</code>
+
+
+#### Rating
+
+<code>-1 | 1</code>
 
 
 #### GetRatingsOptions
