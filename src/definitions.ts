@@ -255,8 +255,8 @@ export interface CapacitorMusicKitPlugin {
     options: GetMultiDataOptions,
   ): Promise<GetLibraryPlaylistsResult>;
   getRatings(options: GetRatingsOptions): Promise<ActionRatingsResult>;
-  addRating(options: AddRatingOptions): Promise<ActionRatingsResult>;
-  deleteRating(options: DeleteRatingOptions): Promise<ActionRatingsResult>;
+  addRating(options: AddRatingOptions): Promise<ActionResult>;
+  deleteRating(options: DeleteRatingOptions): Promise<ActionResult>;
   getCurrentTrack(): Promise<GetCurrentTrackResult>;
   getQueueTracks(): Promise<GetQueueTracksResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;

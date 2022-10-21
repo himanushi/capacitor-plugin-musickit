@@ -522,8 +522,10 @@ export class CapacitorMusicKitWeb
     return { ratings };
   }
 
-  async addRating(options: AddRatingOptions): Promise<ActionRatingsResult> {
-    const response = await MusicKit.getInstance().api.music(
+  async addRating(options: AddRatingOptions): Promise<ActionResult> {
+    let result = false;
+
+    await MusicKit.getInstance().api.music(
       `/v1/me/ratings/${options.type}/${options.id}`,
       {},
       {
@@ -539,29 +541,21 @@ export class CapacitorMusicKitWeb
       },
     );
 
-    const ratings: RatingsResult = {};
-    response.data.data.forEach(rating => {
-      ratings[rating.id] = rating.attributes.value;
-    });
-
-    return { ratings };
+    result = true;
+    return { result };
   }
 
-  async deleteRating(
-    options: DeleteRatingOptions,
-  ): Promise<ActionRatingsResult> {
-    const response = await MusicKit.getInstance().api.music(
+  async deleteRating(options: DeleteRatingOptions): Promise<ActionResult> {
+    let result = false;
+
+    await MusicKit.getInstance().api.music(
       `/v1/me/ratings/${options.type}/${options.id}`,
       {},
       { fetchOptions: { method: 'DELETE' } },
     );
 
-    const ratings: RatingsResult = {};
-    response.data.data.forEach(rating => {
-      ratings[rating.id] = rating.attributes.value;
-    });
-
-    return { ratings };
+    result = true;
+    return { result };
   }
 
   async getCurrentTrack(): Promise<GetCurrentTrackResult> {

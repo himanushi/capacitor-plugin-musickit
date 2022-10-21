@@ -27,6 +27,9 @@ npx cap sync
 * [`getLibraryTracks(...)`](#getlibrarytracks)
 * [`getLibraryPlaylist(...)`](#getlibraryplaylist)
 * [`getLibraryPlaylists(...)`](#getlibraryplaylists)
+* [`getRatings(...)`](#getratings)
+* [`addRating(...)`](#addrating)
+* [`deleteRating(...)`](#deleterating)
 * [`getCurrentTrack()`](#getcurrenttrack)
 * [`getQueueTracks()`](#getqueuetracks)
 * [`getCurrentIndex()`](#getcurrentindex)
@@ -245,6 +248,51 @@ getLibraryPlaylists(options: GetMultiDataOptions) => Promise<GetLibraryPlaylists
 | **`options`** | <code><a href="#getmultidataoptions">GetMultiDataOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#getlibraryplaylistsresult">GetLibraryPlaylistsResult</a>&gt;</code>
+
+--------------------
+
+
+### getRatings(...)
+
+```typescript
+getRatings(options: GetRatingsOptions) => Promise<ActionRatingsResult>
+```
+
+| Param         | Type                                                            |
+| ------------- | --------------------------------------------------------------- |
+| **`options`** | <code><a href="#getratingsoptions">GetRatingsOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#actionratingsresult">ActionRatingsResult</a>&gt;</code>
+
+--------------------
+
+
+### addRating(...)
+
+```typescript
+addRating(options: AddRatingOptions) => Promise<ActionRatingsResult>
+```
+
+| Param         | Type                                                          |
+| ------------- | ------------------------------------------------------------- |
+| **`options`** | <code><a href="#addratingoptions">AddRatingOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#actionratingsresult">ActionRatingsResult</a>&gt;</code>
+
+--------------------
+
+
+### deleteRating(...)
+
+```typescript
+deleteRating(options: DeleteRatingOptions) => Promise<ActionRatingsResult>
+```
+
+| Param         | Type                                                                |
+| ------------- | ------------------------------------------------------------------- |
+| **`options`** | <code><a href="#deleteratingoptions">DeleteRatingOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#actionratingsresult">ActionRatingsResult</a>&gt;</code>
 
 --------------------
 
@@ -683,6 +731,41 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 #### GetLibraryPlaylistsResult
 
 <code>{ playlists: PlaylistResult[]; } & <a href="#getmultidataresult">GetMultiDataResult</a></code>
+
+
+#### ActionRatingsResult
+
+<code>{ ratings: <a href="#ratingsresult">RatingsResult</a>; }</code>
+
+
+#### RatingsResult
+
+<code>{ [key: string]: -1 | 1; }</code>
+
+
+#### GetRatingsOptions
+
+<code>{ type: <a href="#ratingtype">RatingType</a>; ids: string[]; }</code>
+
+
+#### RatingType
+
+<code><a href="#categorytype">CategoryType</a> | `library-${<a href="#categorytype">CategoryType</a>}`</code>
+
+
+#### CategoryType
+
+<code>'artists' | 'albums' | 'songs' | 'playlists'</code>
+
+
+#### AddRatingOptions
+
+<code>{ type: <a href="#ratingtype">RatingType</a>; id: string; value: -1 | 1; }</code>
+
+
+#### DeleteRatingOptions
+
+<code>{ type: <a href="#ratingtype">RatingType</a>; id: string; }</code>
 
 
 #### PlaybackStateDidChangeListener
