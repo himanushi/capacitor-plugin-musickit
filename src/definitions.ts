@@ -98,9 +98,8 @@ export type Rating = -1 | 1;
 export type RatingsResult = {
   [key: string]: Rating;
 };
-
-export type CategoryType = 'artists' | 'albums' | 'tracks' | 'playlists';
-export type RatingType = CategoryType | `library-${CategoryType}`;
+export type RatingCategoryType = 'artists' | 'albums' | 'tracks' | 'playlists';
+export type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
 
 export interface ActionResult {
   result: boolean;
@@ -134,6 +133,15 @@ export interface GetMultiDataResult {
   hasNext: boolean;
 }
 
+export type GetCatalogArtistOptions = GetSingleDataOptions<
+  'albums' | 'genres' | 'music-videos' | 'playlists' | 'station'
+>;
+
+export interface GetCatalogArtistResult {
+  artist?: CatalogArtist;
+  albums?: CatalogAlbum[];
+}
+
 export type GetLibraryArtistOptions = GetSingleDataOptions<
   'albums' | 'catalog'
 >;
@@ -141,6 +149,7 @@ export type GetLibraryArtistOptions = GetSingleDataOptions<
 export interface GetLibraryArtistResult {
   artist?: LibraryArtist;
   albums?: LibraryAlbum[];
+  catalog?: CatalogArtist[];
 }
 
 export type GetLibraryArtistsResult = {
@@ -155,6 +164,7 @@ export interface GetLibraryAlbumResult {
   album?: LibraryAlbum;
   tracks?: LibraryTrack[];
   artists?: LibraryArtist[];
+  catalog?: CatalogAlbum[];
 }
 
 export type GetLibraryAlbumsResult = {
@@ -169,6 +179,7 @@ export interface GetLibraryTrackResult {
   track?: LibraryTrack;
   artists?: LibraryArtist[];
   albums?: LibraryAlbum[];
+  catalog?: CatalogTrack[];
 }
 
 export type GetLibraryTracksResult = {
@@ -182,6 +193,7 @@ export type GetLibraryPlaylistOptions = GetSingleDataOptions<
 export interface GetLibraryPlaylistResult {
   playlist?: LibraryPlaylist;
   tracks?: LibraryTrack[];
+  catalog?: CatalogPlaylist[];
 }
 
 export type GetLibraryPlaylistsResult = {

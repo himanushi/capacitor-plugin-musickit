@@ -42,6 +42,7 @@ import type {
   GetLibraryAlbumOptions,
   GetLibraryTrackOptions,
   GetLibraryPlaylistOptions,
+  CatalogArtist,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -122,18 +123,18 @@ export class CapacitorMusicKitWeb
   include = <T>(options: { include?: T[] }, relation: T): boolean =>
     options.include?.includes(relation) ?? false;
 
-  relationParams(
-    options: { include?: string[] },
-    relations: string[],
-  ): { include: string[] } {
-    const include: string[] = [];
+  relationParams<T>(
+    options: { include?: T[] },
+    relations: T[],
+  ): { include: T[] } {
+    const include: T[] = [];
     relations.forEach(relation => {
       this.include(options, relation) && include.push(relation);
     });
     return { include };
   }
 
-  selectionArtists(item: MusicKit.APIResultData): LibraryArtist[] {
+  selectionLibraryArtists(item: MusicKit.APIResultData): LibraryArtist[] {
     const items: LibraryArtist[] = [];
     item.relationships.artists?.data.forEach(artist => {
       items.push(this.toLibraryArtistResult(artist));
@@ -141,7 +142,7 @@ export class CapacitorMusicKitWeb
     return items;
   }
 
-  selectionAlbums(item: MusicKit.APIResultData): LibraryAlbum[] {
+  selectionLibraryAlbums(item: MusicKit.APIResultData): LibraryAlbum[] {
     const items: LibraryAlbum[] = [];
     item.relationships.albums?.data.forEach(album => {
       items.push(this.toLibraryAlbumResult(album));
@@ -149,7 +150,7 @@ export class CapacitorMusicKitWeb
     return items;
   }
 
-  selectionTracks(item: MusicKit.APIResultData): LibraryTrack[] {
+  selectionLibraryTracks(item: MusicKit.APIResultData): LibraryTrack[] {
     const items: LibraryTrack[] = [];
     item.relationships.tracks?.data.forEach(track => {
       items.push(this.toResultTrack(track));
@@ -266,8 +267,10 @@ export class CapacitorMusicKitWeb
   ): Promise<GetLibraryArtistResult> {
     let artist: LibraryArtist | undefined;
     let albums: LibraryAlbum[] | undefined;
+    let catalog: CatalogArtist[] | undefined;
+
     const fetchUrl = `/v1/me/library/artists/${options.id}`;
-    const params = this.relationParams(options, ['albums', 'tracks']);
+    const params = this.relationParams(options, ['albums', 'catalog']);
 
     try {
       // Artist
@@ -278,14 +281,19 @@ export class CapacitorMusicKitWeb
 
         // Albums
         if (this.include(options, 'albums')) {
-          albums = this.selectionAlbums(item);
+          albums = this.selectionLibraryAlbums(item);
+        }
+
+        // Catalog
+        if (this.include(options, 'catalog')) {
+          albums = this.selectionLibraryAlbums(item);
         }
       }
     } catch (error) {
       console.log(error);
     }
 
-    return { artist, albums };
+    return { artist, albums, catalog };
   }
 
   async getLibraryArtists(
@@ -332,12 +340,12 @@ export class CapacitorMusicKitWeb
         // Tracks
         if (this.include(options, 'tracks')) {
           nextTracksUrl = item.relationships.tracks?.next;
-          tracks = this.selectionTracks(item);
+          tracks = this.selectionLibraryTracks(item);
         }
 
         // Artists
         if (this.include(options, 'artists')) {
-          artists = this.selectionArtists(item);
+          artists = this.selectionLibraryArtists(item);
         }
       }
 
@@ -457,7 +465,7 @@ export class CapacitorMusicKitWeb
         // Tracks
         if (this.include(options, 'tracks')) {
           nextTracksUrl = item.relationships.tracks?.next;
-          tracks = this.selectionTracks(item);
+          tracks = this.selectionLibraryTracks(item);
         }
       }
 
