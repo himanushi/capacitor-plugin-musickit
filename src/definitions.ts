@@ -161,10 +161,7 @@ export type GetLibraryAlbumOptions = GetSingleDataOptions<
 >;
 
 export interface GetLibraryAlbumResult {
-  album?: LibraryAlbum;
-  tracks?: LibraryTrack[];
-  artists?: LibraryArtist[];
-  catalog?: CatalogAlbum[];
+  albums: MusicKit.LibraryAlbums[];
 }
 
 export type GetLibraryAlbumsResult = {

@@ -124,16 +124,13 @@ export class CapacitorMusicKitWeb
     artworkUrl: playlist.attributes.artwork?.url,
   });
 
-  include = <T>(options: { include?: T[] }, relation: T): boolean =>
-    options.include?.includes(relation) ?? false;
+  include = <T>(relation: T, include?: T[]): boolean =>
+    include?.includes(relation) ?? false;
 
-  relationParams<T>(
-    options: { include?: T[] },
-    relations: T[],
-  ): { include: T[] } {
+  relationParams<T>(relations: T[], includes?: T[]): { include: T[] } {
     const include: T[] = [];
     relations.forEach(relation => {
-      this.include(options, relation) && include.push(relation);
+      this.include(relation, includes) && include.push(relation);
     });
     return { include };
   }
@@ -283,7 +280,7 @@ export class CapacitorMusicKitWeb
     let albums: LibraryAlbum[] | undefined;
     let catalog: CatalogArtist[] | undefined;
 
-    const params = this.relationParams(options, ['albums', 'catalog']);
+    const params = this.relationParams(['albums', 'catalog'], options.include);
 
     try {
       // Artist
@@ -294,7 +291,7 @@ export class CapacitorMusicKitWeb
         artist = this.toLibraryArtistResult(item);
 
         // Albums
-        if (this.include(options, 'albums')) {
+        if (this.include('albums', options.include)) {
           albums = this.selectionLibraryAlbums(item);
         }
       }
@@ -331,42 +328,11 @@ export class CapacitorMusicKitWeb
   async getLibraryAlbum(
     options: GetLibraryAlbumOptions,
   ): Promise<GetLibraryAlbumResult> {
-    let album: LibraryAlbum | undefined;
-    let artists: LibraryArtist[] | undefined;
-    let tracks: LibraryTrack[] | undefined;
-
-    let nextTracksUrl: string | undefined;
-    const params = this.relationParams(options, ['artists', 'tracks']);
-
-    try {
-      // Album
-      const fetchUrl = `/v1/me/library/albums/${options.id}` as const;
-      const response = await MusicKit.getInstance().api.music(fetchUrl, params);
-      const item = response.data.data.find(itm => itm.id === options.id);
-      if (item) {
-        album = this.toLibraryAlbumResult(item);
-
-        // Tracks
-        if (this.include(options, 'tracks')) {
-          nextTracksUrl = item.relationships.tracks?.next;
-          tracks = this.selectionLibraryTracks(item);
-        }
-
-        // Artists
-        if (this.include(options, 'artists')) {
-          artists = this.selectionLibraryArtists(item);
-        }
-      }
-
-      // Next tracks
-      if (album) {
-        tracks = tracks?.concat(await this.nextTracks(options, nextTracksUrl));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-
-    return { album, artists, tracks };
+    const response = await MusicKit.getInstance().api.music(
+      `/v1/me/library/albums/${options.id}` as const,
+      this.relationParams(['tracks'], options.include),
+    );
+    return { albums: response.data.data };
   }
 
   async getLibraryAlbums(
@@ -400,7 +366,10 @@ export class CapacitorMusicKitWeb
     let albums: LibraryAlbum[] | undefined;
 
     try {
-      const params = this.relationParams(options, ['albums', 'artists']);
+      const params = this.relationParams(
+        ['albums', 'artists'],
+        options.include,
+      );
       const fetchUrl = `/v1/me/library/songs/${options.id}` as const;
       const response = await MusicKit.getInstance().api.music(fetchUrl, params);
       const resultTrack = response.data.data[0];
@@ -409,7 +378,7 @@ export class CapacitorMusicKitWeb
         track = this.toLibraryTrackResult(resultTrack);
 
         // Artists
-        if (this.include(options, 'artists')) {
+        if (this.include('artists', options.include)) {
           artists = [];
           resultTrack.relationships.artists?.data.forEach(artist => {
             artists?.push(this.toLibraryArtistResult(artist));
@@ -417,7 +386,7 @@ export class CapacitorMusicKitWeb
         }
 
         // Albums
-        if (this.include(options, 'albums')) {
+        if (this.include('albums', options.include)) {
           albums = [];
           resultTrack.relationships.albums?.data.forEach(album => {
             albums?.push(this.toLibraryAlbumResult(album));
@@ -464,7 +433,7 @@ export class CapacitorMusicKitWeb
 
     try {
       // Playlist
-      const params = this.relationParams(options, ['tracks']);
+      const params = this.relationParams(['tracks'], options.include);
       const fetchUrl = `/v1/me/library/playlists/${options.id}` as const;
       const response = await MusicKit.getInstance().api.music(fetchUrl, params);
       const item = response.data.data.find(itm => itm.id === options.id);
@@ -472,7 +441,7 @@ export class CapacitorMusicKitWeb
         playlist = this.toLibraryPlaylist(item);
 
         // Tracks
-        if (this.include(options, 'tracks')) {
+        if (this.include('tracks', options.include)) {
           nextTracksUrl = item.relationships.tracks?.next;
           tracks = this.selectionLibraryTracks(item);
         }

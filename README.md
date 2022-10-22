@@ -590,12 +590,19 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 
 #### GetLibraryAlbumResult
 
+| Prop         | Type               |
+| ------------ | ------------------ |
+| **`albums`** | <code>any[]</code> |
+
+
+#### GetLibraryTrackResult
+
 | Prop          | Type                                                  |
 | ------------- | ----------------------------------------------------- |
-| **`album`**   | <code><a href="#libraryalbum">LibraryAlbum</a></code> |
-| **`tracks`**  | <code>LibraryTrack[]</code>                           |
+| **`track`**   | <code><a href="#librarytrack">LibraryTrack</a></code> |
 | **`artists`** | <code>LibraryArtist[]</code>                          |
-| **`catalog`** | <code>CatalogAlbum[]</code>                           |
+| **`albums`**  | <code>LibraryAlbum[]</code>                           |
+| **`catalog`** | <code>CatalogTrack[]</code>                           |
 
 
 #### LibraryTrack
@@ -608,36 +615,6 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 | **`discNumber`**  | <code>number</code> |
 | **`trackNumber`** | <code>number</code> |
 | **`artworkUrl`**  | <code>string</code> |
-
-
-#### CatalogAlbum
-
-| Prop                      | Type                  |
-| ------------------------- | --------------------- |
-| **`id`**                  | <code>string</code>   |
-| **`artistName`**          | <code>string</code>   |
-| **`artworkUrl`**          | <code>string</code>   |
-| **`copyright`**           | <code>string</code>   |
-| **`genreNames`**          | <code>string[]</code> |
-| **`isCompilation`**       | <code>boolean</code>  |
-| **`isComplete`**          | <code>boolean</code>  |
-| **`isMasteredForItunes`** | <code>boolean</code>  |
-| **`isSingle`**            | <code>boolean</code>  |
-| **`name`**                | <code>string</code>   |
-| **`recordLabel`**         | <code>string</code>   |
-| **`releaseDate`**         | <code>string</code>   |
-| **`trackCount`**          | <code>number</code>   |
-| **`upc`**                 | <code>string</code>   |
-
-
-#### GetLibraryTrackResult
-
-| Prop          | Type                                                  |
-| ------------- | ----------------------------------------------------- |
-| **`track`**   | <code><a href="#librarytrack">LibraryTrack</a></code> |
-| **`artists`** | <code>LibraryArtist[]</code>                          |
-| **`albums`**  | <code>LibraryAlbum[]</code>                           |
-| **`catalog`** | <code>CatalogTrack[]</code>                           |
 
 
 #### CatalogTrack
