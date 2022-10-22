@@ -2,7 +2,6 @@ import { WebPlugin } from '@capacitor/core';
 
 import type {
   CapacitorMusicKitPlugin,
-  PlaybackStates,
   AuthorizationStatus,
   EchoOptions,
   EchoResult,
@@ -43,6 +42,7 @@ import type {
   GetLibraryTrackOptions,
   GetLibraryPlaylistOptions,
   CatalogArtist,
+  PlaybackState,
 } from './definitions';
 
 export class CapacitorMusicKitWeb
@@ -55,20 +55,20 @@ export class CapacitorMusicKitWeb
   }
 
   private playbackStateDidChange = (
-    data: Parameters<MusicKit.PlaybackStateDidChange['callback']>[0],
+    data: MusicKit.Events['playbackStateDidChange'],
   ) => {
-    const state = MusicKit.PlaybackStates[data.state] as PlaybackStates;
+    const state = MusicKit.PlaybackState[data.state] as PlaybackState;
     const result: PlaybackStateDidChangeResult = { state };
     this.notifyListeners('playbackStateDidChange', result);
   };
 
   private nowPlayingItemDidChange = (
-    data: Parameters<MusicKit.NowPlayingItemDidChange['callback']>[0],
+    data: MusicKit.Events['nowPlayingItemDidChange'],
   ) => {
     let track: LibraryTrack | undefined;
     const item = data.item;
     if (item) {
-      track = this.toResultTrack(item);
+      track = this.toLibraryTrackResult(item);
     }
     const index = MusicKit.getInstance().nowPlayingItemIndex;
     const result: NowPlayingItemDidChangeResult = { track, index };
@@ -76,7 +76,7 @@ export class CapacitorMusicKitWeb
   };
 
   private authorizationStatusDidChange = (
-    data: Parameters<MusicKit.AuthorizationStatusDidChange['callback']>[0],
+    data: MusicKit.Events['authorizationStatusDidChange'],
   ) => {
     // state.authorizationStatus === -1
     let status: AuthorizationStatus = 'unavailable';
@@ -93,18 +93,18 @@ export class CapacitorMusicKitWeb
     this.notifyListeners('authorizationStatusDidChange', result);
   };
 
-  toLibraryArtistResult = (artist: MusicKit.APIResultData): LibraryArtist => ({
+  toLibraryArtistResult = (artist: MusicKit.Artists): LibraryArtist => ({
     id: artist.id,
     name: artist.attributes.name,
   });
 
-  toLibraryAlbumResult = (album: MusicKit.APIResultData): LibraryAlbum => ({
+  toLibraryAlbumResult = (album: MusicKit.Albums): LibraryAlbum => ({
     id: album.id,
     name: album.attributes.name,
     artworkUrl: album.attributes.artwork?.url,
   });
 
-  toResultTrack = (track: MusicKit.APIResultData): LibraryTrack => ({
+  toLibraryTrackResult = (track: MusicKit.Songs): LibraryTrack => ({
     id: track.id,
     name: track.attributes.name,
     durationMs: track.attributes.durationInMillis,
@@ -113,7 +113,7 @@ export class CapacitorMusicKitWeb
     artworkUrl: track.attributes.artwork?.url,
   });
 
-  toLibraryPlaylist = (playlist: MusicKit.APIResultData): LibraryPlaylist => ({
+  toLibraryPlaylist = (playlist: MusicKit.Playlists): LibraryPlaylist => ({
     id: playlist.id,
     name: playlist.attributes.name,
     description: playlist.attributes.description?.standard,
@@ -134,7 +134,9 @@ export class CapacitorMusicKitWeb
     return { include };
   }
 
-  selectionLibraryArtists(item: MusicKit.APIResultData): LibraryArtist[] {
+  selectionLibraryArtists(
+    item: MusicKit.Albums | MusicKit.Songs | MusicKit.Playlists,
+  ): LibraryArtist[] {
     const items: LibraryArtist[] = [];
     item.relationships.artists?.data.forEach(artist => {
       items.push(this.toLibraryArtistResult(artist));
@@ -142,7 +144,9 @@ export class CapacitorMusicKitWeb
     return items;
   }
 
-  selectionLibraryAlbums(item: MusicKit.APIResultData): LibraryAlbum[] {
+  selectionLibraryAlbums(
+    item: MusicKit.Artists | MusicKit.Songs | MusicKit.Playlists,
+  ): LibraryAlbum[] {
     const items: LibraryAlbum[] = [];
     item.relationships.albums?.data.forEach(album => {
       items.push(this.toLibraryAlbumResult(album));
@@ -150,10 +154,12 @@ export class CapacitorMusicKitWeb
     return items;
   }
 
-  selectionLibraryTracks(item: MusicKit.APIResultData): LibraryTrack[] {
+  selectionLibraryTracks(item: MusicKit.Albums): LibraryTrack[] {
     const items: LibraryTrack[] = [];
     item.relationships.tracks?.data.forEach(track => {
-      items.push(this.toResultTrack(track));
+      if (track.type === 'songs') {
+        items.push(this.toLibraryTrackResult(track));
+      }
     });
     return items;
   }
@@ -174,7 +180,7 @@ export class CapacitorMusicKitWeb
         const data = response.data;
         if (data) {
           data.data.forEach(track => {
-            tracks.push(this.toResultTrack(track));
+            tracks.push(this.toLibraryTrackResult(track));
           });
           if (data.next) {
             hasNext = true;
@@ -397,7 +403,7 @@ export class CapacitorMusicKitWeb
       const resultTrack = response.data.data[0];
 
       if (resultTrack) {
-        track = this.toResultTrack(resultTrack);
+        track = this.toLibraryTrackResult(resultTrack);
 
         // Artists
         if (this.include(options, 'artists')) {
@@ -436,7 +442,7 @@ export class CapacitorMusicKitWeb
     );
 
     const tracks: LibraryTrack[] = response.data.data.map(item =>
-      this.toResultTrack(item),
+      this.toLibraryTrackResult(item),
     );
 
     const hasNext =
@@ -560,7 +566,7 @@ export class CapacitorMusicKitWeb
     try {
       const item = MusicKit.getInstance().queue.currentItem;
       if (item) {
-        track = this.toResultTrack(item);
+        track = this.toLibraryTrackResult(item);
       }
     } catch (error) {
       console.log(error);
@@ -572,7 +578,7 @@ export class CapacitorMusicKitWeb
     const tracks: LibraryTrack[] = [];
     try {
       MusicKit.getInstance().queue.items.map(item =>
-        tracks.push(this.toResultTrack(item)),
+        tracks.push(this.toLibraryTrackResult(item)),
       );
     } catch (error) {
       console.log(error);

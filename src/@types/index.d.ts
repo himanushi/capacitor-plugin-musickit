@@ -1,3 +1,6 @@
+// ref: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/musickit-js
+
+/* eslint-disable @typescript-eslint/triple-slash-reference */
 // Type definitions for musickit-js 1.0
 // Project: https://developer.apple.com/documentation/musickitjs
 // Definitions by: Devid Farinelli <https://github.com/misterdev>

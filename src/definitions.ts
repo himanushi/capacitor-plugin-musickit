@@ -66,8 +66,8 @@ export interface LibraryTrack {
   id: string;
   name: string;
   durationMs: number;
-  discNumber: number;
-  trackNumber: number;
+  discNumber?: number;
+  trackNumber?: number;
   artworkUrl?: string;
 }
 
@@ -114,7 +114,7 @@ export interface EchoResult {
 }
 
 export interface ConfigureOptions {
-  config: MusicKit.Config;
+  config: MusicKit.Configuration;
 }
 
 export interface GetSingleDataOptions<T> {
@@ -187,7 +187,7 @@ export type GetLibraryTracksResult = {
 } & GetMultiDataResult;
 
 export type GetLibraryPlaylistOptions = GetSingleDataOptions<
-  'albums' | 'artists' | 'catalog'
+  'catalog' | 'tracks'
 >;
 
 export interface GetLibraryPlaylistResult {
@@ -256,10 +256,10 @@ export interface SeekToTimeOptions {
   time: number;
 }
 
-export type PlaybackStates = keyof typeof MusicKit.PlaybackStates;
+export type PlaybackState = keyof typeof MusicKit.PlaybackState;
 
 export type PlaybackStateDidChangeResult = {
-  state: PlaybackStates;
+  state: PlaybackState;
 };
 
 export type PlaybackStateDidChangeListener = (
