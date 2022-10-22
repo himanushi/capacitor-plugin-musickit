@@ -57,7 +57,7 @@ export class CapacitorMusicKitWeb
   private playbackStateDidChange = (
     data: MusicKit.Events['playbackStateDidChange'],
   ) => {
-    const state = MusicKit.PlaybackState[data.state] as PlaybackState;
+    const state = MusicKit.PlaybackStates[data.state] as PlaybackState;
     const result: PlaybackStateDidChangeResult = { state };
     this.notifyListeners('playbackStateDidChange', result);
   };

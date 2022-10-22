@@ -256,7 +256,7 @@ export interface SeekToTimeOptions {
   time: number;
 }
 
-export type PlaybackState = keyof typeof MusicKit.PlaybackState;
+export type PlaybackState = keyof typeof MusicKit.PlaybackStates;
 
 export type PlaybackStateDidChangeResult = {
   state: PlaybackState;
