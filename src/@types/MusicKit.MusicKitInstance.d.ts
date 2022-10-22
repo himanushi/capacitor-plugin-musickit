@@ -62,6 +62,10 @@ declare namespace MusicKit {
      */
     unauthorize(): Promise<any>;
     /**
+     *
+     */
+    hasMusicSubscription(): Promise<boolean>;
+    /**
      * Removes an event listener for a MusicKit instance by name.
      *
      * @param name The name of the event.

@@ -44,6 +44,7 @@ import type {
   CatalogArtist,
   PlaybackState,
 } from './definitions';
+import './@types';
 
 export class CapacitorMusicKitWeb
   extends WebPlugin
@@ -93,18 +94,20 @@ export class CapacitorMusicKitWeb
     this.notifyListeners('authorizationStatusDidChange', result);
   };
 
-  toLibraryArtistResult = (artist: MusicKit.Artists): LibraryArtist => ({
+  toLibraryArtistResult = (artist: MusicKit.LibraryArtists): LibraryArtist => ({
     id: artist.id,
     name: artist.attributes.name,
   });
 
-  toLibraryAlbumResult = (album: MusicKit.Albums): LibraryAlbum => ({
+  toLibraryAlbumResult = (album: MusicKit.LibraryAlbums): LibraryAlbum => ({
     id: album.id,
     name: album.attributes.name,
     artworkUrl: album.attributes.artwork?.url,
   });
 
-  toLibraryTrackResult = (track: MusicKit.Songs): LibraryTrack => ({
+  toLibraryTrackResult = (
+    track: MusicKit.LibrarySongs | MusicKit.MediaItem,
+  ): LibraryTrack => ({
     id: track.id,
     name: track.attributes.name,
     durationMs: track.attributes.durationInMillis,
@@ -113,7 +116,9 @@ export class CapacitorMusicKitWeb
     artworkUrl: track.attributes.artwork?.url,
   });
 
-  toLibraryPlaylist = (playlist: MusicKit.Playlists): LibraryPlaylist => ({
+  toLibraryPlaylist = (
+    playlist: MusicKit.LibraryPlaylists,
+  ): LibraryPlaylist => ({
     id: playlist.id,
     name: playlist.attributes.name,
     description: playlist.attributes.description?.standard,
@@ -135,7 +140,7 @@ export class CapacitorMusicKitWeb
   }
 
   selectionLibraryArtists(
-    item: MusicKit.Albums | MusicKit.Songs | MusicKit.Playlists,
+    item: MusicKit.LibraryAlbums | MusicKit.LibrarySongs,
   ): LibraryArtist[] {
     const items: LibraryArtist[] = [];
     item.relationships.artists?.data.forEach(artist => {
@@ -145,7 +150,7 @@ export class CapacitorMusicKitWeb
   }
 
   selectionLibraryAlbums(
-    item: MusicKit.Artists | MusicKit.Songs | MusicKit.Playlists,
+    item: MusicKit.LibraryArtists | MusicKit.LibrarySongs,
   ): LibraryAlbum[] {
     const items: LibraryAlbum[] = [];
     item.relationships.albums?.data.forEach(album => {
@@ -154,10 +159,12 @@ export class CapacitorMusicKitWeb
     return items;
   }
 
-  selectionLibraryTracks(item: MusicKit.Albums): LibraryTrack[] {
+  selectionLibraryTracks(
+    item: MusicKit.LibraryAlbums | MusicKit.LibraryPlaylists,
+  ): LibraryTrack[] {
     const items: LibraryTrack[] = [];
     item.relationships.tracks?.data.forEach(track => {
-      if (track.type === 'songs') {
+      if (track.type === 'library-songs') {
         items.push(this.toLibraryTrackResult(track));
       }
     });
@@ -176,7 +183,9 @@ export class CapacitorMusicKitWeb
 
       do {
         hasNext = false;
-        const response = await MusicKit.getInstance().api.music(fetchUrl);
+        const response = await MusicKit.getInstance().api.music(
+          fetchUrl as MusicKit.Music.LibrarySongsUrl,
+        );
         const data = response.data;
         if (data) {
           data.data.forEach(track => {
@@ -275,11 +284,11 @@ export class CapacitorMusicKitWeb
     let albums: LibraryAlbum[] | undefined;
     let catalog: CatalogArtist[] | undefined;
 
-    const fetchUrl = `/v1/me/library/artists/${options.id}`;
     const params = this.relationParams(options, ['albums', 'catalog']);
 
     try {
       // Artist
+      const fetchUrl = `/v1/me/library/artists/${options.id}` as const;
       const response = await MusicKit.getInstance().api.music(fetchUrl, params);
       const item = response.data.data.find(itm => itm.id === options.id);
       if (item) {
@@ -287,11 +296,6 @@ export class CapacitorMusicKitWeb
 
         // Albums
         if (this.include(options, 'albums')) {
-          albums = this.selectionLibraryAlbums(item);
-        }
-
-        // Catalog
-        if (this.include(options, 'catalog')) {
           albums = this.selectionLibraryAlbums(item);
         }
       }
@@ -320,9 +324,9 @@ export class CapacitorMusicKitWeb
     );
 
     const hasNext =
-      response.data.meta.total !== options.offset + response.data.data.length;
+      response.data.meta?.total !== options.offset + response.data.data.length;
 
-    return { artists, hasNext, total: response.data.meta.total };
+    return { artists, hasNext, total: response.data.meta?.total ?? 0 };
   }
 
   async getLibraryAlbum(
@@ -333,11 +337,11 @@ export class CapacitorMusicKitWeb
     let tracks: LibraryTrack[] | undefined;
 
     let nextTracksUrl: string | undefined;
-    const fetchUrl = `/v1/me/library/albums/${options.id}`;
     const params = this.relationParams(options, ['artists', 'tracks']);
 
     try {
       // Album
+      const fetchUrl = `/v1/me/library/albums/${options.id}` as const;
       const response = await MusicKit.getInstance().api.music(fetchUrl, params);
       const item = response.data.data.find(itm => itm.id === options.id);
       if (item) {
@@ -384,9 +388,9 @@ export class CapacitorMusicKitWeb
     );
 
     const hasNext =
-      response.data.meta.total !== options.offset + response.data.data.length;
+      response.data.meta?.total !== options.offset + response.data.data.length;
 
-    return { albums, hasNext, total: response.data.meta.total };
+    return { albums, hasNext, total: response.data.meta?.total ?? 0 };
   }
 
   async getLibraryTrack(
@@ -397,8 +401,8 @@ export class CapacitorMusicKitWeb
     let albums: LibraryAlbum[] | undefined;
 
     try {
-      const fetchUrl = `/v1/me/library/songs/${options.id}`;
       const params = this.relationParams(options, ['albums', 'artists']);
+      const fetchUrl = `/v1/me/library/songs/${options.id}` as const;
       const response = await MusicKit.getInstance().api.music(fetchUrl, params);
       const resultTrack = response.data.data[0];
 
@@ -446,9 +450,9 @@ export class CapacitorMusicKitWeb
     );
 
     const hasNext =
-      response.data.meta.total !== options.offset + response.data.data.length;
+      response.data.meta?.total !== options.offset + response.data.data.length;
 
-    return { tracks, hasNext, total: response.data.meta.total };
+    return { tracks, hasNext, total: response.data.meta?.total ?? 0 };
   }
 
   async getLibraryPlaylist(
@@ -458,11 +462,11 @@ export class CapacitorMusicKitWeb
     let tracks: LibraryTrack[] | undefined;
 
     let nextTracksUrl: string | undefined;
-    const fetchUrl = `/v1/me/library/playlists/${options.id}`;
-    const params = this.relationParams(options, ['tracks']);
 
     try {
       // Playlist
+      const params = this.relationParams(options, ['tracks']);
+      const fetchUrl = `/v1/me/library/playlists/${options.id}` as const;
       const response = await MusicKit.getInstance().api.music(fetchUrl, params);
       const item = response.data.data.find(itm => itm.id === options.id);
       if (item) {
@@ -504,9 +508,9 @@ export class CapacitorMusicKitWeb
     );
 
     const hasNext =
-      response.data.meta.total !== options.offset + response.data.data.length;
+      response.data.meta?.total !== options.offset + response.data.data.length;
 
-    return { playlists, hasNext, total: response.data.meta.total };
+    return { playlists, hasNext, total: response.data.meta?.total ?? 0 };
   }
 
   async getRatings(options: GetRatingsOptions): Promise<ActionRatingsResult> {
@@ -518,7 +522,9 @@ export class CapacitorMusicKitWeb
 
     const ratings: RatingsResult = {};
     response.data.data.forEach(rating => {
-      ratings[rating.id] = rating.attributes.value;
+      if (rating.attributes?.value) {
+        ratings[rating.id] = rating.attributes.value;
+      }
     });
 
     return { ratings };
@@ -619,7 +625,7 @@ export class CapacitorMusicKitWeb
 
   async setRepeatMode(options: SetRepeatModeOptions): Promise<ActionResult> {
     let result = false;
-    const modeMap = { none: 0, one: 1, all: 2 };
+    const modeMap = { none: 0, one: 1, all: 2 } as const;
     try {
       MusicKit.getInstance().repeatMode = modeMap[options.mode];
       result = true;
@@ -633,7 +639,7 @@ export class CapacitorMusicKitWeb
     let result = false;
     try {
       await MusicKit.getInstance().setQueue({
-        tracks: options.ids,
+        songs: options.ids,
       });
       result = true;
     } catch (error) {

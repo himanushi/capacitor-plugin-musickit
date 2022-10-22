@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/array-type */
 declare namespace MusicKit {
+  interface Response<Data> {
+    data: Relationship<Data>;
+  }
+
   /**
    * An object that represents a unique identifier for a music item.
    * https://developer.apple.com/documentation/musickit/musicitemid
@@ -23,6 +27,11 @@ declare namespace MusicKit {
    */
   type ContentRating = 'clean' | 'explicit' | null;
 
+  type Meta = {
+    [key: string]: any;
+    total: number;
+  };
+
   /**
    * A to-one or to-many relationship from one resource object to others.
    * https://developer.apple.com/documentation/applemusicapi/relationship
@@ -31,7 +40,7 @@ declare namespace MusicKit {
     href?: string;
     next?: string;
     data: Data[];
-    meta?: Record<string, any>;
+    meta?: Meta;
   }
 
   /**
@@ -116,7 +125,7 @@ declare namespace MusicKit {
       movementName?: string;
       movementNumber?: number;
       name: string;
-      playParams?: PlayParameters;
+      playParams?: PlayParameters<'song'>;
       previews: Preview[];
       releaseDate?: string;
       trackNumber?: number;
@@ -132,6 +141,213 @@ declare namespace MusicKit {
       'composers': Relationship<Artists>;
       'library': Relationship<LibraryAlbums>;
       'music-videos': Relationship<MusicVideos>;
+    };
+  }
+
+  interface LibrarySongs extends Resource {
+    id: MusicItemID;
+    type: 'library-songs';
+    attributes: {
+      albumName: string;
+      artistName: string;
+      artwork: LibraryArtwork;
+      discNumber: number;
+      durationInMillis: number;
+      genreNames: string[];
+      hasLyrics: boolean;
+      name: string;
+      playParams?: PlayParameters<'song'>;
+      releaseDate?: string; //'2015-11-06'
+      trackNumber: number;
+    };
+    relationships: {
+      'albums': Relationship<LibraryAlbums>;
+      'artists': Relationship<LibraryArtists>;
+      'genres': Relationship<Genres>;
+      'station': Relationship<Stations>;
+      'composers': Relationship<Artists>;
+      'library': Relationship<LibraryAlbums>;
+      'music-videos': Relationship<MusicVideos>;
+    };
+  }
+
+  /**
+   * A resource object that represents an album.
+   * https://developer.apple.com/documentation/applemusicapi/albums-uib
+   */
+  interface Albums extends Resource {
+    type: 'albums';
+    attributes: {
+      artistName: string;
+      artistUrl?: string;
+      artwork: Artwork;
+      contentRating?: ContentRating;
+      Possible?: ContentRating;
+      copyright?: string;
+      editorialNotes?: EditorialNotes;
+      genreNames: string[];
+      isCompilation: boolean;
+      isComplete: boolean;
+      isMasteredForItunes: boolean;
+      isSingle: boolean;
+      name: string;
+      playParams?: PlayParameters<'album'>;
+      recordLabel?: string;
+      releaseDate?: string;
+      trackCount: number;
+      upc?: string;
+      url: string;
+    };
+    relationships: {
+      'artists': Relationship<Artists>;
+      'genres': Relationship<Genres>;
+      'tracks': Relationship<MusicVideos | Songs>;
+      'library': Relationship<LibraryAlbums>;
+      'record-labels': Relationship<RecordLabels>;
+    };
+    views: {
+      'appears-on': View<Playlists>;
+      'other-versions': View<Albums>;
+      'related-albums': View<Albums>;
+      'related-videos': View<MusicVideos>;
+    };
+  }
+
+  /**
+   * A resource object that represents a library album.
+   * https://developer.apple.com/documentation/applemusicapi/libraryalbums/
+   */
+  interface LibraryAlbums extends Resource {
+    type: 'library-albums';
+    attributes: {
+      artistName: string;
+      artwork: Artwork;
+      contentRating?: ContentRating;
+      dateAdded?: string;
+      name: string;
+      playParams?: PlayParameters<'album'>;
+      releaseDate?: string;
+      trackCount: number;
+      genreNames: string[];
+    };
+    relationships: {
+      artists: Relationship<LibraryArtists>;
+      catalog: Relationship<Albums>;
+      tracks: Relationship<LibrarySongs>;
+    };
+  }
+
+  /**
+   * A resource object that represents an artist of an album where an artist can be one or more persons.
+   * https://developer.apple.com/documentation/applemusicapi/artists-uip
+   */
+  interface Artists extends Resource {
+    type: 'artists';
+    attributes: {
+      editorialNotes?: EditorialNotes;
+      genreNames: string[];
+      name: string;
+      url: string;
+      artwork?: Artwork;
+    };
+    relationships: {
+      'albums': Relationship<Albums>;
+      'genres': Relationship<Genres>;
+      'music-videos': Relationship<MusicVideos>;
+      'playlists': Relationship<Playlists>;
+      'station': Relationship<Stations>;
+    };
+    views: {
+      'appears-on-albums': View<Albums>;
+      'compilation-albums': {
+        href?: string;
+        next?: string;
+        attributes: {
+          title: string;
+        };
+        data: Albums[];
+      };
+      'featured-albums': View<Albums>;
+      'featured-playlists': View<Playlists>;
+      'full-albums': View<Albums>;
+      'latest-release': View<Albums>;
+      'live-albums': View<Albums>;
+      'similar-artists': View<Artists>;
+      'singles': View<Albums>;
+      'top-music-videos': View<MusicVideos>;
+      'top-songs': View<Songs>;
+    };
+  }
+
+  /**
+   * A resource object that represents an artist of an album where an artist can be one or more persons.
+   * https://developer.apple.com/documentation/applemusicapi/artists-uip
+   */
+  interface LibraryArtists extends Resource {
+    type: 'library-artists';
+    attributes: {
+      name: string;
+    };
+    relationships: {
+      albums: Relationship<LibraryAlbums>;
+      catalog: Relationship<Artists>;
+    };
+  }
+
+  /**
+   * A resource object that represents a playlist.
+   * https://developer.apple.com/documentation/applemusicapi/playlists-ulf
+   */
+  interface Playlists extends Resource {
+    id: MusicItemID;
+    type: 'playlists';
+    attributes: {
+      artwork?: Artwork;
+      curatorName: string;
+      description?: DescriptionAttribute;
+      isChart: boolean;
+      lastModifiedDate?: string;
+      name: string;
+      playlistType:
+        | 'editorial'
+        | 'external'
+        | 'personal-mix'
+        | 'replay'
+        | 'user-shared';
+      url: string;
+      trackTypes: Array<'music-videos' | 'songs'>;
+    };
+    relationships: {
+      curator: Relationship<Activities | AppleCurators | Curators>;
+      library: Relationship<LibraryPlaylists>;
+      tracks: Relationship<MusicVideos | Songs>;
+      artists: Relationship<Artists>;
+      albums: Relationship<Albums>;
+    };
+    views: {
+      'featured-artists': View<Artists>;
+      'more-by-curator': View<Playlists>;
+    };
+  }
+
+  /**
+   * A resource object that represents a library playlist.
+   * https://developer.apple.com/documentation/applemusicapi/libraryplaylists/
+   */
+  interface LibraryPlaylists extends Resource {
+    type: 'library-playlists';
+    attributes: {
+      artwork?: Artwork;
+      canEdit: boolean;
+      dateAdded?: string;
+      description?: DescriptionAttribute;
+      hasCatalog: boolean;
+      name: string;
+      playParams?: PlayParameters<'playlist'>;
+    };
+    relationships: {
+      catalog: Relationship<Playlists>;
+      tracks: Relationship<MusicVideos | LibrarySongs>;
     };
   }
 
@@ -154,7 +370,7 @@ declare namespace MusicKit {
       hasHDR: boolean;
       isrc?: string;
       name: string;
-      playParams?: PlayParameters;
+      playParams?: PlayParameters<'musicVideo'>;
       previews: Preview[];
       releaseDate?: string;
       trackNumber?: number;
@@ -227,9 +443,18 @@ declare namespace MusicKit {
       contentRating?: ContentRating;
       isLive: boolean;
       name: string;
-      playParams: PlayParameters;
+      playParams: PlayParameters<'stations'>;
       stationProviderName: string;
       url: string;
+    };
+  }
+
+  type Rating = -1 | 1;
+
+  interface Ratings extends Resource {
+    type: 'ratings';
+    attributes?: {
+      value: Rating;
     };
   }
 
@@ -249,170 +474,6 @@ declare namespace MusicKit {
     views: {
       'latest-releases': View<Albums>;
       'top-releases': View<Albums>;
-    };
-  }
-
-  /**
-   * A resource object that represents an album.
-   * https://developer.apple.com/documentation/applemusicapi/albums-uib
-   */
-  interface Albums extends Resource {
-    type: 'albums';
-    attributes: {
-      artistName: string;
-      artistUrl?: string;
-      artwork: Artwork;
-      contentRating?: ContentRating;
-      Possible?: ContentRating;
-      copyright?: string;
-      editorialNotes?: EditorialNotes;
-      genreNames: string[];
-      isCompilation: boolean;
-      isComplete: boolean;
-      isMasteredForItunes: boolean;
-      isSingle: boolean;
-      name: string;
-      playParams?: PlayParameters;
-      recordLabel?: string;
-      releaseDate?: string;
-      trackCount: number;
-      upc?: string;
-      url: string;
-    };
-    relationships: {
-      'artists': Relationship<Artists>;
-      'genres': Relationship<Genres>;
-      'tracks': Relationship<MusicVideos | Songs>;
-      'library': Relationship<LibraryAlbums>;
-      'record-labels': Relationship<RecordLabels>;
-    };
-    views: {
-      'appears-on': View<Playlists>;
-      'other-versions': View<Albums>;
-      'related-albums': View<Albums>;
-      'related-videos': View<MusicVideos>;
-    };
-  }
-
-  /**
-   * A resource object that represents a library album.
-   * https://developer.apple.com/documentation/applemusicapi/libraryalbums/
-   */
-  interface LibraryAlbums extends Resource {
-    type: 'library-albums';
-    attributes?: {
-      artistName: string;
-      artwork: Artwork;
-      contentRating?: ContentRating;
-      dateAdded?: string;
-      name: string;
-      playParams?: PlayParameters;
-      releaseDate?: string;
-      trackCount: number;
-      genreNames: string[];
-    };
-    relationships: {
-      artists: Relationship<Artists>;
-      catalog: Relationship<Playlists>;
-      tracks: Relationship<MusicVideos | Songs>;
-    };
-  }
-
-  /**
-   * A resource object that represents a library playlist.
-   * https://developer.apple.com/documentation/applemusicapi/libraryplaylists/
-   */
-  interface LibraryPlaylists extends Resource {
-    type: 'library-playlists';
-    attributes?: {
-      artwork?: Artwork;
-      canEdit: boolean;
-      dateAdded?: string;
-      description?: DescriptionAttribute;
-      hasCatalog: boolean;
-      name: string;
-      playParams?: PlayParameters;
-    };
-    relationships: {
-      catalog: Relationship<Playlists>;
-      tracks: Relationship<MusicVideos | Songs>;
-    };
-  }
-
-  /**
-   * A resource object that represents an artist of an album where an artist can be one or more persons.
-   * https://developer.apple.com/documentation/applemusicapi/artists-uip
-   */
-  interface Artists extends Resource {
-    type: 'artists';
-    attributes: {
-      editorialNotes?: EditorialNotes;
-      genreNames: string[];
-      name: string;
-      url: string;
-    };
-    relationships: {
-      'albums': Relationship<Albums>;
-      'genres': Relationship<Genres>;
-      'music-videos': Relationship<MusicVideos>;
-      'playlists': Relationship<Playlists>;
-      'station': Relationship<Stations>;
-    };
-    views: {
-      'appears-on-albums': View<Albums>;
-      'compilation-albums': {
-        href?: string;
-        next?: string;
-        attributes: {
-          title: string;
-        };
-        data: Albums[];
-      };
-      'featured-albums': View<Albums>;
-      'featured-playlists': View<Playlists>;
-      'full-albums': View<Albums>;
-      'latest-release': View<Albums>;
-      'live-albums': View<Albums>;
-      'similar-artists': View<Artists>;
-      'singles': View<Albums>;
-      'top-music-videos': View<MusicVideos>;
-      'top-songs': View<Songs>;
-    };
-  }
-
-  /**
-   * A resource object that represents a playlist.
-   * https://developer.apple.com/documentation/applemusicapi/playlists-ulf
-   */
-  interface Playlists extends Resource {
-    id: MusicItemID;
-    type: 'playlists';
-    attributes: {
-      artwork?: Artwork;
-      curatorName: string;
-      description?: DescriptionAttribute;
-      isChart: boolean;
-      lastModifiedDate?: string;
-      name: string;
-      playlistType:
-        | 'editorial'
-        | 'external'
-        | 'personal-mix'
-        | 'replay'
-        | 'user-shared';
-      url: string;
-      trackTypes: Array<'music-videos' | 'songs'>;
-    };
-    relationships: {
-      curator: Relationship<Activities | AppleCurators | Curators>;
-      library: Relationship<LibraryPlaylists>;
-      tracks: Relationship<MusicVideos | Songs>;
-      artists: Relationship<Artists>;
-      albums: Relationship<Albums>;
-    };
-    views: {
-      'featured-artists': View<Artists>;
-      'more-by-curator': View<Playlists>;
     };
   }
 
@@ -454,9 +515,14 @@ declare namespace MusicKit {
       contents: Array<Relationship<Resource>>;
     };
   }
-  interface PlayParameters {
+  interface PlayParameters<KIND> {
+    catalogId?: string;
     id: string;
-    kind: string;
+    isLibrary: boolean;
+    kind: KIND;
+    reporting: boolean;
+    reportingId: string;
+    purchasedId?: string;
   }
 
   /**
@@ -483,6 +549,12 @@ declare namespace MusicKit {
     textColor2: string;
     textColor3: string;
     textColor4: string;
+    url: string;
+  }
+
+  interface LibraryArtwork {
+    height: number;
+    width: number;
     url: string;
   }
 
@@ -525,6 +597,7 @@ declare namespace MusicKit {
    * This class represents the Apple Music API.
    */
   interface API {
+    music: typeof MusicKit.Music.music;
     /**
      * An instance of the Cloud library.
      */

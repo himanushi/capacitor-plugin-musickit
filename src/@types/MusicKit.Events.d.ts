@@ -106,6 +106,6 @@ declare namespace MusicKit {
      */
     userTokenDidChange: unknown;
 
-    nowPlayingItemDidChange: { item: MusicKit.Songs };
+    nowPlayingItemDidChange: { item: MusicKit.MediaItem };
   }
 }
