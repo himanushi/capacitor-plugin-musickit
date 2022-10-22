@@ -835,7 +835,7 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 
 #### RatingCategoryType
 
-<code>'artists' | 'albums' | 'tracks' | 'playlists'</code>
+<code>'artists' | 'albums' | 'songs' | 'playlists'</code>
 
 
 #### AddRatingOptions

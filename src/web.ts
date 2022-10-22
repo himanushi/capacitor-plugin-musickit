@@ -557,8 +557,9 @@ export class CapacitorMusicKitWeb
   async deleteRating(options: DeleteRatingOptions): Promise<ActionResult> {
     let result = false;
 
+    const type = options.type.replace('tracks', 'songs');
     await MusicKit.getInstance().api.music(
-      `/v1/me/ratings/${options.type}/${options.id}` as const,
+      `/v1/me/ratings/${type}/${options.id}` as const,
       {},
       { fetchOptions: { method: 'DELETE' } },
     );
