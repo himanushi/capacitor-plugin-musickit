@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/array-type */
 declare namespace MusicKit {
   namespace Music {
-    type Storefront = string;
-    type Category = string;
     type ID = string;
 
-    type AlbumsUrl = `/v1/catalog/${Storefront}/albums${ID}`;
-    type ArtistsUrl = `/v1/catalog/${Storefront}/artists${ID}`;
-    type SongsUrl = `/v1/catalog/${Storefront}/songs${ID}`;
-    type MusicVideosUrl = `/v1/catalog/${Storefront}/music-videos${ID}`;
-    type PlaylistsUrl = `/v1/catalog/${Storefront}/playlists${ID}`;
-    type StationsUrl = `/v1/catalog/${Storefront}/stations${ID}`;
-    type LibraryAlbumsUrl = `/v1/me/library/albums${ID}`;
-    type LibraryArtistsUrl = `/v1/me/library/artists${ID}`;
-    type LibrarySongsUrl = `/v1/me/library/songs${ID}`;
-    type LibraryMusicVideosUrl = `/v1/me/library/music-videos${ID}`;
-    type LibraryPlaylistsUrl = `/v1/me/library/playlists${ID}`;
-    type RatingsUrl = `/v1/me/ratings/${Category}`;
+    type AlbumsUrl = `/v1/catalog/${string}/albums${`/${ID}` | ''}`;
+    type ArtistsUrl = `/v1/catalog/${string}/artists${`/${ID}` | ''}`;
+    type SongsUrl = `/v1/catalog/${string}/songs${`/${ID}` | ''}`;
+    type MusicVideosUrl = `/v1/catalog/${string}/music-videos${`/${ID}` | ''}`;
+    type PlaylistsUrl = `/v1/catalog/${string}/playlists${`/${ID}` | ''}`;
+    type StationsUrl = `/v1/catalog/${string}/stations${`/${ID}` | ''}`;
+    type LibraryAlbumsUrl = `/v1/me/library/albums${`/${ID}` | ''}`;
+    type LibraryArtistsUrl = `/v1/me/library/artists${`/${ID}` | ''}`;
+    type LibrarySongsUrl = `/v1/me/library/songs${`/${ID}` | ''}`;
+    type LibraryMusicVideosUrl = `/v1/me/library/music-videos${`/${ID}` | ''}`;
+    type LibraryPlaylistsUrl = `/v1/me/library/playlists${`/${ID}` | ''}`;
+    type RatingsUrl =
+      | `/v1/me/ratings/${string}`
+      | `/v1/me/ratings/${string}/${string}`;
 
     type Params = Record<string, any>;
     type Options = Record<string, any>;

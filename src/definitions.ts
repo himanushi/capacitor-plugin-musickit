@@ -98,7 +98,7 @@ export type Rating = -1 | 1;
 export type RatingsResult = {
   [key: string]: Rating;
 };
-export type RatingCategoryType = 'artists' | 'albums' | 'tracks' | 'playlists';
+export type RatingCategoryType = 'artists' | 'albums' | 'songs' | 'playlists';
 export type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
 
 export interface ActionResult {

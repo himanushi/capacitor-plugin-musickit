@@ -516,7 +516,7 @@ export class CapacitorMusicKitWeb
   async getRatings(options: GetRatingsOptions): Promise<ActionRatingsResult> {
     const type = options.type.replace('tracks', 'songs');
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/ratings/${type}`,
+      `/v1/me/ratings/${type}` as const,
       { ids: options.ids },
     );
 
@@ -535,7 +535,7 @@ export class CapacitorMusicKitWeb
 
     const type = options.type.replace('tracks', 'songs');
     await MusicKit.getInstance().api.music(
-      `/v1/me/ratings/${type}/${options.id}`,
+      `/v1/me/ratings/${type}/${options.id}` as const,
       {},
       {
         fetchOptions: {
@@ -558,7 +558,7 @@ export class CapacitorMusicKitWeb
     let result = false;
 
     await MusicKit.getInstance().api.music(
-      `/v1/me/ratings/${options.type}/${options.id}`,
+      `/v1/me/ratings/${options.type}/${options.id}` as const,
       {},
       { fetchOptions: { method: 'DELETE' } },
     );
