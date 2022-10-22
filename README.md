@@ -860,7 +860,7 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 
 #### PlaybackState
 
-<code>keyof typeof MusicKit.<a href="#playbackstate">PlaybackState</a></code>
+<code>keyof typeof MusicKit.PlaybackStates</code>
 
 
 #### NowPlayingItemDidChangeListener
