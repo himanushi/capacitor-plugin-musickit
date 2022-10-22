@@ -1,3 +1,5 @@
+import copy from 'rollup-plugin-copy';
+
 export default {
   input: 'dist/esm/index.js',
   output: [
@@ -17,6 +19,11 @@ export default {
       sourcemap: true,
       inlineDynamicImports: true,
     },
+  ],
+  plugins: [
+    copy({
+      targets: [{ src: 'src/@types/**/*', dest: 'dist/@types' }],
+    }),
   ],
   external: ['@capacitor/core'],
 };
