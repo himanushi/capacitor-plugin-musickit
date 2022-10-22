@@ -590,9 +590,9 @@ addListener(eventName: 'authorizationStatusDidChange', listenerFunc: Authorizati
 
 #### GetLibraryAlbumResult
 
-| Prop         | Type               |
-| ------------ | ------------------ |
-| **`albums`** | <code>any[]</code> |
+| Prop         | Type                         |
+| ------------ | ---------------------------- |
+| **`albums`** | <code>LibraryAlbums[]</code> |
 
 
 #### GetLibraryTrackResult
