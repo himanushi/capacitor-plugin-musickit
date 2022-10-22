@@ -2,7 +2,7 @@ declare namespace MusicKit {
   /**
    * The playback states of the music player.
    */
-  enum PlaybackState {
+  enum PlaybackStates {
     none,
     loading,
     playing,
@@ -66,7 +66,7 @@ declare namespace MusicKit {
     /**
      * The current playback state of the music player.
      */
-    readonly playbackState: PlaybackState;
+    readonly playbackState: PlaybackStates;
     /**
      * A Boolean value that indicates whether a playback target is available.
      */

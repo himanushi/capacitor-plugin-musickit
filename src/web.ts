@@ -44,7 +44,6 @@ import type {
   CatalogArtist,
   PlaybackState,
 } from './definitions';
-import './@types';
 
 export class CapacitorMusicKitWeb
   extends WebPlugin
