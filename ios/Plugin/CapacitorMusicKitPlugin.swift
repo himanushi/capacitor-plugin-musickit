@@ -257,46 +257,37 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
 
     @objc func getLibraryAlbum(_ call: CAPPluginCall) {
-        let id = call.getString("id")
+        let id = call.getString("id")!
 
         Task {
             var reason: String = "開始"
             var resultAlbum: Album?
             var resultSongs: [[String: Any?]] = []
+            var requestAlbum = MusicLibraryRequest<Album>()
+            requestAlbum.filter(matching: \.id, equalTo: MusicItemID(id))
+            let responseAlbum = try await requestAlbum.response()
+            if let album = responseAlbum.items.first {
+                reason = reason + ",アルバムあり"
 
-            if MusicAuthorization.currentStatus == .authorized {
-                reason = reason + ",ログイン済み"
+                var requestSong = MusicLibraryRequest<Song>()
+                requestSong.filter(matching: \.albums, contains: album)
+                requestSong.sort(by: \.discNumber, ascending: true)
+                requestSong.sort(by: \.trackNumber, ascending: true)
+                let responseSong = try await requestSong.response()
 
-                if let albumId = id {
-                    var requestAlbum = MusicLibraryRequest<Album>()
-                    requestAlbum.filter(matching: \.id, equalTo: MusicItemID(albumId))
-                    let responseAlbum = try await requestAlbum.response()
-                    if let album = responseAlbum.items.first {
-                        reason = reason + ",アルバムあり"
+                if responseSong.items.count > 0 {
+                    reason = reason + ",曲あり"
 
-                        var requestSong = MusicLibraryRequest<Song>()
-                        requestSong.filter(matching: \.albums, contains: album)
-                        requestSong.sort(by: \.discNumber, ascending: true)
-                        requestSong.sort(by: \.trackNumber, ascending: true)
-                        let responseSong = try await requestSong.response()
-
-                        if responseSong.items.count > 0 {
-                            reason = reason + ",曲あり"
-
-                            resultAlbum = album
-                            let artworkUrl = await toBase64Image(album.artwork, sSize)
-                            responseSong.items.forEach {
-                                resultSongs.append(toResultSong($0, artworkUrl)!)
-                            }
-                        } else {
-                            reason = reason + ",曲なし"
-                        }
-                    } else {
-                        reason = reason + ",アルバムなし"
+                    resultAlbum = album
+                    let artworkUrl = await toBase64Image(album.artwork, sSize)
+                    responseSong.items.forEach {
+                        resultSongs.append(toResultSong($0, artworkUrl)!)
                     }
+                } else {
+                    reason = reason + ",曲なし"
                 }
             } else {
-                reason = reason + ",未ログイン"
+                reason = reason + ",アルバムなし"
             }
 
             if let album = resultAlbum {
@@ -304,7 +295,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 albumHash["tracks"] = resultSongs
                 call.resolve([
                     "reason": reason,
-                    "album": albumHash,
+                    "albums": responseAlbum.items.map { $0 },
                 ])
             } else {
                 call.resolve([

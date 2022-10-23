@@ -15,17 +15,17 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/musickit/musiccatalogchartrequestable
    */
   type MusicCatalogChartRequestable =
-    | 'albums'
-    | 'music-videos'
-    | 'playlists'
-    | 'songs';
+    | "albums"
+    | "music-videos"
+    | "playlists"
+    | "songs";
 
   /**
    * The rating of the content that potentially plays while playing a resource.
    * A nil value means no rating is available for this resource.
    * https://developer.apple.com/documentation/musickit/contentrating
    */
-  type ContentRating = 'clean' | 'explicit' | null;
+  type ContentRating = "clean" | "explicit" | null;
 
   type Meta = {
     [key: string]: any;
@@ -37,10 +37,10 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/relationship
    */
   interface Relationship<Data> {
-    href?: string;
-    next?: string;
     data: Data[];
+    href?: string;
     meta?: Meta;
+    next?: string;
   }
 
   /**
@@ -48,13 +48,13 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/view
    */
   interface View<Data> {
-    href?: string;
-    next?: string;
     attributes?: {
       title: string;
     };
     data: Data[];
+    href?: string;
     meta?: Record<string, any>;
+    next?: string;
   }
 
   /**
@@ -62,15 +62,15 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/resource
    */
   interface Resource {
-    id: string;
-    type: string;
-    href: string;
     attributes?: Record<string, any>;
+    href: string;
+    id: string;
+    meta?: Record<string, any>;
     relationships?: Record<
       string,
       Relationship<Resource> | Array<Relationship<Resource>>
     >;
-    meta?: Record<string, any>;
+    type: string;
     views?: Record<string, View<Resource>>;
   }
 
@@ -79,13 +79,13 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/storefronts
    */
   interface Storefronts extends Resource {
-    type: 'storefronts';
     attributes?: {
       defaultLanguageTag: string;
-      explicitContentPolicy: 'allowed' | 'opt-in' | 'prohibited';
+      explicitContentPolicy: "allowed" | "opt-in" | "prohibited";
       name: string;
       supportedLanguageTags: string[];
     };
+    type: "storefronts";
   }
 
   /**
@@ -93,12 +93,12 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/genres
    */
   interface Genres extends Resource {
-    type: 'genres';
     attributes?: {
       name: string;
       parentId?: string;
       parentName?: string;
     };
+    type: "genres";
   }
 
   /**
@@ -106,11 +106,10 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/songs-um8
    */
   interface Songs extends Resource {
-    id: MusicItemID;
-    type: 'songs';
     attributes: {
       albumName: string;
       artistName: string;
+      artistUrl?: string;
       artwork: Artwork;
       attribution?: string;
       composerName?: string;
@@ -125,28 +124,27 @@ declare namespace MusicKit {
       movementName?: string;
       movementNumber?: number;
       name: string;
-      playParams?: PlayParameters<'song'>;
+      playParams?: PlayParameters<"song">;
       previews: Preview[];
       releaseDate?: string;
       trackNumber?: number;
       url: string;
       workName?: string;
-      artistUrl?: string;
     };
+    id: MusicItemID;
     relationships: {
-      'albums': Relationship<Albums>;
-      'artists': Relationship<Artists>;
-      'genres': Relationship<Genres>;
-      'station': Relationship<Stations>;
-      'composers': Relationship<Artists>;
-      'library': Relationship<LibraryAlbums>;
-      'music-videos': Relationship<MusicVideos>;
+      albums: Relationship<Albums>;
+      artists: Relationship<Artists>;
+      composers: Relationship<Artists>;
+      genres: Relationship<Genres>;
+      library: Relationship<LibraryAlbums>;
+      "music-videos": Relationship<MusicVideos>;
+      station: Relationship<Stations>;
     };
+    type: "songs";
   }
 
   interface LibrarySongs extends Resource {
-    id: MusicItemID;
-    type: 'library-songs';
     attributes: {
       albumName: string;
       artistName: string;
@@ -156,19 +154,21 @@ declare namespace MusicKit {
       genreNames: string[];
       hasLyrics: boolean;
       name: string;
-      playParams?: PlayParameters<'song'>;
-      releaseDate?: string; //'2015-11-06'
+      playParams?: PlayParameters<"song">;
+      releaseDate?: string;
       trackNumber: number;
     };
+    id: MusicItemID;
     relationships: {
-      'albums': Relationship<LibraryAlbums>;
-      'artists': Relationship<LibraryArtists>;
-      'genres': Relationship<Genres>;
-      'station': Relationship<Stations>;
-      'composers': Relationship<Artists>;
-      'library': Relationship<LibraryAlbums>;
-      'music-videos': Relationship<MusicVideos>;
+      albums: Relationship<LibraryAlbums>;
+      artists: Relationship<LibraryArtists>;
+      composers: Relationship<Artists>;
+      genres: Relationship<Genres>;
+      library: Relationship<LibraryAlbums>;
+      "music-videos": Relationship<MusicVideos>;
+      station: Relationship<Stations>;
     };
+    type: "library-songs";
   }
 
   /**
@@ -176,13 +176,12 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/albums-uib
    */
   interface Albums extends Resource {
-    type: 'albums';
     attributes: {
+      Possible?: ContentRating;
       artistName: string;
       artistUrl?: string;
       artwork: Artwork;
       contentRating?: ContentRating;
-      Possible?: ContentRating;
       copyright?: string;
       editorialNotes?: EditorialNotes;
       genreNames: string[];
@@ -191,7 +190,7 @@ declare namespace MusicKit {
       isMasteredForItunes: boolean;
       isSingle: boolean;
       name: string;
-      playParams?: PlayParameters<'album'>;
+      playParams?: PlayParameters<"album">;
       recordLabel?: string;
       releaseDate?: string;
       trackCount: number;
@@ -199,17 +198,18 @@ declare namespace MusicKit {
       url: string;
     };
     relationships: {
-      'artists': Relationship<Artists>;
-      'genres': Relationship<Genres>;
-      'tracks': Relationship<MusicVideos | Songs>;
-      'library': Relationship<LibraryAlbums>;
-      'record-labels': Relationship<RecordLabels>;
+      artists: Relationship<Artists>;
+      genres: Relationship<Genres>;
+      library: Relationship<LibraryAlbums>;
+      "record-labels": Relationship<RecordLabels>;
+      tracks: Relationship<MusicVideos | Songs>;
     };
+    type: "albums";
     views: {
-      'appears-on': View<Playlists>;
-      'other-versions': View<Albums>;
-      'related-albums': View<Albums>;
-      'related-videos': View<MusicVideos>;
+      "appears-on": View<Playlists>;
+      "other-versions": View<Albums>;
+      "related-albums": View<Albums>;
+      "related-videos": View<MusicVideos>;
     };
   }
 
@@ -218,23 +218,23 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/libraryalbums/
    */
   interface LibraryAlbums extends Resource {
-    type: 'library-albums';
     attributes: {
       artistName: string;
       artwork: Artwork;
       contentRating?: ContentRating;
       dateAdded?: string;
+      genreNames: string[];
       name: string;
-      playParams?: PlayParameters<'album'>;
+      playParams?: PlayParameters<"album">;
       releaseDate?: string;
       trackCount: number;
-      genreNames: string[];
     };
     relationships: {
       artists: Relationship<LibraryArtists>;
       catalog: Relationship<Albums>;
       tracks: Relationship<LibrarySongs>;
     };
+    type: "library-albums";
   }
 
   /**
@@ -242,40 +242,40 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/artists-uip
    */
   interface Artists extends Resource {
-    type: 'artists';
     attributes: {
+      artwork?: Artwork;
       editorialNotes?: EditorialNotes;
       genreNames: string[];
       name: string;
       url: string;
-      artwork?: Artwork;
     };
     relationships: {
-      'albums': Relationship<Albums>;
-      'genres': Relationship<Genres>;
-      'music-videos': Relationship<MusicVideos>;
-      'playlists': Relationship<Playlists>;
-      'station': Relationship<Stations>;
+      albums: Relationship<Albums>;
+      genres: Relationship<Genres>;
+      "music-videos": Relationship<MusicVideos>;
+      playlists: Relationship<Playlists>;
+      station: Relationship<Stations>;
     };
+    type: "artists";
     views: {
-      'appears-on-albums': View<Albums>;
-      'compilation-albums': {
-        href?: string;
-        next?: string;
+      "appears-on-albums": View<Albums>;
+      "compilation-albums": {
         attributes: {
           title: string;
         };
         data: Albums[];
+        href?: string;
+        next?: string;
       };
-      'featured-albums': View<Albums>;
-      'featured-playlists': View<Playlists>;
-      'full-albums': View<Albums>;
-      'latest-release': View<Albums>;
-      'live-albums': View<Albums>;
-      'similar-artists': View<Artists>;
-      'singles': View<Albums>;
-      'top-music-videos': View<MusicVideos>;
-      'top-songs': View<Songs>;
+      "featured-albums": View<Albums>;
+      "featured-playlists": View<Playlists>;
+      "full-albums": View<Albums>;
+      "latest-release": View<Albums>;
+      "live-albums": View<Albums>;
+      "similar-artists": View<Artists>;
+      singles: View<Albums>;
+      "top-music-videos": View<MusicVideos>;
+      "top-songs": View<Songs>;
     };
   }
 
@@ -284,7 +284,6 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/artists-uip
    */
   interface LibraryArtists extends Resource {
-    type: 'library-artists';
     attributes: {
       name: string;
     };
@@ -292,6 +291,7 @@ declare namespace MusicKit {
       albums: Relationship<LibraryAlbums>;
       catalog: Relationship<Artists>;
     };
+    type: "library-artists";
   }
 
   /**
@@ -299,8 +299,6 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/playlists-ulf
    */
   interface Playlists extends Resource {
-    id: MusicItemID;
-    type: 'playlists';
     attributes: {
       artwork?: Artwork;
       curatorName: string;
@@ -309,24 +307,26 @@ declare namespace MusicKit {
       lastModifiedDate?: string;
       name: string;
       playlistType:
-        | 'editorial'
-        | 'external'
-        | 'personal-mix'
-        | 'replay'
-        | 'user-shared';
+        | "editorial"
+        | "external"
+        | "personal-mix"
+        | "replay"
+        | "user-shared";
+      trackTypes: Array<"music-videos" | "songs">;
       url: string;
-      trackTypes: Array<'music-videos' | 'songs'>;
     };
+    id: MusicItemID;
     relationships: {
+      albums: Relationship<Albums>;
+      artists: Relationship<Artists>;
       curator: Relationship<Activities | AppleCurators | Curators>;
       library: Relationship<LibraryPlaylists>;
       tracks: Relationship<MusicVideos | Songs>;
-      artists: Relationship<Artists>;
-      albums: Relationship<Albums>;
     };
+    type: "playlists";
     views: {
-      'featured-artists': View<Artists>;
-      'more-by-curator': View<Playlists>;
+      "featured-artists": View<Artists>;
+      "more-by-curator": View<Playlists>;
     };
   }
 
@@ -335,7 +335,6 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/libraryplaylists/
    */
   interface LibraryPlaylists extends Resource {
-    type: 'library-playlists';
     attributes: {
       artwork?: Artwork;
       canEdit: boolean;
@@ -343,12 +342,13 @@ declare namespace MusicKit {
       description?: DescriptionAttribute;
       hasCatalog: boolean;
       name: string;
-      playParams?: PlayParameters<'playlist'>;
+      playParams?: PlayParameters<"playlist">;
     };
     relationships: {
       catalog: Relationship<Playlists>;
       tracks: Relationship<MusicVideos | LibrarySongs>;
     };
+    type: "library-playlists";
   }
 
   /**
@@ -356,11 +356,10 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/musicvideos/
    */
   interface MusicVideos extends Resource {
-    id: MusicItemID;
-    type: 'music-videos';
     attributes?: {
       albumName?: string;
       artistName: string;
+      artistUrl?: string;
       artwork: Artwork;
       contentRating?: ContentRating;
       durationInMillis: number;
@@ -370,25 +369,26 @@ declare namespace MusicKit {
       hasHDR: boolean;
       isrc?: string;
       name: string;
-      playParams?: PlayParameters<'musicVideo'>;
+      playParams?: PlayParameters<"musicVideo">;
       previews: Preview[];
       releaseDate?: string;
       trackNumber?: number;
       url: string;
-      videoSubType?: 'preview';
+      videoSubType?: "preview";
       workId?: string;
       workName?: string;
-      artistUrl?: string;
     };
+    id: MusicItemID;
     relationships: {
       albums: Relationship<Albums>;
       genres: Relationship<Genres>;
       library: Relationship<LibraryAlbums>;
       songs: Relationship<Songs>;
     };
+    type: "music-videos";
     views: {
-      'more-by-artist': View<MusicVideos>;
-      'more-in-genre': View<MusicVideos>;
+      "more-by-artist": View<MusicVideos>;
+      "more-in-genre": View<MusicVideos>;
     };
   }
 
@@ -397,11 +397,10 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/applecurators/
    */
   interface AppleCurators extends Resource {
-    type: 'apple-curators';
     attributes?: {
       artwork: Artwork;
       editorialNotes?: EditorialNotes;
-      kind: 'Curator' | 'Genre' | 'Show';
+      kind: "Curator" | "Genre" | "Show";
       name: string;
       shortName?: string;
       showHostName?: string;
@@ -410,6 +409,7 @@ declare namespace MusicKit {
     relationships: {
       playlists: Relationship<Playlists>;
     };
+    type: "apple-curators";
   }
 
   /**
@@ -417,7 +417,6 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/curators-uja
    */
   interface Curators extends Resource {
-    type: 'curators';
     attributes?: {
       artwork: Artwork;
       editorialNotes?: EditorialNotes;
@@ -427,6 +426,7 @@ declare namespace MusicKit {
     relationships: {
       playlists: Relationship<Playlists>;
     };
+    type: "curators";
   }
 
   /**
@@ -434,28 +434,28 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/stations/
    */
   interface Stations extends Resource {
-    type: 'stations';
     attributes?: {
       artwork: Artwork;
+      contentRating?: ContentRating;
       durationInMillis: number;
       editorialNotes: EditorialNotes;
       episodeNumber: number;
-      contentRating?: ContentRating;
       isLive: boolean;
       name: string;
-      playParams: PlayParameters<'stations'>;
+      playParams: PlayParameters<"stations">;
       stationProviderName: string;
       url: string;
     };
+    type: "stations";
   }
 
   type Rating = -1 | 1;
 
   interface Ratings extends Resource {
-    type: 'ratings';
     attributes?: {
       value: Rating;
     };
+    type: "ratings";
   }
 
   /**
@@ -463,17 +463,17 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/recordlabels/
    */
   interface RecordLabels extends Resource {
-    id: MusicItemID;
-    type: 'record-labels';
     attributes?: {
       artwork: Artwork;
       description: DescriptionAttribute;
       name: string;
       url: string;
     };
+    id: MusicItemID;
+    type: "record-labels";
     views: {
-      'latest-releases': View<Albums>;
-      'top-releases': View<Albums>;
+      "latest-releases": View<Albums>;
+      "top-releases": View<Albums>;
     };
   }
 
@@ -482,7 +482,6 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/activities-ui5
    */
   interface Activities extends Resource {
-    type: 'activities';
     attributes?: {
       artwork: Artwork;
       editorialNotes?: EditorialNotes;
@@ -492,6 +491,7 @@ declare namespace MusicKit {
     relationships: {
       playlists: Relationship<Playlists>;
     };
+    type: "activities";
   }
 
   /**
@@ -499,9 +499,8 @@ declare namespace MusicKit {
    * https://developer.apple.com/documentation/applemusicapi/personalrecommendation
    */
   interface PersonalRecommendation extends Resource {
-    type: 'personal-recommendation';
     attributes?: {
-      kind: 'music-recommendations' | 'recently-played' | 'unknown';
+      kind: "music-recommendations" | "recently-played" | "unknown";
       nextUpdateDate: string;
       reason: {
         stringForDisplay: string;
@@ -514,15 +513,16 @@ declare namespace MusicKit {
     relationships?: {
       contents: Array<Relationship<Resource>>;
     };
+    type: "personal-recommendation";
   }
   interface PlayParameters<KIND> {
     catalogId?: string;
     id: string;
     isLibrary: boolean;
     kind: KIND;
+    purchasedId?: string;
     reporting: boolean;
     reportingId: string;
-    purchasedId?: string;
   }
 
   /**
@@ -544,18 +544,18 @@ declare namespace MusicKit {
   interface Artwork {
     bgColor: string;
     height: number;
-    width: number;
     textColor1: string;
     textColor2: string;
     textColor3: string;
     textColor4: string;
     url: string;
+    width: number;
   }
 
   interface LibraryArtwork {
     height: number;
-    width: number;
     url: string;
+    width: number;
   }
 
   /**
@@ -564,8 +564,8 @@ declare namespace MusicKit {
    */
   interface Preview {
     artwork: Artwork;
-    url: string;
     hlsUrl: string;
+    url: string;
   }
 
   /**
@@ -597,15 +597,7 @@ declare namespace MusicKit {
    * This class represents the Apple Music API.
    */
   interface API {
-    music: typeof MusicKit.Music.music;
-    /**
-     * An instance of the Cloud library.
-     */
-    library: Library;
-    /**
-     * The storefront used for making calls to the API.
-     */
-    storefrontId: string;
+
     /**
      * Fetch one or more activities using their identifiers.
      *
@@ -615,8 +607,9 @@ declare namespace MusicKit {
      */
     activities(
       ids: string[],
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<Activities[]>;
+
     /**
      * Fetch an activity using its identifier.
      *
@@ -625,10 +618,12 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     activity(id: string, parameters?: QueryParameters): Promise<Activities>;
+
     /**
      * Add a catalog resource to a user's library.
      */
     addToLibrary(parameters?: any): Promise<void>;
+
     /**
      * Fetch an album using its identifier.
      *
@@ -637,6 +632,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     album(id: string, parameters?: QueryParameters): Promise<Albums>;
+
     /**
      * Fetch one or more albums using their identifiers.
      *
@@ -645,6 +641,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     albums(ids: string[], parameters?: QueryParameters): Promise<Albums[]>;
+
     /**
      * Fetch an Apple curator using its identifier.
      *
@@ -653,6 +650,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     appleCurator(id: string, parameters?: QueryParameters): Promise<Curators>;
+
     /**
      * Fetch one or more Apple curators using their identifiers.
      *
@@ -662,8 +660,9 @@ declare namespace MusicKit {
      */
     appleCurators(
       ids: string[],
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<AppleCurators[]>;
+
     /**
      * Fetch an artist using its identifier.
      *
@@ -672,6 +671,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     artist(id: string, parameters?: QueryParameters): Promise<Artists>;
+
     /**
      * Fetch one or more artists using their identifiers.
      *
@@ -680,6 +680,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     artists(ids: string[], parameters?: QueryParameters): Promise<Artists[]>;
+
     /**
      * Fetch one or more charts.
      *
@@ -690,24 +691,25 @@ declare namespace MusicKit {
      */
     charts(
       types: MusicCatalogChartRequestable[],
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<
       {
         [key in MusicCatalogChartRequestable]: Array<
           SearchChartResult<
-            key extends 'albums'
+            key extends "albums"
               ? Albums
-              : key extends 'music-videos'
+              : key extends "music-videos"
               ? MusicVideos
-              : key extends 'playlists'
+              : key extends "playlists"
               ? Playlists
-              : key extends 'songs'
+              : key extends "songs"
               ? Songs
               : never
           >
         >;
       }
     >;
+
     /**
      * Fetch a curator using its identifier.
      *
@@ -716,6 +718,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     curator(id: string, parameters?: QueryParameters): Promise<Curators>;
+
     /**
      * Fetch one or more curators using their identifiers.
      *
@@ -724,6 +727,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     curators(ids: string[], parameters?: QueryParameters): Promise<Curators[]>;
+
     /**
      * Fetch a genre using its identifier.
      *
@@ -732,6 +736,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     genre(id: string, parameters?: QueryParameters): Promise<Genres>;
+
     /**
      * Fetch one or more genres using their identifiers.
      *
@@ -740,6 +745,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     genres(ids: string[], parameters?: QueryParameters): Promise<Genres[]>;
+
     /**
      * Fetch the resources in heavy rotation for the user.
      *
@@ -748,9 +754,17 @@ declare namespace MusicKit {
      * https://developer.apple.com/documentation/applemusicapi/paginatedresourcecollectionresponse
      */
     historyHeavyRotation(parameters?: QueryParameters): Promise<{
-      next?: string;
       data: Resource[];
+      next?: string;
     }>;
+
+    /**
+     * An instance of the Cloud library.
+     */
+    library: Library;
+
+    music: typeof MusicKit.Music.music;
+
     /**
      * Fetch a music video using its identifier.
      *
@@ -759,6 +773,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     musicVideo(id: string, parameters?: QueryParameters): Promise<MusicVideos>;
+
     /**
      * Fetch one or more music videos using their identifiers.
      *
@@ -768,8 +783,9 @@ declare namespace MusicKit {
      */
     musicVideos(
       ids: string[],
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<MusicVideos[]>;
+
     /**
      * Fetch a playlist using its identifier.
      *
@@ -778,6 +794,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     playlist(id: string, parameters?: QueryParameters): Promise<Playlists>;
+
     /**
      * Fetch one or more playlists using their identifiers.
      *
@@ -787,8 +804,9 @@ declare namespace MusicKit {
      */
     playlists(
       ids: string[],
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<Playlists[]>;
+
     /**
      * Fetch the recently played resources for the user.
      *
@@ -796,6 +814,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     recentPlayed(parameters?: QueryParameters): Promise<Resource[]>;
+
     /**
      * Fetch a recommendation using its identifier.
      *
@@ -805,8 +824,9 @@ declare namespace MusicKit {
      */
     recommendation(
       id: string,
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<PersonalRecommendation>;
+
     /**
      * Fetch one or more recommendations using their identifiers.
      *
@@ -816,7 +836,7 @@ declare namespace MusicKit {
      */
     recommendations(
       ids: string[],
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<PersonalRecommendation[]>;
 
     /**
@@ -829,19 +849,19 @@ declare namespace MusicKit {
      */
     search(
       term: string,
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<{
-      'activities'?: SearchResult<Activities>;
-      'albums'?: SearchResult<Albums>;
-      'apple-curators'?: SearchResult<AppleCurators>;
-      'artists'?: SearchResult<Artists>;
-      'curators'?: SearchResult<Curators>;
-      'music-videos'?: SearchResult<MusicVideos>;
-      'playlists'?: SearchResult<Playlists>;
-      'record-labels'?: SearchResult<RecordLabels>;
-      'stations'?: SearchResult<Stations>;
-      'songs'?: SearchResult<Songs>;
-      'top'?: {
+      activities?: SearchResult<Activities>;
+      albums?: SearchResult<Albums>;
+      "apple-curators"?: SearchResult<AppleCurators>;
+      artists?: SearchResult<Artists>;
+      curators?: SearchResult<Curators>;
+      "music-videos"?: SearchResult<MusicVideos>;
+      playlists?: SearchResult<Playlists>;
+      "record-labels"?: SearchResult<RecordLabels>;
+      songs?: SearchResult<Songs>;
+      stations?: SearchResult<Stations>;
+      top?: {
         data: Array<
           | Activities
           | Albums
@@ -856,6 +876,7 @@ declare namespace MusicKit {
         >;
       };
     }>;
+
     /**
      * Fetch the search term results for a hint.
      *
@@ -866,10 +887,11 @@ declare namespace MusicKit {
      */
     searchHints(
       term: string,
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<{
       terms: string[];
     }>;
+
     /**
      * Fetch a song using its identifier.
      *
@@ -878,6 +900,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     song(id: string, parameters?: QueryParameters): Promise<Songs>;
+
     /**
      * Fetch one or more songs using their identifiers.
      *
@@ -886,6 +909,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     songs(ids: string[], parameters?: QueryParameters): Promise<Songs[]>;
+
     /**
      * Fetch a station using its identifier.
      *
@@ -894,6 +918,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     station(id: string, parameters?: QueryParameters): Promise<Stations>;
+
     /**
      * Fetch one or more stations using their identifiers.
      *
@@ -902,6 +927,7 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     stations(ids: string[], parameters?: QueryParameters): Promise<Stations[]>;
+
     /**
      * Fetch a storefront using its identifier.
      *
@@ -910,6 +936,12 @@ declare namespace MusicKit {
      * directly to the Apple Music API.
      */
     storefront(id: string, parameters?: QueryParameters): Promise<Storefronts>;
+
+    /**
+     * The storefront used for making calls to the API.
+     */
+    storefrontId: string;
+
     /**
      * Fetch one or more storefronts using their identifiers.
      *
@@ -919,7 +951,7 @@ declare namespace MusicKit {
      */
     storefronts(
       ids: string[],
-      parameters?: QueryParameters,
+      parameters?: QueryParameters
     ): Promise<Storefronts[]>;
   }
 }

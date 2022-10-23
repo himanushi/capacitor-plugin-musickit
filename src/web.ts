@@ -1,4 +1,4 @@
-import { WebPlugin } from '@capacitor/core';
+import { WebPlugin } from "@capacitor/core";
 
 import type {
   CapacitorMusicKitPlugin,
@@ -43,27 +43,26 @@ import type {
   GetLibraryPlaylistOptions,
   CatalogArtist,
   PlaybackState,
-} from './definitions';
+} from "./definitions";
 
 export class CapacitorMusicKitWeb
   extends WebPlugin
-  implements CapacitorMusicKitPlugin
-{
-  async echo(options: EchoOptions): Promise<EchoResult> {
-    console.log('ECHO', options);
+  implements CapacitorMusicKitPlugin {
+  async echo (options: EchoOptions): Promise<EchoResult> {
+    console.log("ECHO", options);
     return options;
   }
 
   private playbackStateDidChange = (
-    data: MusicKit.Events['playbackStateDidChange'],
+    data: MusicKit.Events["playbackStateDidChange"],
   ) => {
     const state = MusicKit.PlaybackStates[data.state] as PlaybackState;
     const result: PlaybackStateDidChangeResult = { state };
-    this.notifyListeners('playbackStateDidChange', result);
+    this.notifyListeners("playbackStateDidChange", result);
   };
 
   private nowPlayingItemDidChange = (
-    data: MusicKit.Events['nowPlayingItemDidChange'],
+    data: MusicKit.Events["nowPlayingItemDidChange"],
   ) => {
     let track: LibraryTrack | undefined;
     const item = data.item;
@@ -71,26 +70,27 @@ export class CapacitorMusicKitWeb
       track = this.toLibraryTrackResult(item);
     }
     const index = MusicKit.getInstance().nowPlayingItemIndex;
-    const result: NowPlayingItemDidChangeResult = { track, index };
-    this.notifyListeners('nowPlayingItemDidChange', result);
+    const result: NowPlayingItemDidChangeResult = { index,
+      track };
+    this.notifyListeners("nowPlayingItemDidChange", result);
   };
 
   private authorizationStatusDidChange = (
-    data: MusicKit.Events['authorizationStatusDidChange'],
+    data: MusicKit.Events["authorizationStatusDidChange"],
   ) => {
     // state.authorizationStatus === -1
-    let status: AuthorizationStatus = 'unavailable';
+    let status: AuthorizationStatus = "unavailable";
     if (data.authorizationStatus === 0) {
-      status = 'notDetermined';
+      status = "notDetermined";
     } else if (data.authorizationStatus === 1) {
-      status = 'denied';
+      status = "denied";
     } else if (data.authorizationStatus === 2) {
-      status = 'restricted';
+      status = "restricted";
     } else if (data.authorizationStatus === 3) {
-      status = 'authorized';
+      status = "authorized";
     }
     const result: AuthorizationStatusDidChangeResult = { status };
-    this.notifyListeners('authorizationStatusDidChange', result);
+    this.notifyListeners("authorizationStatusDidChange", result);
   };
 
   toLibraryArtistResult = (artist: MusicKit.LibraryArtists): LibraryArtist => ({
@@ -99,81 +99,81 @@ export class CapacitorMusicKitWeb
   });
 
   toLibraryAlbumResult = (album: MusicKit.LibraryAlbums): LibraryAlbum => ({
+    artworkUrl: album.attributes.artwork?.url,
     id: album.id,
     name: album.attributes.name,
-    artworkUrl: album.attributes.artwork?.url,
   });
 
   toLibraryTrackResult = (
     track: MusicKit.LibrarySongs | MusicKit.MediaItem,
   ): LibraryTrack => ({
+    artworkUrl: track.attributes.artwork?.url,
+    discNumber: track.attributes.discNumber,
+    durationMs: track.attributes.durationInMillis,
     id: track.id,
     name: track.attributes.name,
-    durationMs: track.attributes.durationInMillis,
-    discNumber: track.attributes.discNumber,
     trackNumber: track.attributes.trackNumber,
-    artworkUrl: track.attributes.artwork?.url,
   });
 
   toLibraryPlaylist = (
     playlist: MusicKit.LibraryPlaylists,
   ): LibraryPlaylist => ({
+    artworkUrl: playlist.attributes.artwork?.url,
+    description: playlist.attributes.description?.standard,
     id: playlist.id,
     name: playlist.attributes.name,
-    description: playlist.attributes.description?.standard,
-    artworkUrl: playlist.attributes.artwork?.url,
   });
 
   include = <T>(relation: T, include?: T[]): boolean =>
     include?.includes(relation) ?? false;
 
-  relationParams<T>(relations: T[], includes?: T[]): { include: T[] } {
+  relationParams<T> (relations: T[], includes?: T[]): { include: T[] } {
     const include: T[] = [];
-    relations.forEach(relation => {
+    relations.forEach((relation) => {
       this.include(relation, includes) && include.push(relation);
     });
     return { include };
   }
 
-  selectionLibraryArtists(
+  selectionLibraryArtists (
     item: MusicKit.LibraryAlbums | MusicKit.LibrarySongs,
   ): LibraryArtist[] {
     const items: LibraryArtist[] = [];
-    item.relationships.artists?.data.forEach(artist => {
+    item.relationships.artists?.data.forEach((artist) => {
       items.push(this.toLibraryArtistResult(artist));
     });
     return items;
   }
 
-  selectionLibraryAlbums(
+  selectionLibraryAlbums (
     item: MusicKit.LibraryArtists | MusicKit.LibrarySongs,
   ): LibraryAlbum[] {
     const items: LibraryAlbum[] = [];
-    item.relationships.albums?.data.forEach(album => {
+    item.relationships.albums?.data.forEach((album) => {
       items.push(this.toLibraryAlbumResult(album));
     });
     return items;
   }
 
-  selectionLibraryTracks(
+  selectionLibraryTracks (
     item: MusicKit.LibraryAlbums | MusicKit.LibraryPlaylists,
   ): LibraryTrack[] {
     const items: LibraryTrack[] = [];
-    item.relationships.tracks?.data.forEach(track => {
-      if (track.type === 'library-songs') {
+    item.relationships.tracks?.data.forEach((track) => {
+      if (track.type === "library-songs") {
         items.push(this.toLibraryTrackResult(track));
       }
     });
     return items;
   }
 
-  async nextTracks(
+  async nextTracks (
     options: { include?: string[] },
     nextTrackUrl: string | undefined,
   ): Promise<LibraryTrack[]> {
     const tracks: LibraryTrack[] = [];
 
-    if (options.include?.includes('tracks') && nextTrackUrl) {
+    if (options.include?.includes("tracks") && nextTrackUrl) {
       let hasNext = false;
       let fetchUrl = `${nextTrackUrl}&limit=100`;
 
@@ -184,7 +184,7 @@ export class CapacitorMusicKitWeb
         );
         const data = response.data;
         if (data) {
-          data.data.forEach(track => {
+          data.data.forEach((track) => {
             tracks.push(this.toLibraryTrackResult(track));
           });
           if (data.next) {
@@ -198,12 +198,12 @@ export class CapacitorMusicKitWeb
     return tracks;
   }
 
-  async configure(options: ConfigureOptions): Promise<ActionResult> {
+  async configure (options: ConfigureOptions): Promise<ActionResult> {
     let result = false;
     try {
       const loaded = await new Promise<boolean>((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://js-cdn.music.apple.com/musickit/v3/musickit.js';
+        const script = document.createElement("script");
+        script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
         script.onload = () => resolve(true);
         script.onerror = () => reject(false);
         document.head.appendChild(script);
@@ -216,17 +216,17 @@ export class CapacitorMusicKitWeb
       const musicKit = await MusicKit.configure(options.config);
 
       musicKit.addEventListener(
-        'playbackStateDidChange',
+        "playbackStateDidChange",
         this.playbackStateDidChange,
       );
 
       musicKit.addEventListener(
-        'nowPlayingItemDidChange',
+        "nowPlayingItemDidChange",
         this.nowPlayingItemDidChange,
       );
 
       musicKit.addEventListener(
-        'authorizationStatusDidChange',
+        "authorizationStatusDidChange",
         this.authorizationStatusDidChange,
       );
 
@@ -237,7 +237,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async isAuthorized(): Promise<ActionResult> {
+  async isAuthorized (): Promise<ActionResult> {
     let result = false;
     try {
       result = Boolean(MusicKit.getInstance()?.isAuthorized);
@@ -247,7 +247,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async hasMusicSubscription(): Promise<ActionResult> {
+  async hasMusicSubscription (): Promise<ActionResult> {
     let result = false;
     try {
       result = await MusicKit.getInstance().hasMusicSubscription();
@@ -257,7 +257,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async authorize(): Promise<void> {
+  async authorize (): Promise<void> {
     try {
       await MusicKit.getInstance().authorize();
     } catch (error) {
@@ -265,7 +265,7 @@ export class CapacitorMusicKitWeb
     }
   }
 
-  async unauthorize(): Promise<void> {
+  async unauthorize (): Promise<void> {
     try {
       await MusicKit.getInstance().unauthorize();
     } catch (error) {
@@ -273,25 +273,25 @@ export class CapacitorMusicKitWeb
     }
   }
 
-  async getLibraryArtist(
+  async getLibraryArtist (
     options: GetLibraryArtistOptions,
   ): Promise<GetLibraryArtistResult> {
     let artist: LibraryArtist | undefined;
     let albums: LibraryAlbum[] | undefined;
     let catalog: CatalogArtist[] | undefined;
 
-    const params = this.relationParams(['albums', 'catalog'], options.include);
+    const params = this.relationParams(["albums", "catalog"], options.include);
 
     try {
       // Artist
       const fetchUrl = `/v1/me/library/artists/${options.id}` as const;
       const response = await MusicKit.getInstance().api.music(fetchUrl, params);
-      const item = response.data.data.find(itm => itm.id === options.id);
+      const item = response.data.data.find((itm) => itm.id === options.id);
       if (item) {
         artist = this.toLibraryArtistResult(item);
 
         // Albums
-        if (this.include('albums', options.include)) {
+        if (this.include("albums", options.include)) {
           albums = this.selectionLibraryAlbums(item);
         }
       }
@@ -299,15 +299,17 @@ export class CapacitorMusicKitWeb
       console.log(error);
     }
 
-    return { artist, albums, catalog };
+    return { albums,
+      artist,
+      catalog };
   }
 
-  async getLibraryArtists(
+  async getLibraryArtists (
     options: GetMultiDataOptions,
   ): Promise<GetLibraryArtistsResult> {
     const idsOption = options.ids ? { ids: options.ids } : {};
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/artists`,
+      "/v1/me/library/artists",
       {
         limit: options.limit,
         offset: options.offset,
@@ -315,32 +317,34 @@ export class CapacitorMusicKitWeb
       },
     );
 
-    const artists: LibraryArtist[] = response.data.data.map(item =>
+    const artists: LibraryArtist[] = response.data.data.map((item) =>
       this.toLibraryArtistResult(item),
     );
 
     const hasNext =
       response.data.meta?.total !== options.offset + response.data.data.length;
 
-    return { artists, hasNext, total: response.data.meta?.total ?? 0 };
+    return { artists,
+      hasNext,
+      total: response.data.meta?.total ?? 0 };
   }
 
-  async getLibraryAlbum(
+  async getLibraryAlbum (
     options: GetLibraryAlbumOptions,
   ): Promise<GetLibraryAlbumResult> {
     const response = await MusicKit.getInstance().api.music(
       `/v1/me/library/albums/${options.id}` as const,
-      this.relationParams(['tracks'], options.include),
+      this.relationParams(["tracks"], options.include),
     );
     return { albums: response.data.data };
   }
 
-  async getLibraryAlbums(
+  async getLibraryAlbums (
     options: GetMultiDataOptions,
   ): Promise<GetLibraryAlbumsResult> {
     const idsOption = options.ids ? { ids: options.ids } : {};
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/albums`,
+      "/v1/me/library/albums",
       {
         limit: options.limit,
         offset: options.offset,
@@ -348,17 +352,19 @@ export class CapacitorMusicKitWeb
       },
     );
 
-    const albums: LibraryAlbum[] = response.data.data.map(item =>
+    const albums: LibraryAlbum[] = response.data.data.map((item) =>
       this.toLibraryAlbumResult(item),
     );
 
     const hasNext =
       response.data.meta?.total !== options.offset + response.data.data.length;
 
-    return { albums, hasNext, total: response.data.meta?.total ?? 0 };
+    return { albums,
+      hasNext,
+      total: response.data.meta?.total ?? 0 };
   }
 
-  async getLibraryTrack(
+  async getLibraryTrack (
     options: GetLibraryTrackOptions,
   ): Promise<GetLibraryTrackResult> {
     let track: LibraryTrack | undefined;
@@ -367,7 +373,7 @@ export class CapacitorMusicKitWeb
 
     try {
       const params = this.relationParams(
-        ['albums', 'artists'],
+        ["albums", "artists"],
         options.include,
       );
       const fetchUrl = `/v1/me/library/songs/${options.id}` as const;
@@ -378,17 +384,17 @@ export class CapacitorMusicKitWeb
         track = this.toLibraryTrackResult(resultTrack);
 
         // Artists
-        if (this.include('artists', options.include)) {
+        if (this.include("artists", options.include)) {
           artists = [];
-          resultTrack.relationships.artists?.data.forEach(artist => {
+          resultTrack.relationships.artists?.data.forEach((artist) => {
             artists?.push(this.toLibraryArtistResult(artist));
           });
         }
 
         // Albums
-        if (this.include('albums', options.include)) {
+        if (this.include("albums", options.include)) {
           albums = [];
-          resultTrack.relationships.albums?.data.forEach(album => {
+          resultTrack.relationships.albums?.data.forEach((album) => {
             albums?.push(this.toLibraryAlbumResult(album));
           });
         }
@@ -397,15 +403,17 @@ export class CapacitorMusicKitWeb
       console.log(error);
     }
 
-    return { track, artists, albums };
+    return { albums,
+      artists,
+      track };
   }
 
-  async getLibraryTracks(
+  async getLibraryTracks (
     options: GetMultiDataOptions,
   ): Promise<GetLibraryTracksResult> {
     const idsOption = options.ids ? { ids: options.ids } : {};
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/songs`,
+      "/v1/me/library/songs",
       {
         limit: options.limit,
         offset: options.offset,
@@ -413,17 +421,19 @@ export class CapacitorMusicKitWeb
       },
     );
 
-    const tracks: LibraryTrack[] = response.data.data.map(item =>
+    const tracks: LibraryTrack[] = response.data.data.map((item) =>
       this.toLibraryTrackResult(item),
     );
 
     const hasNext =
       response.data.meta?.total !== options.offset + response.data.data.length;
 
-    return { tracks, hasNext, total: response.data.meta?.total ?? 0 };
+    return { hasNext,
+      total: response.data.meta?.total ?? 0,
+      tracks };
   }
 
-  async getLibraryPlaylist(
+  async getLibraryPlaylist (
     options: GetLibraryPlaylistOptions,
   ): Promise<GetLibraryPlaylistResult> {
     let playlist: LibraryPlaylist | undefined;
@@ -433,15 +443,15 @@ export class CapacitorMusicKitWeb
 
     try {
       // Playlist
-      const params = this.relationParams(['tracks'], options.include);
+      const params = this.relationParams(["tracks"], options.include);
       const fetchUrl = `/v1/me/library/playlists/${options.id}` as const;
       const response = await MusicKit.getInstance().api.music(fetchUrl, params);
-      const item = response.data.data.find(itm => itm.id === options.id);
+      const item = response.data.data.find((itm) => itm.id === options.id);
       if (item) {
         playlist = this.toLibraryPlaylist(item);
 
         // Tracks
-        if (this.include('tracks', options.include)) {
+        if (this.include("tracks", options.include)) {
           nextTracksUrl = item.relationships.tracks?.next;
           tracks = this.selectionLibraryTracks(item);
         }
@@ -455,15 +465,16 @@ export class CapacitorMusicKitWeb
       console.log(error);
     }
 
-    return { playlist, tracks };
+    return { playlist,
+      tracks };
   }
 
-  async getLibraryPlaylists(
+  async getLibraryPlaylists (
     options: GetMultiDataOptions,
   ): Promise<GetLibraryPlaylistsResult> {
     const idsOption = options.ids ? { ids: options.ids } : {};
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/albums`,
+      "/v1/me/library/albums",
       {
         limit: options.limit,
         offset: options.offset,
@@ -471,25 +482,27 @@ export class CapacitorMusicKitWeb
       },
     );
 
-    const playlists: LibraryPlaylist[] = response.data.data.map(item =>
+    const playlists: LibraryPlaylist[] = response.data.data.map((item) =>
       this.toLibraryAlbumResult(item),
     );
 
     const hasNext =
       response.data.meta?.total !== options.offset + response.data.data.length;
 
-    return { playlists, hasNext, total: response.data.meta?.total ?? 0 };
+    return { hasNext,
+      playlists,
+      total: response.data.meta?.total ?? 0 };
   }
 
-  async getRatings(options: GetRatingsOptions): Promise<ActionRatingsResult> {
-    const type = options.type.replace('tracks', 'songs');
+  async getRatings (options: GetRatingsOptions): Promise<ActionRatingsResult> {
+    const type = options.type.replace("tracks", "songs");
     const response = await MusicKit.getInstance().api.music(
       `/v1/me/ratings/${type}` as const,
       { ids: options.ids },
     );
 
     const ratings: RatingsResult = {};
-    response.data.data.forEach(rating => {
+    response.data.data.forEach((rating) => {
       if (rating.attributes?.value) {
         ratings[rating.id] = rating.attributes.value;
       }
@@ -498,22 +511,22 @@ export class CapacitorMusicKitWeb
     return { ratings };
   }
 
-  async addRating(options: AddRatingOptions): Promise<ActionResult> {
+  async addRating (options: AddRatingOptions): Promise<ActionResult> {
     let result = false;
 
-    const type = options.type.replace('tracks', 'songs');
+    const type = options.type.replace("tracks", "songs");
     await MusicKit.getInstance().api.music(
       `/v1/me/ratings/${type}/${options.id}` as const,
       {},
       {
         fetchOptions: {
-          method: 'PUT',
           body: JSON.stringify({
             attributes: {
               value: options.value,
             },
-            type: 'ratings',
+            type: "ratings",
           }),
+          method: "PUT",
         },
       },
     );
@@ -522,21 +535,21 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async deleteRating(options: DeleteRatingOptions): Promise<ActionResult> {
+  async deleteRating (options: DeleteRatingOptions): Promise<ActionResult> {
     let result = false;
 
-    const type = options.type.replace('tracks', 'songs');
+    const type = options.type.replace("tracks", "songs");
     await MusicKit.getInstance().api.music(
       `/v1/me/ratings/${type}/${options.id}` as const,
       {},
-      { fetchOptions: { method: 'DELETE' } },
+      { fetchOptions: { method: "DELETE" } },
     );
 
     result = true;
     return { result };
   }
 
-  async getCurrentTrack(): Promise<GetCurrentTrackResult> {
+  async getCurrentTrack (): Promise<GetCurrentTrackResult> {
     let track: LibraryTrack | undefined;
     try {
       const item = MusicKit.getInstance().queue.currentItem;
@@ -549,10 +562,10 @@ export class CapacitorMusicKitWeb
     return { track };
   }
 
-  async getQueueTracks(): Promise<GetQueueTracksResult> {
+  async getQueueTracks (): Promise<GetQueueTracksResult> {
     const tracks: LibraryTrack[] = [];
     try {
-      MusicKit.getInstance().queue.items.map(item =>
+      MusicKit.getInstance().queue.items.map((item) =>
         tracks.push(this.toLibraryTrackResult(item)),
       );
     } catch (error) {
@@ -561,7 +574,7 @@ export class CapacitorMusicKitWeb
     return { tracks };
   }
 
-  async getCurrentIndex(): Promise<GetCurrentIndexResult> {
+  async getCurrentIndex (): Promise<GetCurrentIndexResult> {
     let index = -1;
     try {
       index = MusicKit.getInstance().nowPlayingItemIndex;
@@ -571,7 +584,7 @@ export class CapacitorMusicKitWeb
     return { index };
   }
 
-  async getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult> {
+  async getCurrentPlaybackTime (): Promise<GetCurrentPlaybackTimeResult> {
     let time = 0;
     try {
       time = MusicKit.getInstance().currentPlaybackTime;
@@ -581,20 +594,22 @@ export class CapacitorMusicKitWeb
     return { time };
   }
 
-  async getRepeatMode(): Promise<getRepeatModeResult> {
-    const modeArray: getRepeatModeResult['mode'][] = ['none', 'one', 'all'];
-    let mode: getRepeatModeResult['mode'] = 'none';
+  async getRepeatMode (): Promise<getRepeatModeResult> {
+    const modeArray: getRepeatModeResult["mode"][] = ["none", "one", "all"];
+    let mode: getRepeatModeResult["mode"] = "none";
     try {
-      mode = modeArray[MusicKit.getInstance().repeatMode] ?? 'none';
+      mode = modeArray[MusicKit.getInstance().repeatMode] ?? "none";
     } catch (error) {
       console.log(error);
     }
     return { mode };
   }
 
-  async setRepeatMode(options: SetRepeatModeOptions): Promise<ActionResult> {
+  async setRepeatMode (options: SetRepeatModeOptions): Promise<ActionResult> {
     let result = false;
-    const modeMap = { none: 0, one: 1, all: 2 } as const;
+    const modeMap = { all: 2,
+      none: 0,
+      one: 1 } as const;
     try {
       MusicKit.getInstance().repeatMode = modeMap[options.mode];
       result = true;
@@ -604,7 +619,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async setQueue(options: SetQueueOptions): Promise<ActionResult> {
+  async setQueue (options: SetQueueOptions): Promise<ActionResult> {
     let result = false;
     try {
       await MusicKit.getInstance().setQueue({
@@ -617,7 +632,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async play(options: PlayOptions): Promise<ActionResult> {
+  async play (options: PlayOptions): Promise<ActionResult> {
     let result = false;
     try {
       if (options.index === undefined) {
@@ -632,7 +647,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async pause(): Promise<ActionResult> {
+  async pause (): Promise<ActionResult> {
     let result = false;
     try {
       await MusicKit.getInstance().pause();
@@ -643,7 +658,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async stop(): Promise<ActionResult> {
+  async stop (): Promise<ActionResult> {
     let result = false;
     try {
       await MusicKit.getInstance().stop();
@@ -654,7 +669,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async nextPlay(): Promise<ActionResult> {
+  async nextPlay (): Promise<ActionResult> {
     let result = false;
     try {
       await MusicKit.getInstance().skipToNextItem();
@@ -665,7 +680,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async previousPlay(): Promise<ActionResult> {
+  async previousPlay (): Promise<ActionResult> {
     let result = false;
     try {
       await MusicKit.getInstance().skipToPreviousItem();
@@ -676,7 +691,7 @@ export class CapacitorMusicKitWeb
     return { result };
   }
 
-  async seekToTime(options: SeekToTimeOptions): Promise<ActionResult> {
+  async seekToTime (options: SeekToTimeOptions): Promise<ActionResult> {
     let result = false;
     try {
       await MusicKit.getInstance().seekToTime(options.time);

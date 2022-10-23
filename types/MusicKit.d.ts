@@ -7,22 +7,27 @@
  */
 
 declare namespace MusicKit {
+
   /**
    * A configuration for an app.
    */
   interface AppConfiguration {
+
     /**
      * The build number of your app.
      */
     build?: string | undefined;
+
     /**
      * A URL for your app icon.
      */
     icon?: string | undefined;
+
     /**
      * The name of your app.
      */
     name?: string | undefined;
+
     /**
      * The version of your app.
      */
@@ -44,48 +49,56 @@ declare namespace MusicKit {
   const version: string;
 
   interface AuthStatus {
-    UNAUTHORIZED: -1;
-    NOT_DETERMINED: 0;
-    DENIED: 1;
-    RESTRICTED: 2;
     AUTHORIZED: 3;
+    DENIED: 1;
+    NOT_DETERMINED: 0;
+    RESTRICTED: 2;
+    UNAUTHORIZED: -1;
   }
 
   /**
    * A dictionary of configuration options for the MusicKit instance.
    */
   interface Configuration {
+
     /**
      * The version of your app.
      */
     app?: AppConfiguration | undefined;
+
+    /**
+     * The playback bit rate of the music player.
+     */
+    bitrate?: PlaybackBitrate | undefined;
+
     /**
      * This property indicates whether you have explicitly enabled or disabled
      * declarative markup.
      */
     declarativeMarkup?: boolean | undefined;
+
     /**
      * The developer token to identify yourself as a trusted developer and
      * member of the Apple Developer Program.
      */
     developerToken?: string | undefined;
+
     /**
      * The current storefront for this MusicKit configuration.
      */
     storefrontId?: string | undefined;
-    /**
-     * The playback bit rate of the music player.
-     */
-    bitrate?: PlaybackBitrate | undefined;
   }
+
   /**
    * Configure a MusicKit instance.
    */
   function configure(configuration: Configuration): MusicKitInstance;
+
   /**
    * Returns the configured MusicKit instance.
    */
   function getInstance(): MusicKitInstance;
+
   /**
    * Returns a formatted artwork URL.
    *
@@ -96,18 +109,21 @@ declare namespace MusicKit {
   function formatArtworkURL(
     artwork: Artwork,
     height: number,
-    width: number,
+    width: number
   ): string;
+
   /**
    * Returns an object with milliseconds formatted into hours and minutes.
    */
   function formattedMilliseconds(
-    milliseconds: number,
+    milliseconds: number
   ): FormattedPlaybackDuration;
+
   /**
    * Returns an object with seconds formatted into hours and minutes.
    */
   function formattedSeconds(seconds: number): FormattedPlaybackDuration;
+
   /**
    * Generates Apple Music web player markup.
    *

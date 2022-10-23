@@ -54,6 +54,9 @@
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
     "eslint": "^7.11.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "eslint-plugin-typescript-sort-keys": "^2.1.0",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",
     "rimraf": "^3.0.2",
@@ -65,7 +68,6 @@
   "peerDependencies": {
     "@capacitor/core": "^4.0.0"
   },
-  "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",
   "eslintConfig": {
     "extends": "@ionic/eslint-config/recommended"
