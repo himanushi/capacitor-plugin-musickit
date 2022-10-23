@@ -40,20 +40,20 @@ export type GetLibraryPlaylistsResult =
 
 export type GetRatingsOptions = {
   ids: string[];
-  type: MusicKit.Music.RatingType;
+  type: MusicKit.AppleMusicAPI.RatingType;
 };
 
 export type RatingsResult = MusicKit.Relationship<MusicKit.Ratings>;
 
 export type AddRatingOptions = {
   id: string;
-  type: MusicKit.Music.RatingType;
+  type: MusicKit.AppleMusicAPI.RatingType;
   value: MusicKit.Rating;
 };
 
 export type DeleteRatingOptions = {
   id: string;
-  type: MusicKit.Music.RatingType;
+  type: MusicKit.AppleMusicAPI.RatingType;
 };
 
 export interface GetCurrentSongResult {
