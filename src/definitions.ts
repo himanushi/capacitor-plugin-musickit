@@ -60,25 +60,22 @@ export type GetLibraryPlaylistOptions = GetSingleDataOptions<
 export type GetLibraryPlaylistsResult =
   MusicKit.Relationship<MusicKit.LibraryPlaylists>;
 
-export type RatingCategoryType = "artists" | "albums" | "songs" | "playlists";
-export type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
-
 export type GetRatingsOptions = {
   ids: string[];
-  type: RatingType;
+  type: MusicKit.Music.RatingType;
 };
 
 export type RatingsResult = MusicKit.Relationship<MusicKit.Ratings>;
 
 export type AddRatingOptions = {
   id: string;
-  type: RatingType;
+  type: MusicKit.Music.RatingType;
   value: MusicKit.Rating;
 };
 
 export type DeleteRatingOptions = {
   id: string;
-  type: RatingType;
+  type: MusicKit.Music.RatingType;
 };
 
 export interface GetCurrentSongResult {

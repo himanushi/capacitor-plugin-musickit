@@ -138,7 +138,7 @@ export class CapacitorMusicKitWeb
     options: GetLibraryArtistOptions,
   ): Promise<GetLibraryArtistsResult> {
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/artists/${options.id}`,
+      `/v1/me/library/artists/${options.id}` as const,
     );
     return response.data;
   }
@@ -148,7 +148,7 @@ export class CapacitorMusicKitWeb
   ): Promise<GetLibraryArtistsResult> {
     const idsOption = options.ids ? { ids: options.ids } : {};
     const response = await MusicKit.getInstance().api.music(
-      "/v1/me/library/artists",
+      "/v1/me/library/artists" as const,
       {
         limit: options.limit,
         offset: options.offset,
@@ -162,7 +162,7 @@ export class CapacitorMusicKitWeb
     options: GetLibraryAlbumOptions,
   ): Promise<GetLibraryAlbumsResult> {
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/albums/${options.id}`,
+      `/v1/me/library/albums/${options.id}` as const,
     );
     return response.data;
   }
@@ -172,7 +172,7 @@ export class CapacitorMusicKitWeb
   ): Promise<GetLibraryAlbumsResult> {
     const idsOption = options.ids ? { ids: options.ids } : {};
     const response = await MusicKit.getInstance().api.music(
-      "/v1/me/library/albums",
+      "/v1/me/library/albums" as const,
       {
         limit: options.limit,
         offset: options.offset,
@@ -186,7 +186,7 @@ export class CapacitorMusicKitWeb
     options: GetLibrarySongOptions,
   ): Promise<GetLibrarySongsResult> {
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/songs/${options.id}`,
+      `/v1/me/library/songs/${options.id}` as const,
     );
     return response.data;
   }
@@ -196,7 +196,7 @@ export class CapacitorMusicKitWeb
   ): Promise<GetLibrarySongsResult> {
     const idsOption = options.ids ? { ids: options.ids } : {};
     const response = await MusicKit.getInstance().api.music(
-      "/v1/me/library/songs",
+      "/v1/me/library/songs" as const,
       {
         limit: options.limit,
         offset: options.offset,
@@ -210,7 +210,7 @@ export class CapacitorMusicKitWeb
     options: GetLibraryPlaylistOptions,
   ): Promise<GetLibraryPlaylistsResult> {
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/playlists/${options.id}`,
+      `/v1/me/library/playlists/${options.id}` as const,
     );
     return response.data;
   }
@@ -220,7 +220,7 @@ export class CapacitorMusicKitWeb
   ): Promise<GetLibraryPlaylistsResult> {
     const idsOption = options.ids ? { ids: options.ids } : {};
     const response = await MusicKit.getInstance().api.music(
-      "/v1/me/library/playlists",
+      "/v1/me/library/playlists" as const,
       {
         limit: options.limit,
         offset: options.offset,
@@ -232,7 +232,7 @@ export class CapacitorMusicKitWeb
 
   async getRatings ({ type, ids }: GetRatingsOptions): Promise<RatingsResult> {
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/ratings/${type}`,
+      `/v1/me/ratings/${type}` as const,
       {
         ids,
       },
@@ -246,7 +246,7 @@ export class CapacitorMusicKitWeb
     value,
   }: AddRatingOptions): Promise<RatingsResult> {
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/ratings/${type}/${id}`,
+      `/v1/me/ratings/${type}/${id}` as const,
       {},
       {
         fetchOptions: {
@@ -269,7 +269,7 @@ export class CapacitorMusicKitWeb
     id,
   }: DeleteRatingOptions): Promise<RatingsResult> {
     const response = await MusicKit.getInstance().api.music(
-      `/v1/me/ratings/${type}/${id}`,
+      `/v1/me/ratings/${type}/${id}` as const,
       {},
       { fetchOptions: { method: "DELETE" } },
     );

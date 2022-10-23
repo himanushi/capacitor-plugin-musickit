@@ -2,6 +2,8 @@
 declare namespace MusicKit {
   namespace Music {
     type ID = string;
+    type RatingCategoryType = "artists" | "albums" | "songs" | "playlists";
+    type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
 
     type AlbumsUrl = `/v1/catalog/${string}/albums${`/${ID}` | ""}`;
     type ArtistsUrl = `/v1/catalog/${string}/artists${`/${ID}` | ""}`;
@@ -15,8 +17,8 @@ declare namespace MusicKit {
     type LibraryMusicVideosUrl = `/v1/me/library/music-videos${`/${ID}` | ""}`;
     type LibraryPlaylistsUrl = `/v1/me/library/playlists${`/${ID}` | ""}`;
     type RatingsUrl =
-      | `/v1/me/ratings/${string}`
-      | `/v1/me/ratings/${string}/${string}`;
+      | `/v1/me/ratings/${RatingType}`
+      | `/v1/me/ratings/${RatingType}/${string}`;
 
     type CatalogUrls =
       | AlbumsUrl

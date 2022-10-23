@@ -23,16 +23,16 @@ npx cap sync
 * [`echo(...)`](#echo)
 * [`getCurrentIndex()`](#getcurrentindex)
 * [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
-* [`getCurrentTrack()`](#getcurrenttrack)
+* [`getCurrentSong()`](#getcurrentsong)
 * [`getLibraryAlbum(...)`](#getlibraryalbum)
 * [`getLibraryAlbums(...)`](#getlibraryalbums)
 * [`getLibraryArtist(...)`](#getlibraryartist)
 * [`getLibraryArtists(...)`](#getlibraryartists)
 * [`getLibraryPlaylist(...)`](#getlibraryplaylist)
 * [`getLibraryPlaylists(...)`](#getlibraryplaylists)
-* [`getLibraryTrack(...)`](#getlibrarytrack)
-* [`getLibraryTracks(...)`](#getlibrarytracks)
-* [`getQueueTracks()`](#getqueuetracks)
+* [`getLibrarySong(...)`](#getlibrarysong)
+* [`getLibrarySongs(...)`](#getlibrarysongs)
+* [`getQueueSongs()`](#getqueuesongs)
 * [`getRatings(...)`](#getratings)
 * [`getRepeatMode()`](#getrepeatmode)
 * [`hasMusicSubscription()`](#hasmusicsubscription)
@@ -105,14 +105,14 @@ addListener(eventName: "authorizationStatusDidChange", listenerFunc: Authorizati
 ### addRating(...)
 
 ```typescript
-addRating(options: AddRatingOptions) => Promise<ActionResult>
+addRating(options: AddRatingOptions) => Promise<RatingsResult>
 ```
 
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
 | **`options`** | <code><a href="#addratingoptions">AddRatingOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#ratingsresult">RatingsResult</a>&gt;</code>
 
 --------------------
 
@@ -144,14 +144,14 @@ configure(options: ConfigureOptions) => Promise<ActionResult>
 ### deleteRating(...)
 
 ```typescript
-deleteRating(options: DeleteRatingOptions) => Promise<ActionResult>
+deleteRating(options: DeleteRatingOptions) => Promise<RatingsResult>
 ```
 
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
 | **`options`** | <code><a href="#deleteratingoptions">DeleteRatingOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#ratingsresult">RatingsResult</a>&gt;</code>
 
 --------------------
 
@@ -193,13 +193,13 @@ getCurrentPlaybackTime() => Promise<GetCurrentPlaybackTimeResult>
 --------------------
 
 
-### getCurrentTrack()
+### getCurrentSong()
 
 ```typescript
-getCurrentTrack() => Promise<GetCurrentTrackResult>
+getCurrentSong() => Promise<GetCurrentSongResult>
 ```
 
-**Returns:** <code>Promise&lt;<a href="#getcurrenttrackresult">GetCurrentTrackResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getcurrentsongresult">GetCurrentSongResult</a>&gt;</code>
 
 --------------------
 
@@ -207,14 +207,14 @@ getCurrentTrack() => Promise<GetCurrentTrackResult>
 ### getLibraryAlbum(...)
 
 ```typescript
-getLibraryAlbum(options: GetLibraryAlbumOptions) => Promise<GetLibraryAlbumResult>
+getLibraryAlbum(options: GetLibraryAlbumOptions) => Promise<GetLibraryAlbumsResult>
 ```
 
 | Param         | Type                                                                      |
 | ------------- | ------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#getlibraryalbumoptions">GetLibraryAlbumOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#getlibraryalbumresult">GetLibraryAlbumResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getlibraryalbumsresult">GetLibraryAlbumsResult</a>&gt;</code>
 
 --------------------
 
@@ -237,14 +237,14 @@ getLibraryAlbums(options: GetMultiDataOptions) => Promise<GetLibraryAlbumsResult
 ### getLibraryArtist(...)
 
 ```typescript
-getLibraryArtist(options: GetLibraryArtistOptions) => Promise<GetLibraryArtistResult>
+getLibraryArtist(options: GetLibraryArtistOptions) => Promise<GetLibraryArtistsResult>
 ```
 
 | Param         | Type                                                                        |
 | ------------- | --------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#getlibraryartistoptions">GetLibraryArtistOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#getlibraryartistresult">GetLibraryArtistResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getlibraryartistsresult">GetLibraryArtistsResult</a>&gt;</code>
 
 --------------------
 
@@ -267,14 +267,14 @@ getLibraryArtists(options: GetMultiDataOptions) => Promise<GetLibraryArtistsResu
 ### getLibraryPlaylist(...)
 
 ```typescript
-getLibraryPlaylist(options: GetLibraryPlaylistOptions) => Promise<GetLibraryPlaylistResult>
+getLibraryPlaylist(options: GetLibraryPlaylistOptions) => Promise<GetLibraryPlaylistsResult>
 ```
 
 | Param         | Type                                                                            |
 | ------------- | ------------------------------------------------------------------------------- |
 | **`options`** | <code><a href="#getlibraryplaylistoptions">GetLibraryPlaylistOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#getlibraryplaylistresult">GetLibraryPlaylistResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getlibraryplaylistsresult">GetLibraryPlaylistsResult</a>&gt;</code>
 
 --------------------
 
@@ -294,43 +294,43 @@ getLibraryPlaylists(options: GetMultiDataOptions) => Promise<GetLibraryPlaylists
 --------------------
 
 
-### getLibraryTrack(...)
+### getLibrarySong(...)
 
 ```typescript
-getLibraryTrack(options: GetLibraryTrackOptions) => Promise<GetLibraryTrackResult>
+getLibrarySong(options: GetLibrarySongOptions) => Promise<GetLibrarySongsResult>
 ```
 
-| Param         | Type                                                                      |
-| ------------- | ------------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getlibrarytrackoptions">GetLibraryTrackOptions</a></code> |
+| Param         | Type                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| **`options`** | <code><a href="#getlibrarysongoptions">GetLibrarySongOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#getlibrarytrackresult">GetLibraryTrackResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getlibrarysongsresult">GetLibrarySongsResult</a>&gt;</code>
 
 --------------------
 
 
-### getLibraryTracks(...)
+### getLibrarySongs(...)
 
 ```typescript
-getLibraryTracks(options: GetMultiDataOptions) => Promise<GetLibraryTracksResult>
+getLibrarySongs(options: GetMultiDataOptions) => Promise<GetLibrarySongsResult>
 ```
 
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
 | **`options`** | <code><a href="#getmultidataoptions">GetMultiDataOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#getlibrarytracksresult">GetLibraryTracksResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getlibrarysongsresult">GetLibrarySongsResult</a>&gt;</code>
 
 --------------------
 
 
-### getQueueTracks()
+### getQueueSongs()
 
 ```typescript
-getQueueTracks() => Promise<GetQueueTracksResult>
+getQueueSongs() => Promise<GetQueueSongsResult>
 ```
 
-**Returns:** <code>Promise&lt;<a href="#getqueuetracksresult">GetQueueTracksResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getqueuesongsresult">GetQueueSongsResult</a>&gt;</code>
 
 --------------------
 
@@ -338,14 +338,14 @@ getQueueTracks() => Promise<GetQueueTracksResult>
 ### getRatings(...)
 
 ```typescript
-getRatings(options: GetRatingsOptions) => Promise<ActionRatingsResult>
+getRatings(options: GetRatingsOptions) => Promise<RatingsResult>
 ```
 
 | Param         | Type                                                            |
 | ------------- | --------------------------------------------------------------- |
 | **`options`** | <code><a href="#getratingsoptions">GetRatingsOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#actionratingsresult">ActionRatingsResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#ratingsresult">RatingsResult</a>&gt;</code>
 
 --------------------
 
@@ -506,18 +506,6 @@ unauthorize() => Promise<void>
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 
-#### LibraryTrack
-
-| Prop              | Type                |
-| ----------------- | ------------------- |
-| **`artworkUrl`**  | <code>string</code> |
-| **`discNumber`**  | <code>number</code> |
-| **`durationMs`**  | <code>number</code> |
-| **`id`**          | <code>string</code> |
-| **`name`**        | <code>string</code> |
-| **`trackNumber`** | <code>number</code> |
-
-
 #### ActionResult
 
 | Prop         | Type                 |
@@ -560,11 +548,11 @@ unauthorize() => Promise<void>
 | **`time`** | <code>number</code> |
 
 
-#### GetCurrentTrackResult
+#### GetCurrentSongResult
 
-| Prop        | Type                                                  |
-| ----------- | ----------------------------------------------------- |
-| **`track`** | <code><a href="#librarytrack">LibraryTrack</a></code> |
+| Prop       | Type                            |
+| ---------- | ------------------------------- |
+| **`item`** | <code>MusicKit.MediaItem</code> |
 
 
 #### GetSingleDataOptions
@@ -584,120 +572,11 @@ unauthorize() => Promise<void>
 | **`offset`** | <code>number</code>   |
 
 
-#### GetLibraryArtistResult
+#### GetQueueSongsResult
 
-| Prop          | Type                                                    |
-| ------------- | ------------------------------------------------------- |
-| **`albums`**  | <code>LibraryAlbum[]</code>                             |
-| **`artist`**  | <code><a href="#libraryartist">LibraryArtist</a></code> |
-| **`catalog`** | <code>CatalogArtist[]</code>                            |
-
-
-#### LibraryAlbum
-
-| Prop             | Type                |
-| ---------------- | ------------------- |
-| **`artworkUrl`** | <code>string</code> |
-| **`id`**         | <code>string</code> |
-| **`name`**       | <code>string</code> |
-
-
-#### LibraryArtist
-
-| Prop       | Type                |
-| ---------- | ------------------- |
-| **`id`**   | <code>string</code> |
-| **`name`** | <code>string</code> |
-
-
-#### CatalogArtist
-
-| Prop             | Type                  |
-| ---------------- | --------------------- |
-| **`artworkUrl`** | <code>string</code>   |
-| **`genreNames`** | <code>string[]</code> |
-| **`id`**         | <code>string</code>   |
-| **`name`**       | <code>string</code>   |
-
-
-#### GetMultiDataResult
-
-| Prop          | Type                 |
-| ------------- | -------------------- |
-| **`hasNext`** | <code>boolean</code> |
-| **`total`**   | <code>number</code>  |
-
-
-#### GetLibraryPlaylistResult
-
-| Prop           | Type                                                        |
-| -------------- | ----------------------------------------------------------- |
-| **`catalog`**  | <code>CatalogPlaylist[]</code>                              |
-| **`playlist`** | <code><a href="#libraryplaylist">LibraryPlaylist</a></code> |
-| **`tracks`**   | <code>LibraryTrack[]</code>                                 |
-
-
-#### CatalogPlaylist
-
-| Prop                   | Type                 |
-| ---------------------- | -------------------- |
-| **`artworkUrl`**       | <code>string</code>  |
-| **`curatorName`**      | <code>string</code>  |
-| **`description`**      | <code>string</code>  |
-| **`id`**               | <code>string</code>  |
-| **`isChart`**          | <code>boolean</code> |
-| **`lastModifiedDate`** | <code>string</code>  |
-| **`name`**             | <code>string</code>  |
-| **`playlistType`**     | <code>string</code>  |
-| **`shortDescription`** | <code>string</code>  |
-
-
-#### LibraryPlaylist
-
-| Prop              | Type                |
-| ----------------- | ------------------- |
-| **`artworkUrl`**  | <code>string</code> |
-| **`description`** | <code>string</code> |
-| **`id`**          | <code>string</code> |
-| **`name`**        | <code>string</code> |
-
-
-#### GetLibraryTrackResult
-
-| Prop          | Type                                                  |
-| ------------- | ----------------------------------------------------- |
-| **`albums`**  | <code>LibraryAlbum[]</code>                           |
-| **`artists`** | <code>LibraryArtist[]</code>                          |
-| **`catalog`** | <code>CatalogTrack[]</code>                           |
-| **`track`**   | <code><a href="#librarytrack">LibraryTrack</a></code> |
-
-
-#### CatalogTrack
-
-| Prop                       | Type                  |
-| -------------------------- | --------------------- |
-| **`albumName`**            | <code>string</code>   |
-| **`artistName`**           | <code>string</code>   |
-| **`artworkUrl`**           | <code>string</code>   |
-| **`composerName`**         | <code>string</code>   |
-| **`discNumber`**           | <code>number</code>   |
-| **`durationMs`**           | <code>number</code>   |
-| **`genreNames`**           | <code>string[]</code> |
-| **`hasLyrics`**            | <code>boolean</code>  |
-| **`id`**                   | <code>string</code>   |
-| **`isAppleDigitalMaster`** | <code>boolean</code>  |
-| **`isrc`**                 | <code>string</code>   |
-| **`name`**                 | <code>string</code>   |
-| **`previews`**             | <code>string[]</code> |
-| **`releaseDate`**          | <code>string</code>   |
-| **`trackNumber`**          | <code>number</code>   |
-
-
-#### GetQueueTracksResult
-
-| Prop         | Type                        |
-| ------------ | --------------------------- |
-| **`tracks`** | <code>LibraryTrack[]</code> |
+| Prop        | Type                     |
+| ----------- | ------------------------ |
+| **`items`** | <code>MediaItem[]</code> |
 
 
 #### getRepeatModeResult
@@ -760,7 +639,7 @@ unauthorize() => Promise<void>
 
 #### NowPlayingItemDidChangeResult
 
-<code>{ index: number; track: <a href="#librarytrack">LibraryTrack</a>; }</code>
+<code>{ index: number; item: MusicKit.MediaItem; }</code>
 
 
 #### AuthorizationStatusDidChangeListener
@@ -778,32 +657,22 @@ unauthorize() => Promise<void>
 <code>"unavailable" | "notDetermined" | "denied" | "restricted" | "authorized"</code>
 
 
+#### RatingsResult
+
+<code>MusicKit.Relationship&lt;MusicKit.Ratings&gt;</code>
+
+
 #### AddRatingOptions
 
-<code>{ id: string; type: <a href="#ratingtype">RatingType</a>; value: <a href="#rating">Rating</a>; }</code>
-
-
-#### RatingType
-
-<code><a href="#ratingcategorytype">RatingCategoryType</a> | `library-${<a href="#ratingcategorytype">RatingCategoryType</a>}`</code>
-
-
-#### RatingCategoryType
-
-<code>"artists" | "albums" | "songs" | "playlists"</code>
-
-
-#### Rating
-
-<code>-1 | 1</code>
+<code>{ id: string; type: MusicKit.Music.RatingType; value: MusicKit.Rating; }</code>
 
 
 #### DeleteRatingOptions
 
-<code>{ id: string; type: <a href="#ratingtype">RatingType</a>; }</code>
+<code>{ id: string; type: MusicKit.Music.RatingType; }</code>
 
 
-#### GetLibraryAlbumResult
+#### GetLibraryAlbumsResult
 
 <code>MusicKit.Relationship&lt;MusicKit.LibraryAlbums&gt;</code>
 
@@ -813,9 +682,9 @@ unauthorize() => Promise<void>
 <code><a href="#getsingledataoptions">GetSingleDataOptions</a>&lt; "artists" | "catalog" | "tracks" &gt;</code>
 
 
-#### GetLibraryAlbumsResult
+#### GetLibraryArtistsResult
 
-<code>MusicKit.Relationship&lt;MusicKit.LibraryAlbums&gt;</code>
+<code>MusicKit.Relationship&lt;MusicKit.LibraryArtists&gt;</code>
 
 
 #### GetLibraryArtistOptions
@@ -823,9 +692,9 @@ unauthorize() => Promise<void>
 <code><a href="#getsingledataoptions">GetSingleDataOptions</a>&lt; "albums" | "catalog" &gt;</code>
 
 
-#### GetLibraryArtistsResult
+#### GetLibraryPlaylistsResult
 
-<code>{ artists: LibraryArtist[]; } & <a href="#getmultidataresult">GetMultiDataResult</a></code>
+<code>MusicKit.Relationship&lt;MusicKit.LibraryPlaylists&gt;</code>
 
 
 #### GetLibraryPlaylistOptions
@@ -833,33 +702,18 @@ unauthorize() => Promise<void>
 <code><a href="#getsingledataoptions">GetSingleDataOptions</a>&lt; "catalog" | "tracks" &gt;</code>
 
 
-#### GetLibraryPlaylistsResult
+#### GetLibrarySongsResult
 
-<code>{ playlists: LibraryPlaylist[]; } & <a href="#getmultidataresult">GetMultiDataResult</a></code>
+<code>MusicKit.Relationship&lt;MusicKit.LibrarySongs&gt;</code>
 
 
-#### GetLibraryTrackOptions
+#### GetLibrarySongOptions
 
 <code><a href="#getsingledataoptions">GetSingleDataOptions</a>&lt; "albums" | "artists" | "catalog" &gt;</code>
 
 
-#### GetLibraryTracksResult
-
-<code>{ tracks: LibraryTrack[]; } & <a href="#getmultidataresult">GetMultiDataResult</a></code>
-
-
-#### ActionRatingsResult
-
-<code>{ ratings: <a href="#ratingsresult">RatingsResult</a>; }</code>
-
-
-#### RatingsResult
-
-<code>{ [key: string]: <a href="#rating">Rating</a>; }</code>
-
-
 #### GetRatingsOptions
 
-<code>{ ids: string[]; type: <a href="#ratingtype">RatingType</a>; }</code>
+<code>{ ids: string[]; type: MusicKit.Music.RatingType; }</code>
 
 </docgen-api>
