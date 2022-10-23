@@ -455,6 +455,23 @@ declare namespace MusicKit {
     attributes?: {
       value: Rating;
     };
+    href: string;
+    id: string;
+    relationships: {
+      content: {
+        data: (
+          | Albums
+          | Songs
+          | Playlists
+          | Stations
+          | MusicVideos
+          | LibrarySongs
+          | LibraryPlaylists
+        )[];
+        href?: string;
+        next?: string;
+      };
+    };
     type: "ratings";
   }
 

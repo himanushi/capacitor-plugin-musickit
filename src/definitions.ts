@@ -1,106 +1,5 @@
 import type { PluginListenerHandle } from "@capacitor/core";
 
-export interface PlayParameters {
-  catalogId?: string;
-  globalId?: string;
-  id: string;
-  isLibrary: boolean;
-  kind: string;
-  purchasedId?: string;
-}
-
-export interface CatalogArtist {
-  artworkUrl?: string;
-  genreNames: string[];
-  id: string;
-  name: string;
-}
-
-export interface LibraryArtist {
-  id: string;
-  name: string;
-}
-
-export interface CatalogAlbum {
-  artistName: string;
-  artworkUrl?: string;
-  copyright: string;
-  genreNames: string[];
-  id: string;
-  isCompilation: boolean;
-  isComplete: boolean;
-  isMasteredForItunes: boolean;
-  isSingle: boolean;
-  name: string;
-  recordLabel: string;
-  releaseDate: string;
-  trackCount: number;
-  upc: string;
-}
-
-export interface LibraryAlbum {
-  artworkUrl?: string;
-  id: string;
-  name: string;
-}
-
-export interface CatalogTrack {
-  albumName: string;
-  artistName: string;
-  artworkUrl?: string;
-  composerName: string;
-  discNumber: number;
-  durationMs: number;
-  genreNames: string[];
-  hasLyrics: boolean;
-  id: string;
-  isAppleDigitalMaster: boolean;
-  isrc: string;
-  name: string;
-  previews: string[];
-  releaseDate: string;
-  trackNumber: number;
-}
-
-export interface LibraryTrack {
-  artworkUrl?: string;
-  discNumber?: number;
-  durationMs: number;
-  id: string;
-  name: string;
-  trackNumber?: number;
-}
-
-export interface CatalogPlaylist {
-  artworkUrl?: string;
-  curatorName: string;
-  description: string;
-  id: string;
-  isChart: boolean;
-  lastModifiedDate: string;
-  name: string;
-  playlistType: string;
-  shortDescription: string;
-}
-
-export interface LibraryPlaylist {
-  artworkUrl?: string;
-  description?: string;
-  id: string;
-  name: string;
-}
-
-/*
- *  likes (1)
- *  dislikes (-1)
- */
-export type Rating = -1 | 1;
-export type RatingsResult = {
-  [key: string]: Rating;
-};
-export type RatingCategoryType = "artists" | "albums" | "songs" | "playlists";
-export type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
-
 export interface ActionResult {
   result: boolean;
 }
@@ -133,81 +32,48 @@ export interface GetMultiDataResult {
   total: number;
 }
 
-export type GetCatalogArtistOptions = GetSingleDataOptions<
-  "albums" | "genres" | "music-videos" | "playlists" | "station"
->;
-
-export interface GetCatalogArtistResult {
-  albums?: CatalogAlbum[];
-  artist?: CatalogArtist;
-}
-
 export type GetLibraryArtistOptions = GetSingleDataOptions<
   "albums" | "catalog"
 >;
 
-export interface GetLibraryArtistResult {
-  albums?: LibraryAlbum[];
-  artist?: LibraryArtist;
-  catalog?: CatalogArtist[];
-}
-
-export type GetLibraryArtistsResult = {
-  artists: LibraryArtist[];
-} & GetMultiDataResult;
+export type GetLibraryArtistsResult =
+  MusicKit.Relationship<MusicKit.LibraryArtists>;
 
 export type GetLibraryAlbumOptions = GetSingleDataOptions<
   "artists" | "catalog" | "tracks"
 >;
 
-export type GetLibraryAlbumResult =
-  MusicKit.Relationship<MusicKit.LibraryAlbums>;
-
 export type GetLibraryAlbumsResult =
   MusicKit.Relationship<MusicKit.LibraryAlbums>;
 
-export type GetLibraryTrackOptions = GetSingleDataOptions<
+export type GetLibrarySongOptions = GetSingleDataOptions<
   "albums" | "artists" | "catalog"
 >;
 
-export interface GetLibraryTrackResult {
-  albums?: LibraryAlbum[];
-  artists?: LibraryArtist[];
-  catalog?: CatalogTrack[];
-  track?: LibraryTrack;
-}
-
-export type GetLibraryTracksResult = {
-  tracks: LibraryTrack[];
-} & GetMultiDataResult;
+export type GetLibrarySongsResult =
+  MusicKit.Relationship<MusicKit.LibrarySongs>;
 
 export type GetLibraryPlaylistOptions = GetSingleDataOptions<
   "catalog" | "tracks"
 >;
 
-export interface GetLibraryPlaylistResult {
-  catalog?: CatalogPlaylist[];
-  playlist?: LibraryPlaylist;
-  tracks?: LibraryTrack[];
-}
+export type GetLibraryPlaylistsResult =
+  MusicKit.Relationship<MusicKit.LibraryPlaylists>;
 
-export type GetLibraryPlaylistsResult = {
-  playlists: LibraryPlaylist[];
-} & GetMultiDataResult;
+export type RatingCategoryType = "artists" | "albums" | "songs" | "playlists";
+export type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
 
 export type GetRatingsOptions = {
   ids: string[];
   type: RatingType;
 };
 
-export type ActionRatingsResult = {
-  ratings: RatingsResult;
-};
+export type RatingsResult = MusicKit.Relationship<MusicKit.Ratings>;
 
 export type AddRatingOptions = {
   id: string;
   type: RatingType;
-  value: Rating;
+  value: MusicKit.Rating;
 };
 
 export type DeleteRatingOptions = {
@@ -215,12 +81,12 @@ export type DeleteRatingOptions = {
   type: RatingType;
 };
 
-export interface GetCurrentTrackResult {
-  track?: LibraryTrack;
+export interface GetCurrentSongResult {
+  item?: MusicKit.MediaItem;
 }
 
-export interface GetQueueTracksResult {
-  tracks: LibraryTrack[];
+export interface GetQueueSongsResult {
+  items: MusicKit.MediaItem[];
 }
 
 export interface GetCurrentIndexResult {
@@ -263,7 +129,7 @@ export type PlaybackStateDidChangeListener = (
 
 export type NowPlayingItemDidChangeResult = {
   index: number;
-  track: LibraryTrack | undefined;
+  item: MusicKit.MediaItem | undefined;
 };
 
 export type NowPlayingItemDidChangeListener = (
@@ -298,40 +164,38 @@ export interface CapacitorMusicKitPlugin {
     eventName: "authorizationStatusDidChange",
     listenerFunc: AuthorizationStatusDidChangeListener
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
-  addRating(options: AddRatingOptions): Promise<ActionResult>;
+  addRating(options: AddRatingOptions): Promise<RatingsResult>;
   authorize(): Promise<void>;
   configure(options: ConfigureOptions): Promise<ActionResult>;
-  deleteRating(options: DeleteRatingOptions): Promise<ActionResult>;
+  deleteRating(options: DeleteRatingOptions): Promise<RatingsResult>;
   echo(options: EchoOptions): Promise<EchoResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
-  getCurrentTrack(): Promise<GetCurrentTrackResult>;
+  getCurrentSong(): Promise<GetCurrentSongResult>;
   getLibraryAlbum(
     options: GetLibraryAlbumOptions
-  ): Promise<GetLibraryAlbumResult>;
+  ): Promise<GetLibraryAlbumsResult>;
   getLibraryAlbums(
     options: GetMultiDataOptions
   ): Promise<GetLibraryAlbumsResult>;
   getLibraryArtist(
     options: GetLibraryArtistOptions
-  ): Promise<GetLibraryArtistResult>;
+  ): Promise<GetLibraryArtistsResult>;
   getLibraryArtists(
     options: GetMultiDataOptions
   ): Promise<GetLibraryArtistsResult>;
   getLibraryPlaylist(
     options: GetLibraryPlaylistOptions
-  ): Promise<GetLibraryPlaylistResult>;
+  ): Promise<GetLibraryPlaylistsResult>;
   getLibraryPlaylists(
     options: GetMultiDataOptions
   ): Promise<GetLibraryPlaylistsResult>;
-  getLibraryTrack(
-    options: GetLibraryTrackOptions
-  ): Promise<GetLibraryTrackResult>;
-  getLibraryTracks(
-    options: GetMultiDataOptions
-  ): Promise<GetLibraryTracksResult>;
-  getQueueTracks(): Promise<GetQueueTracksResult>;
-  getRatings(options: GetRatingsOptions): Promise<ActionRatingsResult>;
+  getLibrarySong(
+    options: GetLibrarySongOptions
+  ): Promise<GetLibrarySongsResult>;
+  getLibrarySongs(options: GetMultiDataOptions): Promise<GetLibrarySongsResult>;
+  getQueueSongs(): Promise<GetQueueSongsResult>;
+  getRatings(options: GetRatingsOptions): Promise<RatingsResult>;
   getRepeatMode(): Promise<getRepeatModeResult>;
   hasMusicSubscription(): Promise<ActionResult>;
   isAuthorized(): Promise<ActionResult>;

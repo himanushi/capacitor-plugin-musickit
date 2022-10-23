@@ -18,6 +18,24 @@ declare namespace MusicKit {
       | `/v1/me/ratings/${string}`
       | `/v1/me/ratings/${string}/${string}`;
 
+    type CatalogUrls =
+      | AlbumsUrl
+      | ArtistsUrl
+      | SongsUrl
+      | MusicVideosUrl
+      | PlaylistsUrl
+      | StationsUrl;
+
+    type LibraryUrls =
+      | LibraryAlbumsUrl
+      | LibraryArtistsUrl
+      | LibraryArtistsUrl
+      | LibrarySongsUrl
+      | LibraryMusicVideosUrl
+      | LibraryPlaylistsUrl;
+
+    type AllUrls = CatalogUrls | LibraryUrls | RatingsUrl;
+
     type Params = Record<string, any>;
     type Options = Record<string, any>;
 

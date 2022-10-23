@@ -18,7 +18,7 @@ declare namespace MusicKit {
      * media item in the current queue.
      */
     append(descriptor: Descriptor): void;
-    readonly currentItem: MediaItem;
+    readonly currentItem?: MediaItem;
 
     /**
      * Returns the index in the playback queue for a media item descriptor.

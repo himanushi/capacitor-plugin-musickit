@@ -159,6 +159,7 @@ module.exports = {
     "typescript-sort-keys/interface": "error",
     "typescript-sort-keys/string-enum": "error",
 
+    "no-return-await": "off",
     "spaced-comment": "off",
     "id-length": "off",
     "no-invalid-this": "off",
