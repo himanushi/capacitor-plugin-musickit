@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="./@types/index.d.ts" />
+/// <reference types="../types" />
 
 import { registerPlugin } from '@capacitor/core';
 

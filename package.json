@@ -3,8 +3,8 @@
   "version": "0.0.39",
   "description": "Requires iOS 16 or higher",
   "main": "dist/plugin.cjs.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "unpkg": "dist/plugin.js",
   "files": [
     "android/src/main/",
@@ -12,7 +12,7 @@
     "dist/",
     "ios/Plugin/",
     "CapacitorPluginMusickit.podspec",
-    "src/@types/"
+    "types/"
   ],
   "author": "himanushi",
   "license": "MIT",

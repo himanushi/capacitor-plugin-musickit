@@ -10,12 +10,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "dist/esm",
+    "outDir": "dist",
     "pretty": true,
     "sourceMap": true,
     "strict": true,
     "target": "es2017"
   },
-  "include": ["src/@types"],
+  "include": ["types"],
   "files": ["src/index.ts"]
 }
