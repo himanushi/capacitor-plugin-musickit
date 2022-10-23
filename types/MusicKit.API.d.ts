@@ -780,7 +780,7 @@ declare namespace MusicKit {
      */
     library: Library;
 
-    music: typeof MusicKit.Music.music;
+    music: typeof MusicKit.AppleMusicAPI.music;
 
     /**
      * Fetch a music video using its identifier.

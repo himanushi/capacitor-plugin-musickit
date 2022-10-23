@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/array-type */
 declare namespace MusicKit {
-  namespace Music {
+  namespace AppleMusicAPI {
     type ID = `/${string}` | "";
 
     type AlbumsUrl =

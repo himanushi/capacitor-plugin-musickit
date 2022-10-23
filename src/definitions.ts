@@ -22,11 +22,6 @@ export interface GetMultiDataOptions {
   offset: number;
 }
 
-export interface GetMultiDataResult {
-  hasNext: boolean;
-  total: number;
-}
-
 export type GetLibraryArtistsOptions = {
   albumId?: string;
 } & GetMultiDataOptions;
