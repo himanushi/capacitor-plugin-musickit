@@ -1,38 +1,34 @@
 import { WebPlugin } from "@capacitor/core";
-
 import type {
-  CapacitorMusicKitPlugin,
+  ActionResult,
+  AddRatingOptions,
   AuthorizationStatus,
+  AuthorizationStatusDidChangeResult,
+  CapacitorMusicKitPlugin,
+  ConfigureOptions,
+  DeleteRatingOptions,
   EchoOptions,
   EchoResult,
-  ConfigureOptions,
-  GetLibraryAlbumsResult,
-  SetQueueOptions,
-  ActionResult,
-  PlayOptions,
   GetCurrentIndexResult,
   GetCurrentPlaybackTimeResult,
-  SeekToTimeOptions,
-  SetRepeatModeOptions,
-  getRepeatModeResult,
-  PlaybackStateDidChangeResult,
-  NowPlayingItemDidChangeResult,
-  AuthorizationStatusDidChangeResult,
-  GetMultiDataOptions,
+  GetCurrentSongResult,
+  GetLibraryAlbumsResult,
+  GetLibraryArtistsOptions,
   GetLibraryArtistsResult,
   GetLibraryPlaylistsResult,
-  RatingsResult,
-  GetRatingsOptions,
-  AddRatingOptions,
-  DeleteRatingOptions,
-  GetLibraryArtistOptions,
-  GetLibraryAlbumOptions,
-  GetLibraryPlaylistOptions,
-  PlaybackState,
-  GetLibrarySongOptions,
   GetLibrarySongsResult,
-  GetCurrentSongResult,
+  GetMultiDataOptions,
   GetQueueSongsResult,
+  GetRatingsOptions,
+  NowPlayingItemDidChangeResult,
+  PlayOptions,
+  PlaybackState,
+  PlaybackStateDidChangeResult,
+  RatingsResult,
+  SeekToTimeOptions,
+  SetQueueOptions,
+  SetRepeatModeOptions,
+  getRepeatModeResult,
 } from "./definitions";
 
 export class CapacitorMusicKitWeb
@@ -66,7 +62,6 @@ export class CapacitorMusicKitWeb
   private authorizationStatusDidChange = (
     data: MusicKit.Events["authorizationStatusDidChange"],
   ) => {
-    // state.authorizationStatus === -1
     let status: AuthorizationStatus = "unavailable";
     if (data.authorizationStatus === 0) {
       status = "notDetermined";
@@ -82,8 +77,6 @@ export class CapacitorMusicKitWeb
   };
 
   async configure (options: ConfigureOptions): Promise<ActionResult> {
-    let result = false;
-
     const loaded = await new Promise<boolean>((resolve, reject) => {
       const script = document.createElement("script");
       script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
@@ -93,7 +86,7 @@ export class CapacitorMusicKitWeb
     });
 
     if (!loaded) {
-      return { result };
+      return { result: false };
     }
 
     const musicKit = await MusicKit.configure(options.config);
@@ -113,9 +106,7 @@ export class CapacitorMusicKitWeb
       this.authorizationStatusDidChange,
     );
 
-    result = true;
-
-    return { result };
+    return { result: true };
   }
 
   async isAuthorized (): Promise<ActionResult> {
@@ -134,36 +125,19 @@ export class CapacitorMusicKitWeb
     await MusicKit.getInstance().unauthorize();
   }
 
-  async getLibraryArtist (
-    options: GetLibraryArtistOptions,
-  ): Promise<GetLibraryArtistsResult> {
-    const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/artists/${options.id}` as const,
-    );
-    return response.data;
-  }
-
-  async getLibraryArtists (
-    options: GetMultiDataOptions,
-  ): Promise<GetLibraryArtistsResult> {
-    const idsOption = options.ids ? { ids: options.ids } : {};
-    const response = await MusicKit.getInstance().api.music(
-      "/v1/me/library/artists" as const,
-      {
-        limit: options.limit,
-        offset: options.offset,
-        ...idsOption,
-      },
-    );
-    return response.data;
-  }
-
-  async getLibraryAlbum (
-    options: GetLibraryAlbumOptions,
-  ): Promise<GetLibraryAlbumsResult> {
-    const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/albums/${options.id}` as const,
-    );
+  async getLibraryArtists ({
+    limit,
+    offset,
+    ids,
+    albumId,
+  }: GetLibraryArtistsOptions): Promise<GetLibraryArtistsResult> {
+    const url = albumId ? (`/v1/me/library/albums/${albumId}/artists` as const) : ("/v1/me/library/artists" as const);
+    const idsOption = ids ? { ids } : {};
+    const response = await MusicKit.getInstance().api.music(url, {
+      limit,
+      offset,
+      ...idsOption,
+    });
     return response.data;
   }
 
@@ -182,15 +156,6 @@ export class CapacitorMusicKitWeb
     return response.data;
   }
 
-  async getLibrarySong (
-    options: GetLibrarySongOptions,
-  ): Promise<GetLibrarySongsResult> {
-    const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/songs/${options.id}` as const,
-    );
-    return response.data;
-  }
-
   async getLibrarySongs (
     options: GetMultiDataOptions,
   ): Promise<GetLibrarySongsResult> {
@@ -202,15 +167,6 @@ export class CapacitorMusicKitWeb
         offset: options.offset,
         ...idsOption,
       },
-    );
-    return response.data;
-  }
-
-  async getLibraryPlaylist (
-    options: GetLibraryPlaylistOptions,
-  ): Promise<GetLibraryPlaylistsResult> {
-    const response = await MusicKit.getInstance().api.music(
-      `/v1/me/library/playlists/${options.id}` as const,
     );
     return response.data;
   }

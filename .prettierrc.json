@@ -1,4 +1,5 @@
 {
   "useTabs": false,
-  "singleQuote": false
+  "singleQuote": false,
+  "importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"]
 }

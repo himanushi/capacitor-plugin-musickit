@@ -1,21 +1,40 @@
 /* eslint-disable @typescript-eslint/array-type */
 declare namespace MusicKit {
   namespace Music {
-    type ID = string;
+    type ID = `/${string}` | "";
+
+    type AlbumsUrl =
+      | `/v1/catalog/${string}/albums${ID}`
+      | `/v1/me/library/albums/${string}/catalog`;
+    type ArtistsUrl =
+      | `/v1/catalog/${string}/artists${ID}`
+      | `/v1/catalog/${string}/albums/${string}/artists`;
+    type SongsUrl =
+      | `/v1/catalog/${string}/songs${ID}`
+      | `/v1/catalog/${string}/albums/${string}/tracks`;
+    type MusicVideosUrl = `/v1/catalog/${string}/music-videos${ID}`;
+    type PlaylistsUrl = `/v1/catalog/${string}/playlists${ID}`;
+    type StationsUrl = `/v1/catalog/${string}/stations${ID}`;
+    type GenresUrl = `/v1/catalog/${string}/albums/${string}/genres`;
+    type RecordLabelsUrl =
+      `/v1/catalog/${string}/albums/${string}/record-labels`;
+
+    type LibraryAlbumsUrl =
+      | `/v1/me/library/albums${ID}`
+      | `/v1/me/library/artists/${string}/albums`
+      | `/v1/me/library/songs/${string}/albums`
+      | `/v1/me/library/music-videos/${string}/albums`
+      | `/v1/catalog/${string}/albums/${string}/library`;
+    type LibraryArtistsUrl =
+      | `/v1/me/library/artists${ID}`
+      | `/v1/me/library/albums/${string}/artists`;
+    type LibrarySongsUrl = `/v1/me/library/songs${ID}`;
+    type LibraryMusicVideosUrl = `/v1/me/library/music-videos${ID}`;
+    type LibraryPlaylistsUrl = `/v1/me/library/playlists${ID}`;
+
     type RatingCategoryType = "artists" | "albums" | "songs" | "playlists";
     type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
 
-    type AlbumsUrl = `/v1/catalog/${string}/albums${`/${ID}` | ""}`;
-    type ArtistsUrl = `/v1/catalog/${string}/artists${`/${ID}` | ""}`;
-    type SongsUrl = `/v1/catalog/${string}/songs${`/${ID}` | ""}`;
-    type MusicVideosUrl = `/v1/catalog/${string}/music-videos${`/${ID}` | ""}`;
-    type PlaylistsUrl = `/v1/catalog/${string}/playlists${`/${ID}` | ""}`;
-    type StationsUrl = `/v1/catalog/${string}/stations${`/${ID}` | ""}`;
-    type LibraryAlbumsUrl = `/v1/me/library/albums${`/${ID}` | ""}`;
-    type LibraryArtistsUrl = `/v1/me/library/artists${`/${ID}` | ""}`;
-    type LibrarySongsUrl = `/v1/me/library/songs${`/${ID}` | ""}`;
-    type LibraryMusicVideosUrl = `/v1/me/library/music-videos${`/${ID}` | ""}`;
-    type LibraryPlaylistsUrl = `/v1/me/library/playlists${`/${ID}` | ""}`;
     type RatingsUrl =
       | `/v1/me/ratings/${RatingType}`
       | `/v1/me/ratings/${RatingType}/${string}`;

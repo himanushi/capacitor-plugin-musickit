@@ -16,11 +16,6 @@ export interface ConfigureOptions {
   config: MusicKit.Configuration;
 }
 
-export interface GetSingleDataOptions<T> {
-  id: string;
-  include?: T[];
-}
-
 export interface GetMultiDataOptions {
   ids?: string[];
   limit: number;
@@ -32,30 +27,18 @@ export interface GetMultiDataResult {
   total: number;
 }
 
-export type GetLibraryArtistOptions = GetSingleDataOptions<
-  "albums" | "catalog"
->;
+export type GetLibraryArtistsOptions = {
+  albumId?: string;
+} & GetMultiDataOptions;
 
 export type GetLibraryArtistsResult =
   MusicKit.Relationship<MusicKit.LibraryArtists>;
 
-export type GetLibraryAlbumOptions = GetSingleDataOptions<
-  "artists" | "catalog" | "tracks"
->;
-
 export type GetLibraryAlbumsResult =
   MusicKit.Relationship<MusicKit.LibraryAlbums>;
 
-export type GetLibrarySongOptions = GetSingleDataOptions<
-  "albums" | "artists" | "catalog"
->;
-
 export type GetLibrarySongsResult =
   MusicKit.Relationship<MusicKit.LibrarySongs>;
-
-export type GetLibraryPlaylistOptions = GetSingleDataOptions<
-  "catalog" | "tracks"
->;
 
 export type GetLibraryPlaylistsResult =
   MusicKit.Relationship<MusicKit.LibraryPlaylists>;
@@ -169,27 +152,15 @@ export interface CapacitorMusicKitPlugin {
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
   getCurrentSong(): Promise<GetCurrentSongResult>;
-  getLibraryAlbum(
-    options: GetLibraryAlbumOptions
-  ): Promise<GetLibraryAlbumsResult>;
   getLibraryAlbums(
     options: GetMultiDataOptions
   ): Promise<GetLibraryAlbumsResult>;
-  getLibraryArtist(
-    options: GetLibraryArtistOptions
-  ): Promise<GetLibraryArtistsResult>;
   getLibraryArtists(
-    options: GetMultiDataOptions
+    options: GetLibraryArtistsOptions
   ): Promise<GetLibraryArtistsResult>;
-  getLibraryPlaylist(
-    options: GetLibraryPlaylistOptions
-  ): Promise<GetLibraryPlaylistsResult>;
   getLibraryPlaylists(
     options: GetMultiDataOptions
   ): Promise<GetLibraryPlaylistsResult>;
-  getLibrarySong(
-    options: GetLibrarySongOptions
-  ): Promise<GetLibrarySongsResult>;
   getLibrarySongs(options: GetMultiDataOptions): Promise<GetLibrarySongsResult>;
   getQueueSongs(): Promise<GetQueueSongsResult>;
   getRatings(options: GetRatingsOptions): Promise<RatingsResult>;
