@@ -200,77 +200,55 @@ export class CapacitorMusicKitWeb
 
   async configure (options: ConfigureOptions): Promise<ActionResult> {
     let result = false;
-    try {
-      const loaded = await new Promise<boolean>((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
-        script.onload = () => resolve(true);
-        script.onerror = () => reject(false);
-        document.head.appendChild(script);
-      });
 
-      if (!loaded) {
-        return { result };
-      }
+    const loaded = await new Promise<boolean>((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => reject(false);
+      document.head.appendChild(script);
+    });
 
-      const musicKit = await MusicKit.configure(options.config);
-
-      musicKit.addEventListener(
-        "playbackStateDidChange",
-        this.playbackStateDidChange,
-      );
-
-      musicKit.addEventListener(
-        "nowPlayingItemDidChange",
-        this.nowPlayingItemDidChange,
-      );
-
-      musicKit.addEventListener(
-        "authorizationStatusDidChange",
-        this.authorizationStatusDidChange,
-      );
-
-      result = true;
-    } catch (error) {
-      console.log(error);
+    if (!loaded) {
+      return { result };
     }
+
+    const musicKit = await MusicKit.configure(options.config);
+
+    musicKit.addEventListener(
+      "playbackStateDidChange",
+      this.playbackStateDidChange,
+    );
+
+    musicKit.addEventListener(
+      "nowPlayingItemDidChange",
+      this.nowPlayingItemDidChange,
+    );
+
+    musicKit.addEventListener(
+      "authorizationStatusDidChange",
+      this.authorizationStatusDidChange,
+    );
+
+    result = true;
+
     return { result };
   }
 
   async isAuthorized (): Promise<ActionResult> {
-    let result = false;
-    try {
-      result = Boolean(MusicKit.getInstance()?.isAuthorized);
-    } catch (error) {
-      console.log(error);
-    }
-    return { result };
+    return { result: Boolean(MusicKit.getInstance()?.isAuthorized) };
   }
 
   async hasMusicSubscription (): Promise<ActionResult> {
-    let result = false;
-    try {
-      result = await MusicKit.getInstance().hasMusicSubscription();
-    } catch (error) {
-      console.log(error);
-    }
-    return { result };
+    return { result: await MusicKit.getInstance().hasMusicSubscription() };
   }
 
   async authorize (): Promise<void> {
-    try {
-      await MusicKit.getInstance().authorize();
-    } catch (error) {
-      console.log(error);
-    }
+    await MusicKit.getInstance().authorize();
   }
 
   async unauthorize (): Promise<void> {
-    try {
-      await MusicKit.getInstance().unauthorize();
-    } catch (error) {
-      console.log(error);
-    }
+    await MusicKit.getInstance().unauthorize();
   }
 
   async getLibraryArtist (
@@ -336,7 +314,7 @@ export class CapacitorMusicKitWeb
       `/v1/me/library/albums/${options.id}` as const,
       this.relationParams(["tracks"], options.include),
     );
-    return { albums: response.data.data };
+    return response.data;
   }
 
   async getLibraryAlbums (
@@ -351,17 +329,7 @@ export class CapacitorMusicKitWeb
         ...idsOption,
       },
     );
-
-    const albums: LibraryAlbum[] = response.data.data.map((item) =>
-      this.toLibraryAlbumResult(item),
-    );
-
-    const hasNext =
-      response.data.meta?.total !== options.offset + response.data.data.length;
-
-    return { albums,
-      hasNext,
-      total: response.data.meta?.total ?? 0 };
+    return response.data;
   }
 
   async getLibraryTrack (

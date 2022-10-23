@@ -255,52 +255,79 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             ])
         }
     }
+    
+//attributes: {
+//  artistName: string;
+//  artwork: Artwork;
+//  contentRating?: ContentRating;
+//  dateAdded?: string;
+//  genreNames: string[];
+//  name: string;
+//  playParams?: PlayParameters<"album">;
+//  releaseDate?: string;
+//  trackCount: number;
+//};
+//relationships: {
+//  artists: Relationship<LibraryArtists>;
+//  catalog: Relationship<Albums>;
+//  tracks: Relationship<LibrarySongs>;
+//};
+//type: "library-albums";
+    
+    func toISOString(_ optDate: Date?) -> String? {
+        guard let date = optDate else {
+            return nil
+        }
+
+        return ISO8601DateFormatter().string(from: date)
+    }
+    
+    func enumToString(_ optDate: Date?) -> String? {
+        guard let date = optDate else {
+            return nil
+        }
+
+        return ISO8601DateFormatter().string(from: date)
+    }
+    
+    func toLibraryAlbumResult(_ album: Album, _ size: Int) async -> Any {
+        return [
+            "attributes": [
+                "artistName": album.artistName,
+                "artwork": ["url": await toBase64Image(album.artwork, size)],
+                "contentRating": String(describing: album.contentRating),
+                "dateAdded": toISOString(album.libraryAddedDate),
+                "genreNames": album.genreNames,
+                "name": album.title,
+//                "playParams":
+                "releaseDate":  toISOString(album.releaseDate),
+                "trackCount":album.trackCount,
+            ],
+            "relationships": [
+                "artists": [],
+                "catalog": [],
+                "tracks": [],
+            ],
+            "type": "library-albums"
+        ]
+    }
 
     @objc func getLibraryAlbum(_ call: CAPPluginCall) {
         let id = call.getString("id")!
 
         Task {
-            var reason: String = "開始"
-            var resultAlbum: Album?
-            var resultSongs: [[String: Any?]] = []
-            var requestAlbum = MusicLibraryRequest<Album>()
-            requestAlbum.filter(matching: \.id, equalTo: MusicItemID(id))
-            let responseAlbum = try await requestAlbum.response()
-            if let album = responseAlbum.items.first {
-                reason = reason + ",アルバムあり"
-
-                var requestSong = MusicLibraryRequest<Song>()
-                requestSong.filter(matching: \.albums, contains: album)
-                requestSong.sort(by: \.discNumber, ascending: true)
-                requestSong.sort(by: \.trackNumber, ascending: true)
-                let responseSong = try await requestSong.response()
-
-                if responseSong.items.count > 0 {
-                    reason = reason + ",曲あり"
-
-                    resultAlbum = album
-                    let artworkUrl = await toBase64Image(album.artwork, sSize)
-                    responseSong.items.forEach {
-                        resultSongs.append(toResultSong($0, artworkUrl)!)
-                    }
-                } else {
-                    reason = reason + ",曲なし"
-                }
-            } else {
-                reason = reason + ",アルバムなし"
-            }
-
-            if let album = resultAlbum {
-                var albumHash = toResultAlbum(album, await toBase64Image(album.artwork, lSize))
-                albumHash["tracks"] = resultSongs
+            var request = MusicLibraryRequest<Album>()
+            request.filter(matching: \.id, equalTo: MusicItemID(id))
+            let response = try await request.response()
+            if let item = response.items.first {
+                let album = await toLibraryAlbumResult(item, lSize)
+                print(album)
                 call.resolve([
-                    "reason": reason,
-                    "albums": responseAlbum.items.map { $0 },
+                    "albums": [album],
                 ])
             } else {
                 call.resolve([
-                    "reason": reason,
-                    "album": nil,
+                    "albums": [],
                 ])
             }
         }

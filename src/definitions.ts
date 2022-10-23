@@ -160,13 +160,11 @@ export type GetLibraryAlbumOptions = GetSingleDataOptions<
   "artists" | "catalog" | "tracks"
 >;
 
-export interface GetLibraryAlbumResult {
-  albums: MusicKit.LibraryAlbums[];
-}
+export type GetLibraryAlbumResult =
+  MusicKit.Relationship<MusicKit.LibraryAlbums>;
 
-export type GetLibraryAlbumsResult = {
-  albums: LibraryAlbum[];
-} & GetMultiDataResult;
+export type GetLibraryAlbumsResult =
+  MusicKit.Relationship<MusicKit.LibraryAlbums>;
 
 export type GetLibraryTrackOptions = GetSingleDataOptions<
   "albums" | "artists" | "catalog"
