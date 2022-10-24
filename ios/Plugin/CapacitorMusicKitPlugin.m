@@ -10,10 +10,12 @@ CAP_PLUGIN(CapacitorMusicKitPlugin, "CapacitorMusicKit",
            CAP_PLUGIN_METHOD(hasMusicSubscription, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(authorize, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(unauthorize, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(getLibraryAlbum, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getLibraryArtists, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getLibraryAlbums, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(getCurrentTrack, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(getQueueTracks, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getLibrarySongs, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getLibraryPlaylists, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getCurrentSong, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getQueueSongs, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getCurrentIndex, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getCurrentPlaybackTime, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getRepeatMode, CAPPluginReturnPromise);

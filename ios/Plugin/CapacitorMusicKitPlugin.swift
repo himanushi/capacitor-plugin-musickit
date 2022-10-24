@@ -8,6 +8,8 @@ import MusicKit
 @available(iOS 16.0, *)
 @objc(CapacitorMusicKitPlugin)
 public class CapacitorMusicKitPlugin: CAPPlugin {
+    let baseUrl = "https://api.music.apple.com"
+    let storefront = "jp"
     let player = MPMusicPlayerController.applicationMusicPlayer
     var preQueueSongs: [Song] = []
 
@@ -62,13 +64,13 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         Task {
             var resultSong: [String: Any?]? = nil
 
-            if let song = currentSong() {
-                resultSong = toResultSong(song, await toBase64Image(song.artwork, lSize))
-            }
+            //            if let song = currentSong() {
+            //                resultSong = toResultSong(song, await toBase64Image(song.artwork, lSize))
+            //            }
 
-            notifyListeners(
-                "nowPlayingItemDidChange",
-                data: ["track": resultSong as Any, "index": player.indexOfNowPlayingItem])
+            //            notifyListeners(
+            //                "nowPlayingItemDidChange",
+            //                data: ["track": resultSong as Any, "index": player.indexOfNowPlayingItem])
         }
     }
 
@@ -92,49 +94,41 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
 
     func queueSongs() -> [Song] {
-        return ApplicationMusicPlayer.shared.queue.entries.map { toSong($0.item) }.compactMap { $0 }
+        //        return ApplicationMusicPlayer.shared.queue.entries.map { toSong($0.item) }.compactMap { $0 }
+        return []
     }
 
     func currentSong() -> Song? {
-        return toSong(ApplicationMusicPlayer.shared.queue.currentEntry?.item)
+        //        ApplicationMusicPlayer.shared.queue.currentEntry
+        //        return ApplicationMusicPlayer.shared.queue.currentEntry?.item
+        return nil
     }
 
-    func toSong(_ item: MusicKit.MusicPlayer.Queue.Entry.Item?) -> Song? {
-        switch item {
-        case let .song(song):
-            return song
-        default:
-            return nil
+    func buildParams(_ optIds: [String]?, _ optLimit: Int?, _ optOffset: Int?) -> String {
+        var params = ""
+        if let ids = optIds {
+            params = "?ids=\(ids.joined(separator: "%2C"))"
+        } else {
+            if let limit = optLimit {
+                params = "?limit=\(limit)&"
+            }
+            if let offset = optOffset {
+                params += "offset=\(offset)&"
+            }
         }
+        return params
     }
 
-    func toResultSong(_ optionalSong: Song?, _ artworkUrl: String?) -> [String: Any?]? {
-        var resultSong: [String: Any?]? = nil
-
-        guard let song = optionalSong else {
-            return nil
+    func getDataRequestJSON(_ url: String) async -> [String: Any] {
+        do {
+            guard let url = URL(string: "\(baseUrl)\(url)") else {
+                return [:]
+            }
+            let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response().data
+            return try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+        } catch {
+            return [:]
         }
-
-        resultSong = [
-            "id": song.id.rawValue,
-            "name": song.title,
-            "discNumber": song.discNumber,
-            "trackNumber": song.trackNumber,
-            "durationMs": Double(song.duration ?? 0) * 1000,
-            "artworkUrl": artworkUrl,
-        ]
-
-        return resultSong
-    }
-
-    func toResultAlbum(_ album: Album, _ artworkUrl: String?) -> [String: Any?] {
-        let resultAlbum: [String: Any?] = [
-            "id": album.id.rawValue,
-            "name": album.title,
-            "artworkUrl": artworkUrl,
-        ]
-
-        return resultAlbum
     }
 
     func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {
@@ -228,52 +222,62 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
 
     @objc func getLibraryAlbums(_ call: CAPPluginCall) {
-        let limit = call.getInt("limit") ?? 0
+        let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
+        let ids = call.getArray("ids", String.self)
+
+        let optCatalogId = call.getString("catalogId")
+        let optArtistId = call.getString("artistId")
+        let optSongId = call.getString("songId")
+        let optMusicVideoId = call.getString("musicVideoId")
 
         Task {
-            var hasNext = false
-            var resultAlbums: [[String: Any?]] = []
+            var url = "/v1/me/library/albums"
+            let params = buildParams(ids, limit, offset)
 
-            var request = MusicLibraryRequest<Album>()
-            request.sort(by: \.title, ascending: true)
-            request.limit = limit
-            request.offset = offset
-            let response = try await request.response()
-
-            for album in response.items {
-                resultAlbums.append(toResultAlbum(album, await toBase64Image(album.artwork, sSize)))
+            if let catalogId = optCatalogId {
+                url = "/v1/catalog/\(storefront)/albums/\(catalogId)/library"
+            } else if let artistId = optArtistId {
+                url = "/v1/me/library/artists/\(artistId)/albums"
+            } else if let songId = optSongId {
+                url = "/v1/me/library/songs/\(songId)/albums"
+            } else if let musicVideoId = optMusicVideoId {
+                url = "/v1/me/library/music-videos/\(musicVideoId)/albums"
             }
 
-            if response.items.count == limit {
-                hasNext = true
-            }
-
-            call.resolve([
-                "albums": resultAlbums,
-                "hasNext": hasNext,
-            ])
+            url = "\(url)\(params)"
+            let json = await getDataRequestJSON(url)
+            call.resolve(json)
         }
     }
-    
-//attributes: {
-//  artistName: string;
-//  artwork: Artwork;
-//  contentRating?: ContentRating;
-//  dateAdded?: string;
-//  genreNames: string[];
-//  name: string;
-//  playParams?: PlayParameters<"album">;
-//  releaseDate?: string;
-//  trackCount: number;
-//};
-//relationships: {
-//  artists: Relationship<LibraryArtists>;
-//  catalog: Relationship<Albums>;
-//  tracks: Relationship<LibrarySongs>;
-//};
-//type: "library-albums";
-    
+
+    @objc func getLibrarySongs(_ call: CAPPluginCall) {
+        let limit = call.getInt("limit") ?? 1
+        let offset = call.getInt("offset") ?? 0
+        let ids = call.getArray("ids", String.self)
+
+        let optCatalogId = call.getString("catalogId")
+        let optAlbumId = call.getString("albumId")
+        let optPlaylistId = call.getString("playlistId")
+
+        Task {
+            var url = "/v1/me/library/songs"
+            let params = buildParams(ids, limit, offset)
+
+            if let catalogId = optCatalogId {
+                url = "/v1/catalog/\(storefront)/songs/\(catalogId)/library"
+            } else if let albumId = optAlbumId {
+                url = "/v1/me/library/albums/\(albumId)/tracks"
+            } else if let playlistId = optPlaylistId {
+                url = "/v1/me/library/playlists/\(playlistId)/tracks"
+            }
+
+            url = "\(url)\(params)"
+            let json = await getDataRequestJSON(url)
+            call.resolve(json)
+        }
+    }
+
     func toISOString(_ optDate: Date?) -> String? {
         guard let date = optDate else {
             return nil
@@ -281,7 +285,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
         return ISO8601DateFormatter().string(from: date)
     }
-    
+
     func enumToString(_ optDate: Date?) -> String? {
         guard let date = optDate else {
             return nil
@@ -289,7 +293,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
         return ISO8601DateFormatter().string(from: date)
     }
-    
+
     func toLibraryAlbumResult(_ album: Album, _ size: Int) async -> Any {
         return [
             "attributes": [
@@ -299,16 +303,16 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 "dateAdded": toISOString(album.libraryAddedDate),
                 "genreNames": album.genreNames,
                 "name": album.title,
-//                "playParams":
-                "releaseDate":  toISOString(album.releaseDate),
-                "trackCount":album.trackCount,
+                //                "playParams":
+                "releaseDate": toISOString(album.releaseDate),
+                "trackCount": album.trackCount,
             ],
             "relationships": [
                 "artists": [],
                 "catalog": [],
                 "tracks": [],
             ],
-            "type": "library-albums"
+            "type": "library-albums",
         ]
     }
 
@@ -323,35 +327,35 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 let album = await toLibraryAlbumResult(item, lSize)
                 print(album)
                 call.resolve([
-                    "albums": [album],
+                    "albums": [album]
                 ])
             } else {
                 call.resolve([
-                    "albums": [],
+                    "albums": []
                 ])
             }
         }
     }
 
-    @objc func getCurrentTrack(_ call: CAPPluginCall) {
+    @objc func getCurrentSong(_ call: CAPPluginCall) {
         Task {
             var resultTrack: [String: Any?]? = nil
 
-            if let song = currentSong() {
-                resultTrack = toResultSong(song, await toBase64Image(song.artwork, lSize))
-            }
+            //            if let song = currentSong() {
+            //                resultTrack = toResultSong(song, await toBase64Image(song.artwork, lSize))
+            //            }
 
-            call.resolve(["track": resultTrack!])
+            call.resolve(["track": nil])
         }
     }
 
-    @objc func getQueueTracks(_ call: CAPPluginCall) {
+    @objc func getQueueSongs(_ call: CAPPluginCall) {
         Task {
             var resultSongs: [[String: Any?]] = []
 
-            for song in queueSongs() {
-                resultSongs.append(toResultSong(song, await toBase64Image(song.artwork, sSize))!)
-            }
+            //            for song in queueSongs() {
+            //                resultSongs.append(toResultSong(song, await toBase64Image(song.artwork, sSize))!)
+            //            }
 
             call.resolve(["tracks": resultSongs])
         }
