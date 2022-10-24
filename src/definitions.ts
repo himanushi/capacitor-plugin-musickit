@@ -18,7 +18,7 @@ export interface ConfigureOptions {
 
 export interface GetMultiDataOptions {
   ids?: string[];
-  limit: number;
+  limit?: number;
   offset?: number;
 }
 

@@ -130,7 +130,7 @@ export class CapacitorMusicKitWeb
   }
 
   async getLibraryArtists ({
-    limit,
+    limit = 1,
     offset = 0,
     ids,
     albumId,
@@ -143,16 +143,20 @@ export class CapacitorMusicKitWeb
     musicVideoId &&
       urls.push(`/v1/me/library/music-videos/${musicVideoId}/artists` as const);
 
-    const response = await MusicKit.getInstance().api.music(urls.reverse()[0], {
+    const params = ids ? { ids } : {
       limit,
       offset,
-      ...(ids ? { ids } : {}),
-    });
+    };
+
+    const response = await MusicKit.getInstance().api.music(
+      urls.reverse()[0],
+      params,
+    );
     return response.data;
   }
 
   async getLibraryAlbums ({
-    limit,
+    limit = 1,
     offset = 0,
     ids,
     catalogId,
@@ -170,16 +174,20 @@ export class CapacitorMusicKitWeb
     musicVideoId &&
       urls.push(`/v1/me/library/music-videos/${musicVideoId}/albums` as const);
 
-    const response = await MusicKit.getInstance().api.music(urls.reverse()[0], {
+    const params = ids ? { ids } : {
       limit,
       offset,
-      ...(ids ? { ids } : {}),
-    });
+    };
+
+    const response = await MusicKit.getInstance().api.music(
+      urls.reverse()[0],
+      params,
+    );
     return response.data;
   }
 
   async getLibrarySongs ({
-    limit,
+    limit = 1,
     offset = 0,
     ids,
     catalogId,
@@ -195,16 +203,20 @@ export class CapacitorMusicKitWeb
     playlistId &&
       urls.push(`/v1/me/library/playlists/${playlistId}/tracks` as const);
 
-    const response = await MusicKit.getInstance().api.music(urls.reverse()[0], {
+    const params = ids ? { ids } : {
       limit,
       offset,
-      ...(ids ? { ids } : {}),
-    });
+    };
+
+    const response = await MusicKit.getInstance().api.music(
+      urls.reverse()[0],
+      params,
+    );
     return response.data;
   }
 
   async getLibraryPlaylists ({
-    limit,
+    limit = 1,
     offset = 0,
     ids,
     catalogId,
@@ -215,11 +227,15 @@ export class CapacitorMusicKitWeb
         `/v1/catalog/${this.storefront}/playlists/${catalogId}/library` as const,
       );
 
-    const response = await MusicKit.getInstance().api.music(urls.reverse()[0], {
+    const params = ids ? { ids } : {
       limit,
       offset,
-      ...(ids ? { ids } : {}),
-    });
+    };
+
+    const response = await MusicKit.getInstance().api.music(
+      urls.reverse()[0],
+      params,
+    );
     return response.data;
   }
 
