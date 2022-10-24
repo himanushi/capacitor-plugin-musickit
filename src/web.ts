@@ -131,7 +131,7 @@ export class CapacitorMusicKitWeb
 
   async getLibraryArtists ({
     limit,
-    offset,
+    offset = 0,
     ids,
     albumId,
     songId,
@@ -153,7 +153,7 @@ export class CapacitorMusicKitWeb
 
   async getLibraryAlbums ({
     limit,
-    offset,
+    offset = 0,
     ids,
     catalogId,
     artistId,
@@ -180,7 +180,7 @@ export class CapacitorMusicKitWeb
 
   async getLibrarySongs ({
     limit,
-    offset,
+    offset = 0,
     ids,
     catalogId,
     albumId,
@@ -205,7 +205,7 @@ export class CapacitorMusicKitWeb
 
   async getLibraryPlaylists ({
     limit,
-    offset,
+    offset = 0,
     ids,
     catalogId,
   }: GetLibraryPlaylistsOptions): Promise<GetLibraryPlaylistsResult> {

@@ -19,7 +19,7 @@ export interface ConfigureOptions {
 export interface GetMultiDataOptions {
   ids?: string[];
   limit: number;
-  offset: number;
+  offset?: number;
 }
 
 export type GetLibraryArtistsOptions = {
