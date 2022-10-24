@@ -24,13 +24,9 @@ npx cap sync
 * [`getCurrentIndex()`](#getcurrentindex)
 * [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
 * [`getCurrentSong()`](#getcurrentsong)
-* [`getLibraryAlbum(...)`](#getlibraryalbum)
 * [`getLibraryAlbums(...)`](#getlibraryalbums)
-* [`getLibraryArtist(...)`](#getlibraryartist)
 * [`getLibraryArtists(...)`](#getlibraryartists)
-* [`getLibraryPlaylist(...)`](#getlibraryplaylist)
 * [`getLibraryPlaylists(...)`](#getlibraryplaylists)
-* [`getLibrarySong(...)`](#getlibrarysong)
 * [`getLibrarySongs(...)`](#getlibrarysongs)
 * [`getQueueSongs()`](#getqueuesongs)
 * [`getRatings(...)`](#getratings)
@@ -204,47 +200,17 @@ getCurrentSong() => Promise<GetCurrentSongResult>
 --------------------
 
 
-### getLibraryAlbum(...)
-
-```typescript
-getLibraryAlbum(options: GetLibraryAlbumOptions) => Promise<GetLibraryAlbumsResult>
-```
-
-| Param         | Type                                                                      |
-| ------------- | ------------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getlibraryalbumoptions">GetLibraryAlbumOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#getlibraryalbumsresult">GetLibraryAlbumsResult</a>&gt;</code>
-
---------------------
-
-
 ### getLibraryAlbums(...)
 
 ```typescript
-getLibraryAlbums(options: GetMultiDataOptions) => Promise<GetLibraryAlbumsResult>
-```
-
-| Param         | Type                                                                |
-| ------------- | ------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getmultidataoptions">GetMultiDataOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#getlibraryalbumsresult">GetLibraryAlbumsResult</a>&gt;</code>
-
---------------------
-
-
-### getLibraryArtist(...)
-
-```typescript
-getLibraryArtist(options: GetLibraryArtistOptions) => Promise<GetLibraryArtistsResult>
+getLibraryAlbums(options: GetLibraryAlbumsOptions) => Promise<GetLibraryAlbumsResult>
 ```
 
 | Param         | Type                                                                        |
 | ------------- | --------------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getlibraryartistoptions">GetLibraryArtistOptions</a></code> |
+| **`options`** | <code><a href="#getlibraryalbumsoptions">GetLibraryAlbumsOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#getlibraryartistsresult">GetLibraryArtistsResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getlibraryalbumsresult">GetLibraryAlbumsResult</a>&gt;</code>
 
 --------------------
 
@@ -252,29 +218,14 @@ getLibraryArtist(options: GetLibraryArtistOptions) => Promise<GetLibraryArtistsR
 ### getLibraryArtists(...)
 
 ```typescript
-getLibraryArtists(options: GetMultiDataOptions) => Promise<GetLibraryArtistsResult>
+getLibraryArtists(options: GetLibraryArtistsOptions) => Promise<GetLibraryArtistsResult>
 ```
 
-| Param         | Type                                                                |
-| ------------- | ------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getmultidataoptions">GetMultiDataOptions</a></code> |
+| Param         | Type                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#getlibraryartistsoptions">GetLibraryArtistsOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#getlibraryartistsresult">GetLibraryArtistsResult</a>&gt;</code>
-
---------------------
-
-
-### getLibraryPlaylist(...)
-
-```typescript
-getLibraryPlaylist(options: GetLibraryPlaylistOptions) => Promise<GetLibraryPlaylistsResult>
-```
-
-| Param         | Type                                                                            |
-| ------------- | ------------------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getlibraryplaylistoptions">GetLibraryPlaylistOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#getlibraryplaylistsresult">GetLibraryPlaylistsResult</a>&gt;</code>
 
 --------------------
 
@@ -282,29 +233,14 @@ getLibraryPlaylist(options: GetLibraryPlaylistOptions) => Promise<GetLibraryPlay
 ### getLibraryPlaylists(...)
 
 ```typescript
-getLibraryPlaylists(options: GetMultiDataOptions) => Promise<GetLibraryPlaylistsResult>
+getLibraryPlaylists(options: GetLibraryPlaylistsOptions) => Promise<GetLibraryPlaylistsResult>
 ```
 
-| Param         | Type                                                                |
-| ------------- | ------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getmultidataoptions">GetMultiDataOptions</a></code> |
+| Param         | Type                                                                              |
+| ------------- | --------------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#getlibraryplaylistsoptions">GetLibraryPlaylistsOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#getlibraryplaylistsresult">GetLibraryPlaylistsResult</a>&gt;</code>
-
---------------------
-
-
-### getLibrarySong(...)
-
-```typescript
-getLibrarySong(options: GetLibrarySongOptions) => Promise<GetLibrarySongsResult>
-```
-
-| Param         | Type                                                                    |
-| ------------- | ----------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getlibrarysongoptions">GetLibrarySongOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#getlibrarysongsresult">GetLibrarySongsResult</a>&gt;</code>
 
 --------------------
 
@@ -312,12 +248,12 @@ getLibrarySong(options: GetLibrarySongOptions) => Promise<GetLibrarySongsResult>
 ### getLibrarySongs(...)
 
 ```typescript
-getLibrarySongs(options: GetMultiDataOptions) => Promise<GetLibrarySongsResult>
+getLibrarySongs(options: GetLibrarySongsOptions) => Promise<GetLibrarySongsResult>
 ```
 
-| Param         | Type                                                                |
-| ------------- | ------------------------------------------------------------------- |
-| **`options`** | <code><a href="#getmultidataoptions">GetMultiDataOptions</a></code> |
+| Param         | Type                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#getlibrarysongsoptions">GetLibrarySongsOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#getlibrarysongsresult">GetLibrarySongsResult</a>&gt;</code>
 
@@ -555,14 +491,6 @@ unauthorize() => Promise<void>
 | **`item`** | <code>MusicKit.MediaItem</code> |
 
 
-#### GetSingleDataOptions
-
-| Prop          | Type                |
-| ------------- | ------------------- |
-| **`id`**      | <code>string</code> |
-| **`include`** | <code>T[]</code>    |
-
-
 #### GetMultiDataOptions
 
 | Prop         | Type                  |
@@ -664,12 +592,12 @@ unauthorize() => Promise<void>
 
 #### AddRatingOptions
 
-<code>{ id: string; type: MusicKit.Music.RatingType; value: MusicKit.Rating; }</code>
+<code>{ id: string; type: MusicKit.AppleMusicAPI.RatingType; value: MusicKit.Rating; }</code>
 
 
 #### DeleteRatingOptions
 
-<code>{ id: string; type: MusicKit.Music.RatingType; }</code>
+<code>{ id: string; type: MusicKit.AppleMusicAPI.RatingType; }</code>
 
 
 #### GetLibraryAlbumsResult
@@ -677,9 +605,9 @@ unauthorize() => Promise<void>
 <code>MusicKit.Relationship&lt;MusicKit.LibraryAlbums&gt;</code>
 
 
-#### GetLibraryAlbumOptions
+#### GetLibraryAlbumsOptions
 
-<code><a href="#getsingledataoptions">GetSingleDataOptions</a>&lt; "artists" | "catalog" | "tracks" &gt;</code>
+<code>{ artistId?: string; catalogId?: string; musicVideoId?: string; songId?: string; } & <a href="#getmultidataoptions">GetMultiDataOptions</a></code>
 
 
 #### GetLibraryArtistsResult
@@ -687,9 +615,9 @@ unauthorize() => Promise<void>
 <code>MusicKit.Relationship&lt;MusicKit.LibraryArtists&gt;</code>
 
 
-#### GetLibraryArtistOptions
+#### GetLibraryArtistsOptions
 
-<code><a href="#getsingledataoptions">GetSingleDataOptions</a>&lt; "albums" | "catalog" &gt;</code>
+<code>{ albumId?: string; musicVideoId?: string; songId?: string; } & <a href="#getmultidataoptions">GetMultiDataOptions</a></code>
 
 
 #### GetLibraryPlaylistsResult
@@ -697,9 +625,9 @@ unauthorize() => Promise<void>
 <code>MusicKit.Relationship&lt;MusicKit.LibraryPlaylists&gt;</code>
 
 
-#### GetLibraryPlaylistOptions
+#### GetLibraryPlaylistsOptions
 
-<code><a href="#getsingledataoptions">GetSingleDataOptions</a>&lt; "catalog" | "tracks" &gt;</code>
+<code>{ catalogId?: string; } & <a href="#getmultidataoptions">GetMultiDataOptions</a></code>
 
 
 #### GetLibrarySongsResult
@@ -707,13 +635,13 @@ unauthorize() => Promise<void>
 <code>MusicKit.Relationship&lt;MusicKit.LibrarySongs&gt;</code>
 
 
-#### GetLibrarySongOptions
+#### GetLibrarySongsOptions
 
-<code><a href="#getsingledataoptions">GetSingleDataOptions</a>&lt; "albums" | "artists" | "catalog" &gt;</code>
+<code>{ albumId?: string; catalogId?: string; playlistId?: string; } & <a href="#getmultidataoptions">GetMultiDataOptions</a></code>
 
 
 #### GetRatingsOptions
 
-<code>{ ids: string[]; type: MusicKit.Music.RatingType; }</code>
+<code>{ ids: string[]; type: MusicKit.AppleMusicAPI.RatingType; }</code>
 
 </docgen-api>

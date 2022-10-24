@@ -24,16 +24,35 @@ export interface GetMultiDataOptions {
 
 export type GetLibraryArtistsOptions = {
   albumId?: string;
+  musicVideoId?: string;
+  songId?: string;
 } & GetMultiDataOptions;
 
 export type GetLibraryArtistsResult =
   MusicKit.Relationship<MusicKit.LibraryArtists>;
 
+export type GetLibraryAlbumsOptions = {
+  artistId?: string;
+  catalogId?: string;
+  musicVideoId?: string;
+  songId?: string;
+} & GetMultiDataOptions;
+
 export type GetLibraryAlbumsResult =
   MusicKit.Relationship<MusicKit.LibraryAlbums>;
 
+export type GetLibrarySongsOptions = {
+  albumId?: string;
+  catalogId?: string;
+  playlistId?: string;
+} & GetMultiDataOptions;
+
 export type GetLibrarySongsResult =
   MusicKit.Relationship<MusicKit.LibrarySongs>;
+
+export type GetLibraryPlaylistsOptions = {
+  catalogId?: string;
+} & GetMultiDataOptions;
 
 export type GetLibraryPlaylistsResult =
   MusicKit.Relationship<MusicKit.LibraryPlaylists>;
@@ -148,15 +167,17 @@ export interface CapacitorMusicKitPlugin {
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
   getCurrentSong(): Promise<GetCurrentSongResult>;
   getLibraryAlbums(
-    options: GetMultiDataOptions
+    options: GetLibraryAlbumsOptions
   ): Promise<GetLibraryAlbumsResult>;
   getLibraryArtists(
     options: GetLibraryArtistsOptions
   ): Promise<GetLibraryArtistsResult>;
   getLibraryPlaylists(
-    options: GetMultiDataOptions
+    options: GetLibraryPlaylistsOptions
   ): Promise<GetLibraryPlaylistsResult>;
-  getLibrarySongs(options: GetMultiDataOptions): Promise<GetLibrarySongsResult>;
+  getLibrarySongs(
+    options: GetLibrarySongsOptions
+  ): Promise<GetLibrarySongsResult>;
   getQueueSongs(): Promise<GetQueueSongsResult>;
   getRatings(options: GetRatingsOptions): Promise<RatingsResult>;
   getRepeatMode(): Promise<getRepeatModeResult>;

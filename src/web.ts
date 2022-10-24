@@ -17,8 +17,9 @@ import type {
   GetLibraryArtistsResult,
   GetLibraryPlaylistsResult,
   GetLibrarySongsResult,
-  GetMultiDataOptions,
   GetQueueSongsResult,
+  getRepeatModeResult,
+  GetLibraryAlbumsOptions,
   GetRatingsOptions,
   NowPlayingItemDidChangeResult,
   PlayOptions,
@@ -28,12 +29,15 @@ import type {
   SeekToTimeOptions,
   SetQueueOptions,
   SetRepeatModeOptions,
-  getRepeatModeResult,
+  GetLibrarySongsOptions,
+  GetLibraryPlaylistsOptions,
 } from "./definitions";
 
 export class CapacitorMusicKitWeb
   extends WebPlugin
   implements CapacitorMusicKitPlugin {
+  storefront = "jp";
+
   async echo (options: EchoOptions): Promise<EchoResult> {
     console.log("ECHO", options);
     return options;
@@ -130,59 +134,92 @@ export class CapacitorMusicKitWeb
     offset,
     ids,
     albumId,
+    songId,
+    musicVideoId,
   }: GetLibraryArtistsOptions): Promise<GetLibraryArtistsResult> {
-    const url = albumId ? (`/v1/me/library/albums/${albumId}/artists` as const) : ("/v1/me/library/artists" as const);
-    const idsOption = ids ? { ids } : {};
-    const response = await MusicKit.getInstance().api.music(url, {
+    const urls: MusicKit.AppleMusicAPI.LibraryArtistsUrl[] = ["/v1/me/library/artists" as const];
+    albumId && urls.push(`/v1/me/library/albums/${albumId}/artists` as const);
+    songId && urls.push(`/v1/me/library/songs/${songId}/artists` as const);
+    musicVideoId &&
+      urls.push(`/v1/me/library/music-videos/${musicVideoId}/artists` as const);
+
+    const response = await MusicKit.getInstance().api.music(urls.reverse()[0], {
       limit,
       offset,
-      ...idsOption,
+      ...(ids ? { ids } : {}),
     });
     return response.data;
   }
 
-  async getLibraryAlbums (
-    options: GetMultiDataOptions,
-  ): Promise<GetLibraryAlbumsResult> {
-    const idsOption = options.ids ? { ids: options.ids } : {};
-    const response = await MusicKit.getInstance().api.music(
-      "/v1/me/library/albums" as const,
-      {
-        limit: options.limit,
-        offset: options.offset,
-        ...idsOption,
-      },
-    );
+  async getLibraryAlbums ({
+    limit,
+    offset,
+    ids,
+    catalogId,
+    artistId,
+    songId,
+    musicVideoId,
+  }: GetLibraryAlbumsOptions): Promise<GetLibraryAlbumsResult> {
+    const urls: MusicKit.AppleMusicAPI.LibraryAlbumsUrl[] = ["/v1/me/library/albums" as const];
+    catalogId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/albums/${catalogId}/library` as const,
+      );
+    artistId && urls.push(`/v1/me/library/artists/${artistId}/albums` as const);
+    songId && urls.push(`/v1/me/library/songs/${songId}/albums` as const);
+    musicVideoId &&
+      urls.push(`/v1/me/library/music-videos/${musicVideoId}/albums` as const);
+
+    const response = await MusicKit.getInstance().api.music(urls.reverse()[0], {
+      limit,
+      offset,
+      ...(ids ? { ids } : {}),
+    });
     return response.data;
   }
 
-  async getLibrarySongs (
-    options: GetMultiDataOptions,
-  ): Promise<GetLibrarySongsResult> {
-    const idsOption = options.ids ? { ids: options.ids } : {};
-    const response = await MusicKit.getInstance().api.music(
-      "/v1/me/library/songs" as const,
-      {
-        limit: options.limit,
-        offset: options.offset,
-        ...idsOption,
-      },
-    );
+  async getLibrarySongs ({
+    limit,
+    offset,
+    ids,
+    catalogId,
+    albumId,
+    playlistId,
+  }: GetLibrarySongsOptions): Promise<GetLibrarySongsResult> {
+    const urls: MusicKit.AppleMusicAPI.LibrarySongsUrl[] = ["/v1/me/library/songs" as const];
+    catalogId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/songs/${catalogId}/library` as const,
+      );
+    albumId && urls.push(`/v1/me/library/albums/${albumId}/tracks` as const);
+    playlistId &&
+      urls.push(`/v1/me/library/playlists/${playlistId}/tracks` as const);
+
+    const response = await MusicKit.getInstance().api.music(urls.reverse()[0], {
+      limit,
+      offset,
+      ...(ids ? { ids } : {}),
+    });
     return response.data;
   }
 
-  async getLibraryPlaylists (
-    options: GetMultiDataOptions,
-  ): Promise<GetLibraryPlaylistsResult> {
-    const idsOption = options.ids ? { ids: options.ids } : {};
-    const response = await MusicKit.getInstance().api.music(
-      "/v1/me/library/playlists" as const,
-      {
-        limit: options.limit,
-        offset: options.offset,
-        ...idsOption,
-      },
-    );
+  async getLibraryPlaylists ({
+    limit,
+    offset,
+    ids,
+    catalogId,
+  }: GetLibraryPlaylistsOptions): Promise<GetLibraryPlaylistsResult> {
+    const urls: MusicKit.AppleMusicAPI.LibraryPlaylistsUrl[] = ["/v1/me/library/playlists" as const];
+    catalogId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/playlists/${catalogId}/library` as const,
+      );
+
+    const response = await MusicKit.getInstance().api.music(urls.reverse()[0], {
+      limit,
+      offset,
+      ...(ids ? { ids } : {}),
+    });
     return response.data;
   }
 

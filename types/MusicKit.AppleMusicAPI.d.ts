@@ -5,35 +5,35 @@ declare namespace MusicKit {
 
     type AlbumsUrl =
       | `/v1/me/library/albums/${string}/catalog`
-      | `/v1/catalog/${string}/albums${ID}`
+      | `/v1/catalog/${string}/albums`
       | `/v1/catalog/${string}/artists/${string}/albums`
       | `/v1/catalog/${string}/songs/${string}/albums`
       | `/v1/catalog/${string}/music-videos/${string}/albums`;
     type ArtistsUrl =
       | `/v1/me/library/artists/${string}/catalog`
-      | `/v1/catalog/${string}/artists${ID}`
+      | `/v1/catalog/${string}/artists`
       | `/v1/catalog/${string}/albums/${string}/artists`
       | `/v1/catalog/${string}/songs/${string}/artists`
       | `/v1/catalog/${string}/songs/${string}/composers`
       | `/v1/catalog/${string}/music-videos/${string}/artists`;
     type SongsUrl =
       | `/v1/me/library/songs/${string}/catalog`
-      | `/v1/catalog/${string}/songs${ID}`
+      | `/v1/catalog/${string}/songs`
       | `/v1/catalog/${string}/albums/${string}/tracks`
       | `/v1/catalog/${string}/music-videos/${string}/songs`
       | `/v1/catalog/${string}/playlists/${string}/tracks`;
     type MusicVideosUrl =
       | `/v1/me/library/music-videos/${string}/catalog`
-      | `/v1/catalog/${string}/music-videos${ID}`
+      | `/v1/catalog/${string}/music-videos`
       | `/v1/catalog/${string}/artists/${string}/music-videos`
       | `/v1/catalog/${string}/songs/${string}/music-videos`;
     type PlaylistsUrl =
       | `/v1/me/library/playlists/${string}/catalog`
-      | `/v1/catalog/${string}/playlists${ID}`
+      | `/v1/catalog/${string}/playlists`
       | `/v1/catalog/${string}/artists/${string}/playlists`;
     //  `/v1/catalog/${string}/playlists/${string}/curator`
     type StationsUrl =
-      | `/v1/catalog/${string}/stations${ID}`
+      | `/v1/catalog/${string}/stations`
       | `/v1/catalog/${string}/artists/${string}/station`
       | `/v1/catalog/${string}/songs/${string}/station`;
     type GenresUrl =
@@ -46,26 +46,26 @@ declare namespace MusicKit {
 
     type LibraryAlbumsUrl =
       | `/v1/catalog/${string}/albums/${string}/library`
-      | `/v1/me/library/albums${ID}`
+      | "/v1/me/library/albums"
       | `/v1/me/library/artists/${string}/albums`
       | `/v1/me/library/songs/${string}/albums`
       | `/v1/me/library/music-videos/${string}/albums`;
     type LibraryArtistsUrl =
-      | `/v1/me/library/artists${ID}`
+      | "/v1/me/library/artists"
       | `/v1/me/library/albums/${string}/artists`
       | `/v1/me/library/songs/${string}/artists`
       | `/v1/me/library/music-videos/${string}/artists`;
     type LibrarySongsUrl =
       | `/v1/catalog/${string}/songs/${string}/library`
-      | `/v1/me/library/songs${ID}`
+      | "/v1/me/library/songs"
       | `/v1/me/library/albums/${string}/tracks`
       | `/v1/me/library/playlists/${string}/tracks`;
     type LibraryMusicVideosUrl =
       | `/v1/catalog/${string}/music-videos/${string}/library`
-      | `/v1/me/library/music-videos${ID}`;
+      | "/v1/me/library/music-videos";
     type LibraryPlaylistsUrl =
       | `/v1/catalog/${string}/playlists/${string}/library`
-      | `/v1/me/library/playlists${ID}`;
+      | "/v1/me/library/playlists";
 
     type RatingCategoryType = "artists" | "albums" | "songs" | "playlists";
     type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
@@ -84,7 +84,6 @@ declare namespace MusicKit {
 
     type LibraryUrls =
       | LibraryAlbumsUrl
-      | LibraryArtistsUrl
       | LibraryArtistsUrl
       | LibrarySongsUrl
       | LibraryMusicVideosUrl
