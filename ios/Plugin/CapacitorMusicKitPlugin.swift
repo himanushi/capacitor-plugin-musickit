@@ -62,15 +62,9 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     @objc private func nowPlayingItemDidChange() {
         Task {
-            var resultSong: [String: Any?]? = nil
-
-            //            if let song = currentSong() {
-            //                resultSong = toResultSong(song, await toBase64Image(song.artwork, lSize))
-            //            }
-
-            //            notifyListeners(
-            //                "nowPlayingItemDidChange",
-            //                data: ["track": resultSong as Any, "index": player.indexOfNowPlayingItem])
+            notifyListeners(
+                "nowPlayingItemDidChange",
+                data: ["item": await currentSong() as Any, "index": player.indexOfNowPlayingItem])
         }
     }
 
@@ -93,15 +87,57 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         }
     }
 
-    func queueSongs() -> [Song] {
-        //        return ApplicationMusicPlayer.shared.queue.entries.map { toSong($0.item) }.compactMap { $0 }
-        return []
+    func formatISOString(_ optDate: Date?) -> String? {
+        guard let date = optDate else {
+            return nil
+        }
+        return ISO8601DateFormatter().string(from: date)
     }
 
-    func currentSong() -> Song? {
-        //        ApplicationMusicPlayer.shared.queue.currentEntry
-        //        return ApplicationMusicPlayer.shared.queue.currentEntry?.item
-        return nil
+    func toMediaItem(_ item: MusicKit.MusicPlayer.Queue.Entry.Item?, _ size: Int) async -> [String:
+        Any?]?
+    {
+        switch item {
+        case let .song(song):
+            let artworkUrl = await toBase64Image(song.artwork, size)
+            return [
+                "albumInfo": song.albumTitle,
+                "albumName": song.albumTitle,
+                "artistName": song.artistName,
+                "artwork": ["url": artworkUrl],
+                "artworkURL": artworkUrl,
+                "attributes": nil,
+                "contentRating": song.contentRating == .clean ? "clean" : "explicit",
+                "discNumber": song.discNumber,
+                "id": song.id.rawValue,
+                "info": song.title,
+                "isExplicitItem": song.contentRating == .explicit,
+                "isPlayable": true,
+                "isPreparedToPlay": nil,
+                "isrc": song.isrc,
+                "playbackDuration": Double(song.duration ?? 0) * 1000,
+                "playlistArtworkURL": artworkUrl,
+                "playlistName": song.albumTitle,
+                "previewURL": song.previewAssets?.first?.url,
+                "releaseDate": formatISOString(song.releaseDate),
+                "title": song.title,
+                "trackNumber": song.trackNumber,
+                "type": "songs",
+            ]
+        default: return nil
+        }
+    }
+
+    func queueSongs() async -> [[String: Any?]] {
+        var songs: [[String: Any?]?] = []
+        for entry in ApplicationMusicPlayer.shared.queue.entries {
+            songs.append(await toMediaItem(entry.item, sSize))
+        }
+        return songs.compactMap { $0 }
+    }
+
+    func currentSong() async -> [String: Any?]? {
+        return await toMediaItem(ApplicationMusicPlayer.shared.queue.currentEntry?.item, lSize)
     }
 
     func buildParams(_ optIds: [String]?, _ optLimit: Int?, _ optOffset: Int?) -> String {
@@ -278,86 +314,15 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         }
     }
 
-    func toISOString(_ optDate: Date?) -> String? {
-        guard let date = optDate else {
-            return nil
-        }
-
-        return ISO8601DateFormatter().string(from: date)
-    }
-
-    func enumToString(_ optDate: Date?) -> String? {
-        guard let date = optDate else {
-            return nil
-        }
-
-        return ISO8601DateFormatter().string(from: date)
-    }
-
-    func toLibraryAlbumResult(_ album: Album, _ size: Int) async -> Any {
-        return [
-            "attributes": [
-                "artistName": album.artistName,
-                "artwork": ["url": await toBase64Image(album.artwork, size)],
-                "contentRating": String(describing: album.contentRating),
-                "dateAdded": toISOString(album.libraryAddedDate),
-                "genreNames": album.genreNames,
-                "name": album.title,
-                //                "playParams":
-                "releaseDate": toISOString(album.releaseDate),
-                "trackCount": album.trackCount,
-            ],
-            "relationships": [
-                "artists": [],
-                "catalog": [],
-                "tracks": [],
-            ],
-            "type": "library-albums",
-        ]
-    }
-
-    @objc func getLibraryAlbum(_ call: CAPPluginCall) {
-        let id = call.getString("id")!
-
-        Task {
-            var request = MusicLibraryRequest<Album>()
-            request.filter(matching: \.id, equalTo: MusicItemID(id))
-            let response = try await request.response()
-            if let item = response.items.first {
-                let album = await toLibraryAlbumResult(item, lSize)
-                print(album)
-                call.resolve([
-                    "albums": [album]
-                ])
-            } else {
-                call.resolve([
-                    "albums": []
-                ])
-            }
-        }
-    }
-
     @objc func getCurrentSong(_ call: CAPPluginCall) {
         Task {
-            var resultTrack: [String: Any?]? = nil
-
-            //            if let song = currentSong() {
-            //                resultTrack = toResultSong(song, await toBase64Image(song.artwork, lSize))
-            //            }
-
-            call.resolve(["track": nil])
+            call.resolve(["item": await currentSong()])
         }
     }
 
     @objc func getQueueSongs(_ call: CAPPluginCall) {
         Task {
-            var resultSongs: [[String: Any?]] = []
-
-            //            for song in queueSongs() {
-            //                resultSongs.append(toResultSong(song, await toBase64Image(song.artwork, sSize))!)
-            //            }
-
-            call.resolve(["tracks": resultSongs])
+            call.resolve(["items": await queueSongs()])
         }
     }
 
