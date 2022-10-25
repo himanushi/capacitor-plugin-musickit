@@ -2,9 +2,10 @@
   "name": "capacitor-plugin-musickit",
   "version": "0.0.48",
   "description": "Requires iOS 16 or higher",
-  "main": "dist/plugin.js",
+  "main": "dist/plugin.cjs.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "unpkg": "dist/plugin.js",
   "files": [
     "android/src/main/",
     "android/build.gradle",
