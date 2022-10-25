@@ -1,29 +1,16 @@
-import copy from 'rollup-plugin-copy';
-
 export default {
-  input: 'dist/index.js',
+  external: ["@capacitor/core"],
+  input: "dist/index.js",
   output: [
     {
-      file: 'dist/plugin.js',
-      format: 'iife',
-      name: 'capacitorCapacitorMusicKit',
+      file: "dist/plugin.js",
+      format: "iife",
       globals: {
-        '@capacitor/core': 'capacitorExports',
+        "@capacitor/core": "capacitorExports",
       },
-      sourcemap: true,
       inlineDynamicImports: true,
-    },
-    {
-      file: 'dist/plugin.cjs.js',
-      format: 'cjs',
+      name: "capacitorCapacitorMusicKit",
       sourcemap: true,
-      inlineDynamicImports: true,
     },
   ],
-  plugins: [
-    copy({
-      // targets: [{ src: 'src/@types/**/*', dest: 'dist/@types' }],
-    }),
-  ],
-  external: ['@capacitor/core'],
 };
