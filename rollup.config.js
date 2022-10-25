@@ -5,9 +5,6 @@ export default {
     {
       file: "dist/plugin.js",
       format: "iife",
-      globals: {
-        "@capacitor/core": "capacitorExports",
-      },
       inlineDynamicImports: true,
       name: "capacitorCapacitorMusicKit",
       sourcemap: true,
