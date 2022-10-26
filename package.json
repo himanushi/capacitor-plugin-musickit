@@ -67,11 +67,6 @@
   "peerDependencies": {
     "@capacitor/core": "^4.0.0"
   },
-  "swiftlint": "@ionic/swiftlint-config",
-  "eslintConfig": {
-    "extends": "@ionic/eslint-config/recommended"
-  },
-  "type": "module",
   "capacitor": {
     "ios": {
       "src": "ios"
