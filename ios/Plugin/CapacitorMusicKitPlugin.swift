@@ -257,6 +257,33 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         }
     }
 
+    @objc func getLibraryArtists(_ call: CAPPluginCall) {
+        let limit = call.getInt("limit") ?? 1
+        let offset = call.getInt("offset") ?? 0
+        let ids = call.getArray("ids", String.self)
+
+        let optAlbumId = call.getString("albumId")
+        let optSongId = call.getString("songId")
+        let optMusicVideoId = call.getString("musicVideoId")
+
+        Task {
+            var url = "/v1/me/library/artists"
+            let params = buildParams(ids, limit, offset)
+
+            if let albumId = optAlbumId {
+                url = "/v1/me/library/albums/\(albumId)/artists"
+            } else if let songId = optSongId {
+                url = "/v1/me/library/songs/\(songId)/artists"
+            } else if let musicVideoId = optMusicVideoId {
+                url = "/v1/me/library/music-videos/\(musicVideoId)/artists"
+            }
+
+            url = "\(url)\(params)"
+            let json = await getDataRequestJSON(url)
+            call.resolve(json)
+        }
+    }
+
     @objc func getLibraryAlbums(_ call: CAPPluginCall) {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
