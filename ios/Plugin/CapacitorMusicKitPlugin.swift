@@ -94,12 +94,16 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         return ISO8601DateFormatter().string(from: date)
     }
 
-    func toMediaItem(_ item: MusicKit.MusicPlayer.Queue.Entry.Item?, _ size: Int) async -> [String:
-        Any?]?
-    {
+    func toMediaItem(
+        item: MusicKit.MusicPlayer.Queue.Entry.Item?, artworkUrl optArtworkUrl: String? = nil,
+        size optSize: Int? = nil
+    ) async -> [String: Any?]? {
         switch item {
         case let .song(song):
-            let artworkUrl = await toBase64Image(song.artwork, size)
+            var artworkUrl: String? = optArtworkUrl
+            if let size = optSize {
+                artworkUrl = await toBase64Image(song.artwork, size)
+            }
             return [
                 "albumInfo": song.albumTitle,
                 "albumName": song.albumTitle,
@@ -130,14 +134,18 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     func queueSongs() async -> [[String: Any?]] {
         var songs: [[String: Any?]?] = []
+        var count = 0
         for entry in ApplicationMusicPlayer.shared.queue.entries {
-            songs.append(await toMediaItem(entry.item, sSize))
+            let artwrokUrl = await toBase64Image(preQueueSongs[count].artwork, sSize)
+            songs.append(await toMediaItem(item: entry.item, artworkUrl: artwrokUrl))
+            count += 1
         }
         return songs.compactMap { $0 }
     }
 
     func currentSong() async -> [String: Any?]? {
-        return await toMediaItem(ApplicationMusicPlayer.shared.queue.currentEntry?.item, lSize)
+        return await toMediaItem(
+            item: ApplicationMusicPlayer.shared.queue.currentEntry?.item, size: lSize)
     }
 
     func buildParams(_ optIds: [String]?, _ optLimit: Int?, _ optOffset: Int?) -> String {
