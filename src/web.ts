@@ -31,6 +31,7 @@ import type {
   SetRepeatModeOptions,
   GetLibrarySongsOptions,
   GetLibraryPlaylistsOptions,
+  SetQueueResult,
 } from "./definitions";
 
 export class CapacitorMusicKitWeb
@@ -316,11 +317,11 @@ export class CapacitorMusicKitWeb
     return { result: true };
   }
 
-  async setQueue (options: SetQueueOptions): Promise<ActionResult> {
+  async setQueue (options: SetQueueOptions): Promise<SetQueueResult> {
     await MusicKit.getInstance().setQueue({
       songs: options.ids,
     });
-    return { result: true };
+    return { items: MusicKit.getInstance().queue.items };
   }
 
   async play (options: PlayOptions): Promise<ActionResult> {

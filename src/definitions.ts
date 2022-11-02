@@ -103,6 +103,10 @@ export interface SetQueueOptions {
   ids: string[];
 }
 
+export interface SetQueueResult {
+  items: MusicKit.MediaItem[];
+}
+
 export interface PlayOptions {
   index?: number;
 }
@@ -188,7 +192,7 @@ export interface CapacitorMusicKitPlugin {
   play(options: PlayOptions): Promise<ActionResult>;
   previousPlay(): Promise<ActionResult>;
   seekToTime(options: SeekToTimeOptions): Promise<ActionResult>;
-  setQueue(options: SetQueueOptions): Promise<ActionResult>;
+  setQueue(options: SetQueueOptions): Promise<SetQueueResult>;
   setRepeatMode(options: SetRepeatModeOptions): Promise<ActionResult>;
   stop(): Promise<ActionResult>;
   unauthorize(): Promise<void>;

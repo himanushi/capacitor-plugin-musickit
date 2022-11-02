@@ -12,12 +12,22 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     let storefront = "jp"
     let player = MPMusicPlayerController.applicationMusicPlayer
     var preQueueSongs: [Song] = []
+    var previewPlayer: AVQueuePlayer? = nil
 
     let sSize = 200
     let mSize = 400
     let lSize = 600
 
     override public func load() {
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(
+                .playback, mode: .default, options: [.mixWithOthers])
+            try audioSession.setActive(true)
+        } catch {
+            print(error)
+        }
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(self.playbackStateDidChange),
@@ -395,6 +405,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         let ids: [String] = call.getArray("ids", String.self) ?? []
 
         Task {
+            previewPlayer = nil
             var requestLibrary = MusicLibraryRequest<Song>()
             requestLibrary.filter(matching: \.id, memberOf: ids.map { MusicItemID($0) })
             let responseLibrary = try await requestLibrary.response()
@@ -424,8 +435,15 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
                 }
             }
             ApplicationMusicPlayer.shared.queue = .init(for: songs)
-            try await ApplicationMusicPlayer.shared.prepareToPlay()
             preQueueSongs = songs
+            do {
+                try await ApplicationMusicPlayer.shared.prepareToPlay()
+            } catch {
+                ApplicationMusicPlayer.shared.queue = []
+                let urls = preQueueSongs.map { $0.previewAssets?.first?.url }.compactMap { $0 }
+                let playerItems = urls.map { AVPlayerItem(url: $0) }
+                previewPlayer = AVQueuePlayer(items: playerItems)
+            }
             call.resolve(["result": true])
         }
     }
@@ -435,39 +453,52 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
         Task {
             var result = false
-            do {
-                if let startIndex = index {
-                    // Use preQueueSongs because there is no data in the ApplicationMusicPlayer.shared.queue before playback.
-                    let songs = preQueueSongs
-                    let trackIndex = songs.count > startIndex ? startIndex : songs.count
-                    ApplicationMusicPlayer.shared.queue = .init(
-                        for: songs, startingAt: songs[trackIndex])
 
-                    // Await prepare
-                    for time in [1, 1, 1] {
-                        sleep(UInt32(time))
-                        try await ApplicationMusicPlayer.shared.prepareToPlay()
-                        if ApplicationMusicPlayer.shared.isPreparedToPlay {
-                            try await ApplicationMusicPlayer.shared.play()
-                            result = true
-                            break
-                        }
-                    }
-                } else {
+            if let pPlayer = previewPlayer {
+                await pPlayer.play()
+                notifyListeners("playbackStateDidChange", data: ["state": "playing"])
+                call.resolve(["result": true])
+                return
+            }
 
-                    // Await prepare
-                    for time in [0, 1, 1] {
-                        sleep(UInt32(time))
-                        if ApplicationMusicPlayer.shared.isPreparedToPlay {
-                            try await ApplicationMusicPlayer.shared.play()
-                            result = true
-                            break
-                        }
+            if let startIndex = index {
+                // Use preQueueSongs because there is no data in the ApplicationMusicPlayer.shared.queue before playback.
+                let songs = preQueueSongs
+
+                guard songs.count > 0 else {
+                    call.resolve(["result": result])
+                    return
+                }
+
+                let trackIndex = songs.count > startIndex ? startIndex : songs.count
+                ApplicationMusicPlayer.shared.queue = .init(
+                    for: songs,
+                    startingAt: songs[trackIndex]
+                )
+
+                // Await prepare
+                for time in [1, 1, 1] {
+                    sleep(UInt32(time))
+                    try await ApplicationMusicPlayer.shared.prepareToPlay()
+                    if ApplicationMusicPlayer.shared.isPreparedToPlay {
+                        try await ApplicationMusicPlayer.shared.play()
+                        result = true
+                        break
                     }
                 }
-            } catch {
-                print(error)
+            } else {
+
+                // Await prepare
+                for time in [0, 1, 1] {
+                    sleep(UInt32(time))
+                    if ApplicationMusicPlayer.shared.isPreparedToPlay {
+                        try await ApplicationMusicPlayer.shared.play()
+                        result = true
+                        break
+                    }
+                }
             }
+
             call.resolve(["result": result])
         }
     }
