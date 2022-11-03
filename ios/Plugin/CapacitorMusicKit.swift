@@ -6,6 +6,7 @@ import MusicKit
 @available(iOS 16.0, *)
 @objc public class CapacitorMusicKit: NSObject {
     let musicKitPlayer = MusicKitPlayer()
+    let previewPlayer = PreviewPlayer()
     let storefront = "jp"
     let baseUrl = "https://api.music.apple.com"
     var isPreview = false
@@ -192,55 +193,141 @@ import MusicKit
         return await getDataRequestJSON(url)
     }
 
+    func selectSongs(_ ids: [String]) async throws -> [Song] {
+        var requestLibrary = MusicLibraryRequest<Song>()
+        requestLibrary.filter(matching: \.id, memberOf: ids.map { MusicItemID($0) })
+        let responseLibrary = try await requestLibrary.response()
+
+        let libraryIds = responseLibrary.items.map { $0.id.rawValue }
+        let catalogIds = ids.filter { !libraryIds.contains($0) }
+
+        var responseCatalog: MusicCatalogResourceResponse<Song>? = nil
+        if catalogIds.count > 0 {
+            let requestCatalog = MusicCatalogResourceRequest<Song>(
+                matching: \.id, memberOf: catalogIds.map { MusicItemID($0) })
+            responseCatalog = try await requestCatalog.response()
+        }
+
+        // sort songs
+        var songs: [Song] = []
+        ids.forEach { id in
+            let libraryItem = responseLibrary.items.first(where: { $0.id.rawValue == id })
+            if let track = libraryItem {
+                songs.append(track)
+            }
+
+            if let catalog = responseCatalog {
+                if let track = catalog.items.first(where: { $0.id.rawValue == id }) {
+                    songs.append(track)
+                }
+            }
+        }
+
+        return songs
+    }
+
     func queueSongs() async -> [[String: Any?]] {
-        return await musicKitPlayer.queueSongs()
+        if isPreview {
+            return await previewPlayer.queueSongs()
+        } else {
+            return await musicKitPlayer.queueSongs()
+        }
     }
 
     func currentSong() async -> [String: Any?]? {
-        return await musicKitPlayer.currentSong()
+        if isPreview {
+            return await previewPlayer.currentSong()
+        } else {
+            return await musicKitPlayer.currentSong()
+        }
     }
 
     @objc func getCurrentIndex() -> Int {
-        return musicKitPlayer.getCurrentIndex()
+        if isPreview {
+            return previewPlayer.getCurrentIndex()
+        } else {
+            return musicKitPlayer.getCurrentIndex()
+        }
     }
 
     @objc func getCurrentPlaybackTime() -> Double {
-        return musicKitPlayer.getCurrentPlaybackTime()
+        if isPreview {
+            return previewPlayer.getCurrentPlaybackTime()
+        } else {
+            return musicKitPlayer.getCurrentPlaybackTime()
+        }
     }
 
     @objc func getRepeatMode() -> String {
-        return musicKitPlayer.getRepeatMode()
+        if isPreview {
+            return previewPlayer.getRepeatMode()
+        } else {
+            return musicKitPlayer.getRepeatMode()
+        }
     }
 
     @objc func setRepeatMode(_ call: CAPPluginCall) {
         musicKitPlayer.setRepeatMode(call)
+        previewPlayer.setRepeatMode(call)
     }
 
     @objc func setQueue(_ call: CAPPluginCall) async throws {
-        try await musicKitPlayer.setQueue(call)
+        let ids: [String] = call.getArray("ids", String.self) ?? []
+        isPreview = false
+        let songs = try await selectSongs(ids)
+        do {
+            try await musicKitPlayer.setQueue(songs)
+        } catch {
+            isPreview = true
+            try await previewPlayer.setQueue(songs)
+        }
     }
 
     @objc func play(_ call: CAPPluginCall) async throws {
-        try await musicKitPlayer.play(call)
+        if isPreview {
+            try await previewPlayer.play(call)
+        } else {
+            try await musicKitPlayer.play(call)
+        }
     }
 
     @objc func pause() {
-        musicKitPlayer.pause()
+        if isPreview {
+            previewPlayer.pause()
+        } else {
+            musicKitPlayer.pause()
+        }
     }
 
     @objc func stop() {
-        musicKitPlayer.stop()
+        if isPreview {
+            previewPlayer.stop()
+        } else {
+            musicKitPlayer.stop()
+        }
     }
 
     @objc func nextPlay() async throws {
-        try await musicKitPlayer.nextPlay()
+        if isPreview {
+            try await previewPlayer.nextPlay()
+        } else {
+            try await musicKitPlayer.nextPlay()
+        }
     }
 
     @objc func previousPlay() async throws {
-        try await musicKitPlayer.previousPlay()
+        if isPreview {
+            try await previewPlayer.previousPlay()
+        } else {
+            try await musicKitPlayer.previousPlay()
+        }
     }
 
     @objc func seekToTime(_ call: CAPPluginCall) {
-        musicKitPlayer.seekToTime(call)
+        if isPreview {
+            previewPlayer.seekToTime(call)
+        } else {
+            musicKitPlayer.seekToTime(call)
+        }
     }
 }

@@ -4,7 +4,7 @@ import MediaPlayer
 import MusicKit
 
 @available(iOS 16.0, *)
-@objc public class MusicKitPlayer: NSObject {
+@objc public class PreviewPlayer: NSObject {
     let player = MPMusicPlayerController.applicationMusicPlayer
     var preQueueSongs: [Song] = []
     var previewPlayer: AVQueuePlayer? = nil
@@ -135,42 +135,18 @@ import MusicKit
     }
 
     func setQueue(_ songs: [Song]) async throws {
-        ApplicationMusicPlayer.shared.queue = .init(for: songs)
-        preQueueSongs = songs
-        try await ApplicationMusicPlayer.shared.prepareToPlay()
+        let urls = songs.map { $0.previewAssets?.first?.url }.compactMap { $0 }
+        let playerItems = urls.map { AVPlayerItem(url: $0) }
+        previewPlayer = AVQueuePlayer(items: playerItems)
     }
 
     @objc func play(_ call: CAPPluginCall) async throws {
         let index = call.getInt("index")
 
-        if let startIndex = index {
-            // Use preQueueSongs because there is no data in the ApplicationMusicPlayer.shared.queue before playback.
-            let songs = preQueueSongs
-            let trackIndex = songs.count > startIndex ? startIndex : songs.count
-            ApplicationMusicPlayer.shared.queue = .init(
-                for: songs,
-                startingAt: songs[trackIndex]
-            )
-
-            // Await prepare
-            for time in [1, 1, 1] {
-                sleep(UInt32(time))
-                try await ApplicationMusicPlayer.shared.prepareToPlay()
-                if ApplicationMusicPlayer.shared.isPreparedToPlay {
-                    try await ApplicationMusicPlayer.shared.play()
-                    break
-                }
-            }
-        } else {
-
-            // Await prepare
-            for time in [0, 1, 1] {
-                sleep(UInt32(time))
-                if ApplicationMusicPlayer.shared.isPreparedToPlay {
-                    try await ApplicationMusicPlayer.shared.play()
-                    break
-                }
-            }
+        if let pPlayer = previewPlayer {
+            await pPlayer.play()
+            call.resolve(["result": true])
+            return
         }
     }
 
