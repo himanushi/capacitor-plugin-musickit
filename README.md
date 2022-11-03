@@ -385,14 +385,14 @@ seekToTime(options: SeekToTimeOptions) => Promise<ActionResult>
 ### setQueue(...)
 
 ```typescript
-setQueue(options: SetQueueOptions) => Promise<ActionResult>
+setQueue(options: SetQueueOptions) => Promise<SetQueueResult>
 ```
 
 | Param         | Type                                                        |
 | ------------- | ----------------------------------------------------------- |
 | **`options`** | <code><a href="#setqueueoptions">SetQueueOptions</a></code> |
 
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#setqueueresult">SetQueueResult</a>&gt;</code>
 
 --------------------
 
@@ -526,6 +526,13 @@ unauthorize() => Promise<void>
 | Prop       | Type                |
 | ---------- | ------------------- |
 | **`time`** | <code>number</code> |
+
+
+#### SetQueueResult
+
+| Prop        | Type                     |
+| ----------- | ------------------------ |
+| **`items`** | <code>MediaItem[]</code> |
 
 
 #### SetQueueOptions
