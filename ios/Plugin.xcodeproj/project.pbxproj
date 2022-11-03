@@ -10,6 +10,7 @@
 		03FC29A292ACC40490383A1F /* Pods_Plugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B2A61DA5A1F2DD4F959604D /* Pods_Plugin.framework */; };
 		20C0B05DCFC8E3958A738AF2 /* Pods_PluginTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6753A823D3815DB436415E3 /* Pods_PluginTests.framework */; };
 		3A31483629131F9B0020B993 /* CapacitorMusicKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A31483529131F9B0020B993 /* CapacitorMusicKit.swift */; };
+		3A31483C291337C40020B993 /* MusicKitPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A31483B291337C40020B993 /* MusicKitPlayer.swift */; };
 		50ADFF92201F53D600D50D53 /* Plugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50ADFF88201F53D600D50D53 /* Plugin.framework */; };
 		50ADFF97201F53D600D50D53 /* CapacitorMusicKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ADFF96201F53D600D50D53 /* CapacitorMusicKitTests.swift */; };
 		50ADFF99201F53D600D50D53 /* CapacitorMusicKitPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 50ADFF8B201F53D600D50D53 /* CapacitorMusicKitPlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -30,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		3A31483529131F9B0020B993 /* CapacitorMusicKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapacitorMusicKit.swift; sourceTree = "<group>"; };
+		3A31483B291337C40020B993 /* MusicKitPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitPlayer.swift; sourceTree = "<group>"; };
 		3B2A61DA5A1F2DD4F959604D /* Pods_Plugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Plugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50ADFF88201F53D600D50D53 /* Plugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50ADFF8B201F53D600D50D53 /* CapacitorMusicKitPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CapacitorMusicKitPlugin.h; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 				50E1A94720377CB70090CE1A /* CapacitorMusicKitPlugin.swift */,
 				50ADFF8B201F53D600D50D53 /* CapacitorMusicKitPlugin.h */,
 				3A31483529131F9B0020B993 /* CapacitorMusicKit.swift */,
+				3A31483B291337C40020B993 /* MusicKitPlayer.swift */,
 				50ADFFA72020EE4F00D50D53 /* CapacitorMusicKitPlugin.m */,
 				50ADFF8C201F53D600D50D53 /* Info.plist */,
 			);
@@ -307,6 +310,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50E1A94820377CB70090CE1A /* CapacitorMusicKitPlugin.swift in Sources */,
+				3A31483C291337C40020B993 /* MusicKitPlayer.swift in Sources */,
 				50ADFFA82020EE4F00D50D53 /* CapacitorMusicKitPlugin.m in Sources */,
 				3A31483629131F9B0020B993 /* CapacitorMusicKit.swift in Sources */,
 			);
