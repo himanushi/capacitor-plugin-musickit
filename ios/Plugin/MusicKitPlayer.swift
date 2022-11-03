@@ -5,8 +5,6 @@ import MusicKit
 
 @available(iOS 16.0, *)
 @objc public class MusicKitPlayer: NSObject {
-    let baseUrl = "https://api.music.apple.com"
-    let storefront = "jp"
     let player = MPMusicPlayerController.applicationMusicPlayer
     var preQueueSongs: [Song] = []
     var previewPlayer: AVQueuePlayer? = nil
@@ -74,33 +72,6 @@ import MusicKit
     func currentSong() async -> [String: Any?]? {
         return await toMediaItem(
             item: ApplicationMusicPlayer.shared.queue.currentEntry?.item, size: lSize)
-    }
-
-    func buildParams(_ optIds: [String]?, _ optLimit: Int?, _ optOffset: Int?) -> String {
-        var params = ""
-        if let ids = optIds {
-            params = "?ids=\(ids.joined(separator: "%2C"))"
-        } else {
-            if let limit = optLimit {
-                params = "?limit=\(limit)&"
-            }
-            if let offset = optOffset {
-                params += "offset=\(offset)&"
-            }
-        }
-        return params
-    }
-
-    func getDataRequestJSON(_ url: String) async -> [String: Any] {
-        do {
-            guard let url = URL(string: "\(baseUrl)\(url)") else {
-                return [:]
-            }
-            let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response().data
-            return try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-        } catch {
-            return [:]
-        }
     }
 
     func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {

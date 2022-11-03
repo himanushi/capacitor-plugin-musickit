@@ -6,7 +6,10 @@ import MusicKit
 @available(iOS 16.0, *)
 @objc public class CapacitorMusicKit: NSObject {
     let musicKitPlayer = MusicKitPlayer()
+    let storefront = "jp"
+    let baseUrl = "https://api.music.apple.com"
     var isPreview = false
+    let player = MPMusicPlayerController.applicationMusicPlayer
 
     @objc public func playbackStateDidChange() -> String? {
         var result: String? = nil
@@ -87,6 +90,33 @@ import MusicKit
         await UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
     }
 
+    func buildParams(_ optIds: [String]?, _ optLimit: Int?, _ optOffset: Int?) -> String {
+        var params = ""
+        if let ids = optIds {
+            params = "?ids=\(ids.joined(separator: "%2C"))"
+        } else {
+            if let limit = optLimit {
+                params = "?limit=\(limit)&"
+            }
+            if let offset = optOffset {
+                params += "offset=\(offset)&"
+            }
+        }
+        return params
+    }
+
+    func getDataRequestJSON(_ url: String) async -> [String: Any] {
+        do {
+            guard let url = URL(string: "\(baseUrl)\(url)") else {
+                return [:]
+            }
+            let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response().data
+            return try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+        } catch {
+            return [:]
+        }
+    }
+
     @objc func getLibraryArtists(_ call: CAPPluginCall) async -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
@@ -162,6 +192,14 @@ import MusicKit
         return await getDataRequestJSON(url)
     }
 
+    func queueSongs() async -> [[String: Any?]] {
+        return await musicKitPlayer.queueSongs()
+    }
+
+    func currentSong() async -> [String: Any?]? {
+        return await musicKitPlayer.currentSong()
+    }
+
     @objc func getCurrentIndex() -> Int {
         return musicKitPlayer.getCurrentIndex()
     }
@@ -179,11 +217,11 @@ import MusicKit
     }
 
     @objc func setQueue(_ call: CAPPluginCall) async throws {
-        musicKitPlayer.setQueue(call)
+        try await musicKitPlayer.setQueue(call)
     }
 
     @objc func play(_ call: CAPPluginCall) async throws {
-        musicKitPlayer.play(call)
+        try await musicKitPlayer.play(call)
     }
 
     @objc func pause() {
@@ -195,11 +233,11 @@ import MusicKit
     }
 
     @objc func nextPlay() async throws {
-        musicKitPlayer.nextPlay()
+        try await musicKitPlayer.nextPlay()
     }
 
     @objc func previousPlay() async throws {
-        musicKitPlayer.previousPlay()
+        try await musicKitPlayer.previousPlay()
     }
 
     @objc func seekToTime(_ call: CAPPluginCall) {
