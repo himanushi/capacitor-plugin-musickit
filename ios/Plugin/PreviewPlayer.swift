@@ -25,41 +25,41 @@ import MusicKit
         item optSong: Song?, artworkUrl optArtworkUrl: String? = nil,
         size optSize: Int? = nil
     ) async -> [String: Any?]? {
-        guard let song = optSong else{
+        guard let song = optSong else {
             return nil
         }
 
-            var artworkUrl: String? = optArtworkUrl
-            if let size = optSize {
-                artworkUrl = await toBase64Image(song.artwork, size)
-            }
-            
+        var artworkUrl: String? = optArtworkUrl
+        if let size = optSize {
+            artworkUrl = await toBase64Image(song.artwork, size)
+        }
+
         let duration = Double(song.duration ?? 0) * 1000
-        
-            return [
-                "albumInfo": song.albumTitle,
-                "albumName": song.albumTitle,
-                "artistName": song.artistName,
-                "artwork": ["url": artworkUrl],
-                "artworkURL": artworkUrl,
-                "attributes": nil,
-                "contentRating": song.contentRating == .clean ? "clean" : "explicit",
-                "discNumber": song.discNumber,
-                "id": song.id.rawValue,
-                "info": song.title,
-                "isExplicitItem": song.contentRating == .explicit,
-                "isPlayable": true,
-                "isPreparedToPlay": nil,
-                "isrc": song.isrc,
-                "playbackDuration": duration > 30000 ? 30000 : duration,
-                "playlistArtworkURL": artworkUrl,
-                "playlistName": song.albumTitle,
-                "previewURL": nil,
-                "releaseDate": formatISOString(song.releaseDate),
-                "title": song.title,
-                "trackNumber": song.trackNumber,
-                "type": "songs",
-            ]
+
+        return [
+            "albumInfo": song.albumTitle,
+            "albumName": song.albumTitle,
+            "artistName": song.artistName,
+            "artwork": ["url": artworkUrl],
+            "artworkURL": artworkUrl,
+            "attributes": nil,
+            "contentRating": song.contentRating == .clean ? "clean" : "explicit",
+            "discNumber": song.discNumber,
+            "id": song.id.rawValue,
+            "info": song.title,
+            "isExplicitItem": song.contentRating == .explicit,
+            "isPlayable": true,
+            "isPreparedToPlay": nil,
+            "isrc": song.isrc,
+            "playbackDuration": duration > 30000 ? 30000 : duration,
+            "playlistArtworkURL": artworkUrl,
+            "playlistName": song.albumTitle,
+            "previewURL": nil,
+            "releaseDate": formatISOString(song.releaseDate),
+            "title": song.title,
+            "trackNumber": song.trackNumber,
+            "type": "songs",
+        ]
     }
 
     func queueSongs() async -> [[String: Any?]] {
@@ -67,7 +67,7 @@ import MusicKit
         var count = 0
         for song in preQueueSongs {
             let artwrokUrl = await toBase64Image(song.artwork, sSize)
-            songs.append(await toMediaItem(item:song, artworkUrl: artwrokUrl))
+            songs.append(await toMediaItem(item: song, artworkUrl: artwrokUrl))
             count += 1
         }
         return songs.compactMap { $0 }
