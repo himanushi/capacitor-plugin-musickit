@@ -11,6 +11,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     private let musicKit = CapacitorMusicKit()
 
     override public func load() {
+        musicKit.notifyListeners = notifyListeners
         let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(
@@ -38,10 +39,6 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             name: UIApplication.didBecomeActiveNotification,
             object: nil
         )
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
 
     @objc private func playbackStateDidChange() {
@@ -152,9 +149,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     @objc func play(_ call: CAPPluginCall) {
         Task {
-            if let state = try await musicKit.play(call) {
-                notifyListeners("playbackStateDidChange", data: ["state": state])
-            }
+            try await musicKit.play(call)
             call.resolve(["result": true])
         }
     }

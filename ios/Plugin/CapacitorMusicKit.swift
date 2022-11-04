@@ -3,6 +3,8 @@ import Foundation
 import MediaPlayer
 import MusicKit
 
+typealias NotifyListeners = ((String, [String: Any]?) -> Void)
+
 @available(iOS 16.0, *)
 @objc public class CapacitorMusicKit: NSObject {
     let musicKitPlayer = MusicKitPlayer()
@@ -11,9 +13,19 @@ import MusicKit
     let baseUrl = "https://api.music.apple.com"
     var isPreview = false
     let player = MPMusicPlayerController.applicationMusicPlayer
+    var notifyListeners: NotifyListeners?
+
+    func load() {
+        musicKitPlayer.notifyListeners = notifyListeners
+        previewPlayer.notifyListeners = notifyListeners
+    }
 
     @objc public func playbackStateDidChange() -> String? {
         var result: String? = nil
+
+        if isPreview {
+            return result
+        }
 
         if player.playbackState == .playing {
             result = "playing"
@@ -26,9 +38,10 @@ import MusicKit
         }
 
         return result
+
     }
 
-    @objc public func nowPlayingItemDidChange() async -> [String: Any]? {
+    @objc public func nowPlayingItemDidChange() async -> [String: Any] {
         return ["item": await currentSong() as Any, "index": player.indexOfNowPlayingItem]
     }
 
@@ -47,6 +60,7 @@ import MusicKit
         }
 
         return result
+
     }
 
     @objc func isAuthorized() -> Bool {
@@ -283,13 +297,14 @@ import MusicKit
         }
     }
 
-    @objc func play(_ call: CAPPluginCall) async throws -> String? {
+    @objc func play(_ call: CAPPluginCall) async throws {
         if isPreview {
+            musicKitPlayer.pause()
             try await previewPlayer.play(call)
-            return "playing"
+            notifyListeners!("playbackStateDidChange", ["state": "playing"])
         } else {
+            previewPlayer.pause()
             try await musicKitPlayer.play(call)
-            return nil
         }
     }
 

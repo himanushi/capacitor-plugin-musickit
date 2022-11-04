@@ -7,6 +7,7 @@ import MusicKit
 @objc public class MusicKitPlayer: NSObject {
     let player = MPMusicPlayerController.applicationMusicPlayer
     var preQueueSongs: [Song] = []
+    var notifyListeners: NotifyListeners?
 
     let sSize = 200
     let mSize = 400

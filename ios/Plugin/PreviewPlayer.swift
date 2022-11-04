@@ -9,6 +9,7 @@ import MusicKit
     var preQueueSongs: [Song] = []
     var previewPlayer: AVQueuePlayer? = nil
     var currentIndex = 0
+    var notifyListeners: NotifyListeners?
 
     let sSize = 200
     let mSize = 400
@@ -113,7 +114,10 @@ import MusicKit
     }
 
     @objc func getCurrentPlaybackTime() -> Double {
-        return ApplicationMusicPlayer.shared.playbackTime
+        if let player = previewPlayer {
+            return Double(CMTimeGetSeconds(player.currentTime()))
+        }
+        return 0.0
     }
 
     @objc func getRepeatMode() -> String {
@@ -143,6 +147,11 @@ import MusicKit
         let urls = songs.map { $0.previewAssets?.first?.url }.compactMap { $0 }
         let playerItems = urls.map { AVPlayerItem(url: $0) }
         previewPlayer = AVQueuePlayer(items: playerItems)
+        //        previewPlayer?.addObserver(self, forKeyPath: "currentItem", context: nil)
+        //        previewPlayer!.observe(\.status, options: .new, changeHandler: { object, change in
+        //            // value変更時の処理を記載
+        //            print("変更前の値: \(change.newValue), 変更後の値: \(change.oldValue)")
+        //        })
     }
 
     @objc func play(_ call: CAPPluginCall) async throws {
