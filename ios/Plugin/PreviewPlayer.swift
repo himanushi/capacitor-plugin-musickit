@@ -8,6 +8,7 @@ import MusicKit
     let player = MPMusicPlayerController.applicationMusicPlayer
     var preQueueSongs: [Song] = []
     var previewPlayer: AVQueuePlayer? = nil
+    var currentIndex = 0
 
     let sSize = 200
     let mSize = 400
@@ -21,15 +22,20 @@ import MusicKit
     }
 
     func toMediaItem(
-        item: MusicKit.MusicPlayer.Queue.Entry.Item?, artworkUrl optArtworkUrl: String? = nil,
+        item optSong: Song?, artworkUrl optArtworkUrl: String? = nil,
         size optSize: Int? = nil
     ) async -> [String: Any?]? {
-        switch item {
-        case let .song(song):
+        guard let song = optSong else{
+            return nil
+        }
+
             var artworkUrl: String? = optArtworkUrl
             if let size = optSize {
                 artworkUrl = await toBase64Image(song.artwork, size)
             }
+            
+        let duration = Double(song.duration ?? 0) * 1000
+        
             return [
                 "albumInfo": song.albumTitle,
                 "albumName": song.albumTitle,
@@ -45,33 +51,30 @@ import MusicKit
                 "isPlayable": true,
                 "isPreparedToPlay": nil,
                 "isrc": song.isrc,
-                "playbackDuration": Double(song.duration ?? 0) * 1000,
+                "playbackDuration": duration > 30000 ? 30000 : duration,
                 "playlistArtworkURL": artworkUrl,
                 "playlistName": song.albumTitle,
-                "previewURL": song.previewAssets?.first?.url,
+                "previewURL": nil,
                 "releaseDate": formatISOString(song.releaseDate),
                 "title": song.title,
                 "trackNumber": song.trackNumber,
                 "type": "songs",
             ]
-        default: return nil
-        }
     }
 
     func queueSongs() async -> [[String: Any?]] {
         var songs: [[String: Any?]?] = []
         var count = 0
-        for entry in ApplicationMusicPlayer.shared.queue.entries {
-            let artwrokUrl = await toBase64Image(preQueueSongs[count].artwork, sSize)
-            songs.append(await toMediaItem(item: entry.item, artworkUrl: artwrokUrl))
+        for song in preQueueSongs {
+            let artwrokUrl = await toBase64Image(song.artwork, sSize)
+            songs.append(await toMediaItem(item:song, artworkUrl: artwrokUrl))
             count += 1
         }
         return songs.compactMap { $0 }
     }
 
     func currentSong() async -> [String: Any?]? {
-        return await toMediaItem(
-            item: ApplicationMusicPlayer.shared.queue.currentEntry?.item, size: lSize)
+        return await toMediaItem(item: preQueueSongs[currentIndex], size: lSize)
     }
 
     func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {
@@ -135,16 +138,20 @@ import MusicKit
     }
 
     func setQueue(_ songs: [Song]) async throws {
+        currentIndex = 0
+        preQueueSongs = songs
         let urls = songs.map { $0.previewAssets?.first?.url }.compactMap { $0 }
         let playerItems = urls.map { AVPlayerItem(url: $0) }
         previewPlayer = AVQueuePlayer(items: playerItems)
     }
 
     @objc func play(_ call: CAPPluginCall) async throws {
-        let index = call.getInt("index")
+        let optIndex = call.getInt("index")
 
-        if let pPlayer = previewPlayer {
+        if let pPlayer = previewPlayer, let index = optIndex {
+            currentIndex = index
             await pPlayer.play()
+            pPlayer.advanceToNextItem()
             call.resolve(["result": true])
             return
         }

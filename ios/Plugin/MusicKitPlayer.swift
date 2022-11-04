@@ -7,7 +7,6 @@ import MusicKit
 @objc public class MusicKitPlayer: NSObject {
     let player = MPMusicPlayerController.applicationMusicPlayer
     var preQueueSongs: [Song] = []
-    var previewPlayer: AVQueuePlayer? = nil
 
     let sSize = 200
     let mSize = 400
@@ -135,8 +134,8 @@ import MusicKit
     }
 
     func setQueue(_ songs: [Song]) async throws {
-        ApplicationMusicPlayer.shared.queue = .init(for: songs)
         preQueueSongs = songs
+        ApplicationMusicPlayer.shared.queue = .init(for: songs)
         try await ApplicationMusicPlayer.shared.prepareToPlay()
     }
 

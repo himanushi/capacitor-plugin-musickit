@@ -14,7 +14,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(
-                .playback, mode: .default, options: [.mixWithOthers])
+                .playback, mode: .default, options: [.defaultToSpeaker])
             try audioSession.setActive(true)
         } catch {
             print(error)
@@ -116,7 +116,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     @objc func getCurrentSong(_ call: CAPPluginCall) {
         Task {
-            call.resolve(["item": await musicKit.currentSong()!])
+            call.resolve(["item": await musicKit.currentSong()])
         }
     }
 
@@ -152,7 +152,9 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     @objc func play(_ call: CAPPluginCall) {
         Task {
-            try await musicKit.play(call)
+            if let state = try await musicKit.play(call) {
+                notifyListeners("playbackStateDidChange", data: ["state": state])
+            }
             call.resolve(["result": true])
         }
     }

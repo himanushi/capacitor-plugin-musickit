@@ -283,11 +283,13 @@ import MusicKit
         }
     }
 
-    @objc func play(_ call: CAPPluginCall) async throws {
+    @objc func play(_ call: CAPPluginCall) async throws -> String? {
         if isPreview {
             try await previewPlayer.play(call)
+            return "playing"
         } else {
             try await musicKitPlayer.play(call)
+            return nil
         }
     }
 
