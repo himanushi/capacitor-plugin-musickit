@@ -12,6 +12,8 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     override public func load() {
         musicKit.notifyListeners = notifyListeners
+        musicKit.load()
+
         let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(
@@ -113,7 +115,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     @objc func getCurrentSong(_ call: CAPPluginCall) {
         Task {
-            call.resolve(["item": await musicKit.currentSong()])
+            call.resolve(["item": await musicKit.currentSong() as Any])
         }
     }
 

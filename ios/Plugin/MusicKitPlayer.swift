@@ -13,64 +13,19 @@ import MusicKit
     let mSize = 400
     let lSize = 600
 
-    func formatISOString(_ optDate: Date?) -> String? {
-        guard let date = optDate else {
-            return nil
-        }
-        return ISO8601DateFormatter().string(from: date)
-    }
-
-    func toMediaItem(
-        item: MusicKit.MusicPlayer.Queue.Entry.Item?, artworkUrl optArtworkUrl: String? = nil,
-        size optSize: Int? = nil
-    ) async -> [String: Any?]? {
-        switch item {
-        case let .song(song):
-            var artworkUrl: String? = optArtworkUrl
-            if let size = optSize {
-                artworkUrl = await toBase64Image(song.artwork, size)
-            }
-            return [
-                "albumInfo": song.albumTitle,
-                "albumName": song.albumTitle,
-                "artistName": song.artistName,
-                "artwork": ["url": artworkUrl],
-                "artworkURL": artworkUrl,
-                "attributes": nil,
-                "contentRating": song.contentRating == .clean ? "clean" : "explicit",
-                "discNumber": song.discNumber,
-                "id": song.id.rawValue,
-                "info": song.title,
-                "isExplicitItem": song.contentRating == .explicit,
-                "isPlayable": true,
-                "isPreparedToPlay": nil,
-                "isrc": song.isrc,
-                "playbackDuration": Double(song.duration ?? 0) * 1000,
-                "playlistArtworkURL": artworkUrl,
-                "playlistName": song.albumTitle,
-                "previewURL": song.previewAssets?.first?.url,
-                "releaseDate": formatISOString(song.releaseDate),
-                "title": song.title,
-                "trackNumber": song.trackNumber,
-                "type": "songs",
-            ]
-        default: return nil
-        }
-    }
-
     func queueSongs() async -> [[String: Any?]] {
         var songs: [[String: Any?]?] = []
         var count = 0
         for entry in ApplicationMusicPlayer.shared.queue.entries {
-            let artwrokUrl = await toBase64Image(preQueueSongs[count].artwork, sSize)
-            songs.append(await toMediaItem(item: entry.item, artworkUrl: artwrokUrl))
+            let artwrokUrl = await Convertor.toBase64Image(preQueueSongs[count].artwork, sSize)
+            songs.append(await Convertor.toMediaItem(item: entry.item, artworkUrl: artwrokUrl))
             count += 1
         }
         return songs.compactMap { $0 }
     }
 
     func currentSong() async -> [String: Any?]? {
-        return await toMediaItem(
+        return await Convertor.toMediaItem(
             item: ApplicationMusicPlayer.shared.queue.currentEntry?.item, size: lSize)
     }
 

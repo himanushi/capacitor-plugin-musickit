@@ -10,7 +10,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
     let musicKitPlayer = MusicKitPlayer()
     let previewPlayer = PreviewPlayer()
     let storefront = "jp"
-    let baseUrl = "https://api.music.apple.com"
     var isPreview = false
     let player = MPMusicPlayerController.applicationMusicPlayer
     var notifyListeners: NotifyListeners?
@@ -38,7 +37,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         return result
-
     }
 
     @objc public func nowPlayingItemDidChange() async -> [String: Any] {
@@ -60,7 +58,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         return result
-
     }
 
     @objc func isAuthorized() -> Bool {
@@ -120,18 +117,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         return params
     }
 
-    func getDataRequestJSON(_ url: String) async -> [String: Any] {
-        do {
-            guard let url = URL(string: "\(baseUrl)\(url)") else {
-                return [:]
-            }
-            let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response().data
-            return try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-        } catch {
-            return [:]
-        }
-    }
-
     @objc func getLibraryArtists(_ call: CAPPluginCall) async -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
@@ -153,7 +138,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         url = "\(url)\(params)"
-        return await getDataRequestJSON(url)
+        return await Convertor.getDataRequestJSON(url)
     }
 
     @objc func getLibraryAlbums(_ call: CAPPluginCall) async -> [String: Any] {
@@ -180,7 +165,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         url = "\(url)\(params)"
-        return await getDataRequestJSON(url)
+        return await Convertor.getDataRequestJSON(url)
     }
 
     @objc func getLibrarySongs(_ call: CAPPluginCall) async -> [String: Any] {
@@ -204,7 +189,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         url = "\(url)\(params)"
-        return await getDataRequestJSON(url)
+        return await Convertor.getDataRequestJSON(url)
     }
 
     func selectSongs(_ ids: [String]) async throws -> [Song] {
@@ -236,7 +221,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
                 }
             }
         }
-
         return songs
     }
 
@@ -301,7 +285,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         if isPreview {
             musicKitPlayer.pause()
             try await previewPlayer.play(call)
-            notifyListeners!("playbackStateDidChange", ["state": "playing"])
         } else {
             previewPlayer.pause()
             try await musicKitPlayer.play(call)
