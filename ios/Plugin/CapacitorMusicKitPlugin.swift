@@ -16,9 +16,9 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(
-                .playback, mode: .default, options: [.defaultToSpeaker])
+            try audioSession.setCategory(.playback, mode: .default)
             try audioSession.setActive(true)
+            UIApplication.shared.beginReceivingRemoteControlEvents()
         } catch {
             print(error)
         }

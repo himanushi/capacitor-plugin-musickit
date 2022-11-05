@@ -17,8 +17,8 @@ import MusicKit
         var songs: [[String: Any?]?] = []
         var count = 0
         for entry in ApplicationMusicPlayer.shared.queue.entries {
-            let artwrokUrl = await Convertor.toBase64Image(preQueueSongs[count].artwork, sSize)
-            songs.append(await Convertor.toMediaItem(item: entry.item, artworkUrl: artwrokUrl))
+            let artworkUrl = await Convertor.toBase64Image(preQueueSongs[count].artwork, sSize)
+            songs.append(await Convertor.toMediaItem(item: entry.item, artworkUrl: artworkUrl))
             count += 1
         }
         return songs.compactMap { $0 }

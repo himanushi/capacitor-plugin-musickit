@@ -10,24 +10,39 @@ import MusicKit
     var previewPlayer: AVQueuePlayer? = nil
     var currentIndex = 0
     var notifyListeners: NotifyListeners?
+    var observations = [NSKeyValueObservation]()
 
     let sSize = 200
     let mSize = 400
     let lSize = 600
 
+    func load() {
+        //        let commandCenter = MPRemoteCommandCenter.shared()
+        //        commandCenter.playCommand.addTarget(self, action: "play")
+        //        commandCenter.playCommand.isEnabled = true
+        //        commandCenter.pauseCommand.addTarget(self, action: "pause")
+        //        commandCenter.pauseCommand.isEnabled = true
+        //        commandCenter.skipForwardCommand.addTarget(self, action: "skipForward")
+        //        commandCenter.skipForwardCommand.isEnabled = true
+        //        commandCenter.skipBackwardCommand.addTarget(self, action: "skipBackward")
+        //        commandCenter.skipBackwardCommand.isEnabled = true
+    }
+
     func queueSongs() async -> [[String: Any?]] {
         var songs: [[String: Any?]?] = []
         var count = 0
         for song in preQueueSongs {
-            let artwrokUrl = await toBase64Image(song.artwork, sSize)
-            songs.append(await Convertor.toMediaItem(item: song, artworkUrl: artwrokUrl))
+            let artworkUrl = await toBase64Image(song.artwork, sSize)
+            songs.append(
+                await Convertor.toMediaItem(item: song, artworkUrl: artworkUrl, isPlayable: false))
             count += 1
         }
         return songs.compactMap { $0 }
     }
 
     func currentSong() async -> [String: Any?]? {
-        return await Convertor.toMediaItem(item: preQueueSongs[currentIndex], size: lSize)
+        return await Convertor.toMediaItem(
+            item: preQueueSongs[currentIndex], size: lSize, isPlayable: false)
     }
 
     func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {
@@ -99,14 +114,76 @@ import MusicKit
         let urls = songs.map { $0.previewAssets?.first?.url }.compactMap { $0 }
         let playerItems = urls.map { AVPlayerItem(url: $0) }
         previewPlayer = AVQueuePlayer(items: playerItems)
+        previewPlayer!.observe(
+            \.timeControlStatus, options: .new,
+            changeHandler: { object, change in
+                print("change")
+            })
+        //        previewPlayer!.observe(\.currentItem, options: [.new]) {
+        //                [weak self] (player, _) in
+        //                print("media item changed...")
+        //            }
+        //        previewPlayer!.currentItem?.observe(\.status, options: [.initial,.new]) {
+        //            [weak self] (_, _) in
+        //            print("status...-----------------")
+        //        }
+        //        previewPlayer!.publisher(for: \.currentItem).sink { item in
+        //            print("changeeeeeeeeeeee")
+        //        }
+        print("init----------------")
+    }
+
+    func initNowPlayingItemDidChange(
+        object: AVQueuePlayer, didChangeItem value: NSKeyValueObservedChange<AVPlayerItem?>
+    ) {
+        Task {
+            //            currentIndex = currentIndex + 1
+            print("^------------------------^")
+            print(preQueueSongs.count)
+            print(object.items().count)
+            notifyListeners!(
+                "nowPlayingItemDidChange",
+                ["item": await currentSong() as Any, "index": currentIndex])
+        }
+    }
+
+    func nowPlayingItemDidChange(
+        object: AVQueuePlayer, didChangeItem value: NSKeyValueObservedChange<AVPlayerItem?>
+    ) {
+        Task {
+            currentIndex = currentIndex + 1
+            print("^------------------------^")
+            print(preQueueSongs.count)
+            print(object.items().count)
+            notifyListeners!(
+                "nowPlayingItemDidChange",
+                ["item": await currentSong() as Any, "index": currentIndex])
+        }
+    }
+
+    func setNowPlayingInfo() async {
+        let song = preQueueSongs[currentIndex]
+        var nowPlayingInfo = [String: Any]()
+        let duration = song.duration ?? 0.0
+        nowPlayingInfo[MPMediaItemPropertyTitle] = song.title
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = song.albumTitle
+        nowPlayingInfo[MPMediaItemPropertyArtist] = song.artistName
+        nowPlayingInfo[MPMediaItemPropertyArtwork] = await Convertor.toMPMediaItemArtwork(
+            song.artwork, lSize)
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration > 30 ? 30 : duration
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
 
     @objc func play(_ call: CAPPluginCall) async throws {
         let optIndex = call.getInt("index")
 
-        if let pPlayer = previewPlayer, let index = optIndex {
-            currentIndex = index
+        if let pPlayer = previewPlayer {
+            if let index = optIndex {
+                currentIndex = index
+            }
             await pPlayer.play()
+            await setNowPlayingInfo()
+            MPNowPlayingInfoCenter.default().playbackState = .playing
             notifyListeners!("playbackStateDidChange", ["state": "playing"])
             call.resolve(["result": true])
             return
@@ -114,16 +191,29 @@ import MusicKit
     }
 
     @objc func pause() {
-        ApplicationMusicPlayer.shared.pause()
+        if let pPlayer = previewPlayer {
+            pPlayer.pause()
+            MPNowPlayingInfoCenter.default().playbackState = .paused
+            notifyListeners!("playbackStateDidChange", ["state": "paused"])
+        }
     }
 
     @objc func stop() {
-
-        ApplicationMusicPlayer.shared.stop()
+        if let pPlayer = previewPlayer {
+            pPlayer.pause()
+            MPNowPlayingInfoCenter.default().playbackState = .stopped
+            notifyListeners!("playbackStateDidChange", ["state": "stopped"])
+        }
     }
 
     @objc func nextPlay() async throws {
-        try await ApplicationMusicPlayer.shared.skipToNextEntry()
+        if let pPlayer = previewPlayer {
+            currentIndex = currentIndex + 1
+            pPlayer.advanceToNextItem()
+            notifyListeners!(
+                "nowPlayingItemDidChange",
+                ["item": await currentSong() as Any, "index": currentIndex])
+        }
     }
 
     @objc func previousPlay() async throws {

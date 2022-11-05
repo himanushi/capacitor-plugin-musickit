@@ -50,7 +50,8 @@ class Convertor {
     static func toMediaItem(
         item optSong: Song?,
         artworkUrl optArtworkUrl: String? = nil,
-        size optSize: Int? = nil
+        size optSize: Int? = nil,
+        isPlayable: Bool = true
     ) async -> [String: Any?]? {
         guard let song = optSong else {
             return nil
@@ -62,7 +63,6 @@ class Convertor {
         }
 
         let duration = Double(song.duration ?? 0) * 1000
-        let isPlayable = isPlayable(song)
         var playbackDuration = 0.0
         if isPlayable {
             playbackDuration = duration
@@ -107,6 +107,28 @@ class Convertor {
     }
 
     static func toBase64Image(_ artwork: Artwork?, _ size: Int) async -> String? {
+        let image = await toImage(artwork, size)
+        if let imageData = image?.jpegData(compressionQuality: 0.1) {
+            return imageData.base64EncodedString()
+        }
+
+        return nil
+    }
+
+    static func toMPMediaItemArtwork(_ artwork: Artwork?, _ size: Int) async -> MPMediaItemArtwork?
+    {
+        let image = await toImage(artwork, size)
+        if let imageData = image {
+            return MPMediaItemArtwork(
+                boundsSize: CGSize(width: size, height: size),
+                requestHandler: { _ in
+                    return imageData
+                })
+        }
+        return nil
+    }
+
+    static func toImage(_ artwork: Artwork?, _ size: Int) async -> UIImage? {
         do {
             guard let url = artwork?.url(width: size, height: size) else {
                 return nil
@@ -117,13 +139,9 @@ class Convertor {
             guard let image = UIImage(data: data) else {
                 return nil
             }
-
-            if let imageData = image.jpegData(compressionQuality: 0.1) {
-                return imageData.base64EncodedString()
-            }
+            return image
         } catch {
             return nil
         }
-        return nil
     }
 }
