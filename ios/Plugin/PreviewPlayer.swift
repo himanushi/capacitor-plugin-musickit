@@ -58,7 +58,8 @@ import MusicKit
         context: UnsafeMutableRawPointer?
     ) {
         if keyPath == "currentItem" {
-            if change?[NSKeyValueChangeKey.newKey] == nil {
+            guard change?[NSKeyValueChangeKey.newKey] is AVPlayerItem else {
+                notifyListeners!("playbackStateDidChange", ["state": "paused"])
                 return
             }
             if change?[NSKeyValueChangeKey.oldKey] != nil {
