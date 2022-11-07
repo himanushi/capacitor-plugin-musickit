@@ -1,6 +1,6 @@
 {
   "name": "capacitor-plugin-musickit",
-  "version": "0.0.55",
+  "version": "0.0.56",
   "description": "Requires iOS 16 or higher",
   "main": "dist/plugin.cjs.js",
   "module": "dist/index.js",
