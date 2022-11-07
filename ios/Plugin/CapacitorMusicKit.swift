@@ -17,6 +17,60 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
     func load() {
         musicKitPlayer.notifyListeners = notifyListeners
         previewPlayer.notifyListeners = notifyListeners
+
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.togglePlayPauseCommand.addTarget {
+            (commandEvent) -> MPRemoteCommandHandlerStatus in
+            Task {
+                if self.isPreview {
+                    try await self.previewPlayer.playOrPause()
+                }
+            }
+            return MPRemoteCommandHandlerStatus.success
+        }
+        commandCenter.nextTrackCommand.addTarget { (commandEvent) -> MPRemoteCommandHandlerStatus in
+            Task {
+                if self.isPreview {
+                    try await self.previewPlayer.nextPlay()
+                }
+            }
+            return MPRemoteCommandHandlerStatus.success
+        }
+        commandCenter.previousTrackCommand.addTarget {
+            (commandEvent) -> MPRemoteCommandHandlerStatus in
+            Task {
+                if self.isPreview {
+                    try await self.previewPlayer.previousPlay()
+                }
+            }
+            return MPRemoteCommandHandlerStatus.success
+        }
+        commandCenter.changePlaybackPositionCommand.addTarget {
+            (commandEvent) -> MPRemoteCommandHandlerStatus in
+            Task {
+                if self.isPreview, let event = commandEvent as? MPChangePlaybackPositionCommandEvent
+                {
+                    self.previewPlayer.seekToTime(event.positionTime)
+                }
+            }
+            return MPRemoteCommandHandlerStatus.success
+        }
+        commandCenter.likeCommand.addTarget { (commandEvent) -> MPRemoteCommandHandlerStatus in
+            Task {
+                print("like")
+            }
+            return MPRemoteCommandHandlerStatus.success
+        }
+        changeCommandCenterStatus(false)
+    }
+
+    func changeCommandCenterStatus(_ status: Bool) {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.togglePlayPauseCommand.isEnabled = status
+        commandCenter.nextTrackCommand.isEnabled = status
+        commandCenter.previousTrackCommand.isEnabled = status
+        commandCenter.changePlaybackPositionCommand.isEnabled = status
+        commandCenter.likeCommand.isEnabled = true
     }
 
     @objc public func playbackStateDidChange() -> String? {
@@ -275,19 +329,22 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         let songs = try await selectSongs(ids)
         do {
             try await musicKitPlayer.setQueue(songs)
+            changeCommandCenterStatus(false)
         } catch {
             isPreview = true
             try await previewPlayer.setQueue(songs)
+            changeCommandCenterStatus(true)
         }
     }
 
     @objc func play(_ call: CAPPluginCall) async throws {
+        let index = call.getInt("index")
         if isPreview {
             musicKitPlayer.pause()
-            try await previewPlayer.play(call)
+            try await previewPlayer.play(index)
         } else {
             previewPlayer.pause()
-            try await musicKitPlayer.play(call)
+            try await musicKitPlayer.play(index)
         }
     }
 
@@ -324,10 +381,11 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
     }
 
     @objc func seekToTime(_ call: CAPPluginCall) {
+        let playbackTime = call.getDouble("time") ?? 0.0
         if isPreview {
-            previewPlayer.seekToTime(call)
+            previewPlayer.seekToTime(playbackTime)
         } else {
-            musicKitPlayer.seekToTime(call)
+            musicKitPlayer.seekToTime(playbackTime)
         }
     }
 }

@@ -5,34 +5,20 @@ import MusicKit
 
 @available(iOS 16.0, *)
 @objc public class PreviewPlayer: NSObject {
-    let player = MPMusicPlayerController.applicationMusicPlayer
     var preQueueSongs: [Song] = []
     var previewPlayer: AVQueuePlayer? = nil
     var currentIndex = 0
     var notifyListeners: NotifyListeners?
-    var observations = [NSKeyValueObservation]()
 
     let sSize = 200
     let mSize = 400
     let lSize = 600
 
-    func load() {
-        //        let commandCenter = MPRemoteCommandCenter.shared()
-        //        commandCenter.playCommand.addTarget(self, action: "play")
-        //        commandCenter.playCommand.isEnabled = true
-        //        commandCenter.pauseCommand.addTarget(self, action: "pause")
-        //        commandCenter.pauseCommand.isEnabled = true
-        //        commandCenter.skipForwardCommand.addTarget(self, action: "skipForward")
-        //        commandCenter.skipForwardCommand.isEnabled = true
-        //        commandCenter.skipBackwardCommand.addTarget(self, action: "skipBackward")
-        //        commandCenter.skipBackwardCommand.isEnabled = true
-    }
-
     func queueSongs() async -> [[String: Any?]] {
         var songs: [[String: Any?]?] = []
         var count = 0
         for song in preQueueSongs {
-            let artworkUrl = await toBase64Image(song.artwork, sSize)
+            let artworkUrl = await Convertor.toBase64Image(song.artwork, sSize)
             songs.append(
                 await Convertor.toMediaItem(item: song, artworkUrl: artworkUrl, isPlayable: false))
             count += 1
@@ -45,39 +31,8 @@ import MusicKit
             item: preQueueSongs[currentIndex], size: lSize, isPlayable: false)
     }
 
-    func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {
-        if let artworkItem = artwork {
-            let image = artworkItem.image(at: CGSize(width: size, height: size))
-            if let data = image?.jpegData(compressionQuality: 0.1) {
-                return data.base64EncodedString()
-            }
-        }
-        return nil
-    }
-
-    func toBase64Image(_ artwork: Artwork?, _ size: Int) async -> String? {
-        do {
-            guard let url = artwork?.url(width: size, height: size) else {
-                return nil
-            }
-
-            let imageRequest = URLRequest(url: url)
-            let (data, _) = try await URLSession.shared.data(for: imageRequest)
-            guard let image = UIImage(data: data) else {
-                return nil
-            }
-
-            if let imageData = image.jpegData(compressionQuality: 0.1) {
-                return imageData.base64EncodedString()
-            }
-        } catch {
-            return nil
-        }
-        return nil
-    }
-
     @objc func getCurrentIndex() -> Int {
-        return player.indexOfNowPlayingItem
+        return currentIndex
     }
 
     @objc func getCurrentPlaybackTime() -> Double {
@@ -88,77 +43,59 @@ import MusicKit
     }
 
     @objc func getRepeatMode() -> String {
-        var mode = "none"
-        if ApplicationMusicPlayer.shared.state.repeatMode == .all {
-            mode = "all"
-        } else if ApplicationMusicPlayer.shared.state.repeatMode == .one {
-            mode = "one"
-        }
-        return mode
+        // TODO
+        return "none"
     }
 
     @objc func setRepeatMode(_ call: CAPPluginCall) {
-        let mode = call.getString("mode") ?? "none"
-        if mode == "none" {
-            ApplicationMusicPlayer.shared.state.repeatMode = MusicPlayer.RepeatMode.none
-        } else if mode == "one" {
-            ApplicationMusicPlayer.shared.state.repeatMode = MusicPlayer.RepeatMode.one
-        } else if mode == "all" {
-            ApplicationMusicPlayer.shared.state.repeatMode = MusicPlayer.RepeatMode.all
+        // TODO
+    }
+
+    public override func observeValue(
+        forKeyPath keyPath: String?,
+        of object: Any?,
+        change: [NSKeyValueChangeKey: Any]?,
+        context: UnsafeMutableRawPointer?
+    ) {
+        if keyPath == "currentItem" {
+            if change?[NSKeyValueChangeKey.newKey] == nil {
+                return
+            }
+            if change?[NSKeyValueChangeKey.oldKey] != nil {
+                currentIndex = currentIndex + 1
+            }
+            Task {
+                await setNowPlayingInfo()
+                notifyListeners!(
+                    "nowPlayingItemDidChange",
+                    ["item": await currentSong() as Any, "index": currentIndex])
+            }
+        }
+        if keyPath == "rate", let player = object as? AVQueuePlayer {
+            Task {
+                MPNowPlayingInfoCenter.default().nowPlayingInfo?[
+                    MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.currentTime().seconds
+                if await player.rate == 1 {
+                    MPNowPlayingInfoCenter.default().playbackState = .playing
+                    notifyListeners!("playbackStateDidChange", ["state": "playing"])
+                } else {
+                    MPNowPlayingInfoCenter.default().playbackState = .paused
+                    notifyListeners!("playbackStateDidChange", ["state": "paused"])
+                }
+            }
         }
     }
 
-    func setQueue(_ songs: [Song]) async throws {
-        currentIndex = 0
+    func setQueue(_ songs: [Song], _ index: Int = 0) async throws {
+        currentIndex = index
         preQueueSongs = songs
-        let urls = songs.map { $0.previewAssets?.first?.url }.compactMap { $0 }
+        let urls = songs.dropFirst(index).map { $0.previewAssets?.first?.url }.compactMap { $0 }
         let playerItems = urls.map { AVPlayerItem(url: $0) }
         previewPlayer = AVQueuePlayer(items: playerItems)
-        previewPlayer!.observe(
-            \.timeControlStatus, options: .new,
-            changeHandler: { object, change in
-                print("change")
-            })
-        //        previewPlayer!.observe(\.currentItem, options: [.new]) {
-        //                [weak self] (player, _) in
-        //                print("media item changed...")
-        //            }
-        //        previewPlayer!.currentItem?.observe(\.status, options: [.initial,.new]) {
-        //            [weak self] (_, _) in
-        //            print("status...-----------------")
-        //        }
-        //        previewPlayer!.publisher(for: \.currentItem).sink { item in
-        //            print("changeeeeeeeeeeee")
-        //        }
-        print("init----------------")
-    }
-
-    func initNowPlayingItemDidChange(
-        object: AVQueuePlayer, didChangeItem value: NSKeyValueObservedChange<AVPlayerItem?>
-    ) {
-        Task {
-            //            currentIndex = currentIndex + 1
-            print("^------------------------^")
-            print(preQueueSongs.count)
-            print(object.items().count)
-            notifyListeners!(
-                "nowPlayingItemDidChange",
-                ["item": await currentSong() as Any, "index": currentIndex])
-        }
-    }
-
-    func nowPlayingItemDidChange(
-        object: AVQueuePlayer, didChangeItem value: NSKeyValueObservedChange<AVPlayerItem?>
-    ) {
-        Task {
-            currentIndex = currentIndex + 1
-            print("^------------------------^")
-            print(preQueueSongs.count)
-            print(object.items().count)
-            notifyListeners!(
-                "nowPlayingItemDidChange",
-                ["item": await currentSong() as Any, "index": currentIndex])
-        }
+        previewPlayer!.addObserver(
+            self, forKeyPath: "currentItem", options: [.initial, .new, .old], context: nil)
+        previewPlayer!.addObserver(
+            self, forKeyPath: "rate", options: [.initial, .new, .old], context: nil)
     }
 
     func setNowPlayingInfo() async {
@@ -171,44 +108,45 @@ import MusicKit
         nowPlayingInfo[MPMediaItemPropertyArtwork] = await Convertor.toMPMediaItemArtwork(
             song.artwork, lSize)
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration > 30 ? 30 : duration
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = 0.0
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
 
-    @objc func play(_ call: CAPPluginCall) async throws {
-        let optIndex = call.getInt("index")
-
+    @objc func playOrPause() async throws {
         if let pPlayer = previewPlayer {
-            if let index = optIndex {
-                currentIndex = index
+            if await pPlayer.rate == 1 {
+                await pPlayer.pause()
+            } else {
+                await pPlayer.play()
             }
-            await pPlayer.play()
-            await setNowPlayingInfo()
-            MPNowPlayingInfoCenter.default().playbackState = .playing
-            notifyListeners!("playbackStateDidChange", ["state": "playing"])
-            call.resolve(["result": true])
             return
         }
+    }
+
+    func play(_ optIndex: Int?) async throws {
+        if let index = optIndex {
+            try await setQueue(preQueueSongs, index)
+        }
+        if let pPlayer = previewPlayer {
+            await pPlayer.play()
+        }
+        return
     }
 
     @objc func pause() {
         if let pPlayer = previewPlayer {
             pPlayer.pause()
-            MPNowPlayingInfoCenter.default().playbackState = .paused
-            notifyListeners!("playbackStateDidChange", ["state": "paused"])
         }
     }
 
     @objc func stop() {
         if let pPlayer = previewPlayer {
             pPlayer.pause()
-            MPNowPlayingInfoCenter.default().playbackState = .stopped
-            notifyListeners!("playbackStateDidChange", ["state": "stopped"])
         }
     }
 
     @objc func nextPlay() async throws {
         if let pPlayer = previewPlayer {
-            currentIndex = currentIndex + 1
             pPlayer.advanceToNextItem()
             notifyListeners!(
                 "nowPlayingItemDidChange",
@@ -217,11 +155,26 @@ import MusicKit
     }
 
     @objc func previousPlay() async throws {
-        try await ApplicationMusicPlayer.shared.skipToPreviousEntry()
+        if currentIndex > 0 {
+            try await setQueue(preQueueSongs, currentIndex - 1)
+            try await play(nil)
+            notifyListeners!(
+                "nowPlayingItemDidChange",
+                ["item": await currentSong() as Any, "index": currentIndex])
+        } else {
+            try await setQueue(preQueueSongs, 0)
+            stop()
+            notifyListeners!(
+                "nowPlayingItemDidChange",
+                ["item": await currentSong() as Any, "index": currentIndex])
+        }
     }
 
-    @objc func seekToTime(_ call: CAPPluginCall) {
-        let playbackTime = call.getDouble("time") ?? 0.0
-        ApplicationMusicPlayer.shared.playbackTime = playbackTime
+    @objc func seekToTime(_ playbackTime: Double) {
+        if let pPlayer = previewPlayer {
+            let cmTime = CMTimeMakeWithSeconds(
+                playbackTime, preferredTimescale: Int32(NSEC_PER_SEC))
+            pPlayer.seek(to: cmTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+        }
     }
 }

@@ -21,7 +21,6 @@ class Convertor {
         do {
             let data = try JSONEncoder().encode(song.playParameters)
             let playParameters = try JSONSerialization.jsonObject(with: data, options: [])
-            print(playParameters)
             return true
         } catch {
             return false

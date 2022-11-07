@@ -29,37 +29,6 @@ import MusicKit
             item: ApplicationMusicPlayer.shared.queue.currentEntry?.item, size: lSize)
     }
 
-    func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {
-        if let artworkItem = artwork {
-            let image = artworkItem.image(at: CGSize(width: size, height: size))
-            if let data = image?.jpegData(compressionQuality: 0.1) {
-                return data.base64EncodedString()
-            }
-        }
-        return nil
-    }
-
-    func toBase64Image(_ artwork: Artwork?, _ size: Int) async -> String? {
-        do {
-            guard let url = artwork?.url(width: size, height: size) else {
-                return nil
-            }
-
-            let imageRequest = URLRequest(url: url)
-            let (data, _) = try await URLSession.shared.data(for: imageRequest)
-            guard let image = UIImage(data: data) else {
-                return nil
-            }
-
-            if let imageData = image.jpegData(compressionQuality: 0.1) {
-                return imageData.base64EncodedString()
-            }
-        } catch {
-            return nil
-        }
-        return nil
-    }
-
     @objc func getCurrentIndex() -> Int {
         return player.indexOfNowPlayingItem
     }
@@ -95,9 +64,7 @@ import MusicKit
         try await ApplicationMusicPlayer.shared.prepareToPlay()
     }
 
-    @objc func play(_ call: CAPPluginCall) async throws {
-        let index = call.getInt("index")
-
+    func play(_ index: Int?) async throws {
         if let startIndex = index {
             // Use preQueueSongs because there is no data in the ApplicationMusicPlayer.shared.queue before playback.
             let songs = preQueueSongs
@@ -146,8 +113,7 @@ import MusicKit
         try await ApplicationMusicPlayer.shared.skipToPreviousEntry()
     }
 
-    @objc func seekToTime(_ call: CAPPluginCall) {
-        let playbackTime = call.getDouble("time") ?? 0.0
+    @objc func seekToTime(_ playbackTime: Double) {
         ApplicationMusicPlayer.shared.playbackTime = playbackTime
     }
 }
