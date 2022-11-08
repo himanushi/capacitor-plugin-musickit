@@ -91,12 +91,20 @@ export interface GetCurrentPlaybackTimeResult {
   time: number;
 }
 
-export interface getRepeatModeResult {
+export interface GetRepeatModeResult {
   mode: "none" | "one" | "all";
 }
 
 export interface SetRepeatModeOptions {
   mode: "none" | "one" | "all";
+}
+
+export interface GetShuffleModeResult {
+  mode: "off" | "songs";
+}
+
+export interface SetShuffleModeOptions {
+  mode: "off" | "songs";
 }
 
 export interface SetQueueOptions {
@@ -184,7 +192,8 @@ export interface CapacitorMusicKitPlugin {
   ): Promise<GetLibrarySongsResult>;
   getQueueSongs(): Promise<GetQueueSongsResult>;
   getRatings(options: GetRatingsOptions): Promise<RatingsResult>;
-  getRepeatMode(): Promise<getRepeatModeResult>;
+  getRepeatMode(): Promise<GetRepeatModeResult>;
+  getShuffleMode(): Promise<GetShuffleModeResult>;
   hasMusicSubscription(): Promise<ActionResult>;
   isAuthorized(): Promise<ActionResult>;
   nextPlay(): Promise<ActionResult>;
@@ -194,6 +203,7 @@ export interface CapacitorMusicKitPlugin {
   seekToTime(options: SeekToTimeOptions): Promise<ActionResult>;
   setQueue(options: SetQueueOptions): Promise<SetQueueResult>;
   setRepeatMode(options: SetRepeatModeOptions): Promise<ActionResult>;
+  setShuffleMode(options: SetShuffleModeOptions): Promise<ActionResult>;
   stop(): Promise<ActionResult>;
   unauthorize(): Promise<void>;
 }

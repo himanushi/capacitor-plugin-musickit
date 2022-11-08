@@ -142,6 +142,15 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         call.resolve(["result": true])
     }
 
+    @objc func getShuffleMode(_ call: CAPPluginCall) {
+        call.resolve(["mode": musicKit.getRepeatMode()])
+    }
+
+    @objc func setShuffleMode(_ call: CAPPluginCall) {
+        musicKit.setRepeatMode(call)
+        call.resolve(["result": true])
+    }
+
     @objc func setQueue(_ call: CAPPluginCall) {
         Task {
             try await musicKit.setQueue(call)

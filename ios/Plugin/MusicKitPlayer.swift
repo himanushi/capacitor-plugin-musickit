@@ -58,6 +58,23 @@ import MusicKit
         }
     }
 
+    @objc func getShuffleMode() -> String {
+        var mode = "off"
+        if ApplicationMusicPlayer.shared.state.shuffleMode == .songs {
+            mode = "songs"
+        }
+        return mode
+    }
+
+    @objc func setShuffleMode(_ call: CAPPluginCall) {
+        let mode = call.getString("mode") ?? "none"
+        if mode == "off" {
+            ApplicationMusicPlayer.shared.state.shuffleMode = .off
+        } else if mode == "songs" {
+            ApplicationMusicPlayer.shared.state.shuffleMode = .songs
+        }
+    }
+
     func setQueue(_ songs: [Song]) async throws {
         preQueueSongs = songs
         ApplicationMusicPlayer.shared.queue = .init(for: songs)

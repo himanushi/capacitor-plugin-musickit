@@ -20,6 +20,8 @@ CAP_PLUGIN(CapacitorMusicKitPlugin, "CapacitorMusicKit",
            CAP_PLUGIN_METHOD(getCurrentPlaybackTime, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getRepeatMode, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(setRepeatMode, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getShuffleMode, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(setShuffleMode, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(setQueue, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(play, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(pause, CAPPluginReturnPromise);

@@ -18,7 +18,7 @@ import type {
   GetLibraryPlaylistsResult,
   GetLibrarySongsResult,
   GetQueueSongsResult,
-  getRepeatModeResult,
+  GetRepeatModeResult,
   GetLibraryAlbumsOptions,
   GetRatingsOptions,
   NowPlayingItemDidChangeResult,
@@ -32,6 +32,8 @@ import type {
   GetLibrarySongsOptions,
   GetLibraryPlaylistsOptions,
   SetQueueResult,
+  GetShuffleModeResult,
+  SetShuffleModeOptions,
 } from "./definitions";
 
 export class CapacitorMusicKitWeb
@@ -302,8 +304,8 @@ export class CapacitorMusicKitWeb
     return { time: MusicKit.getInstance().currentPlaybackTime };
   }
 
-  async getRepeatMode (): Promise<getRepeatModeResult> {
-    const modeArray: getRepeatModeResult["mode"][] = ["none", "one", "all"];
+  async getRepeatMode (): Promise<GetRepeatModeResult> {
+    const modeArray: GetRepeatModeResult["mode"][] = ["none", "one", "all"];
     return { mode: modeArray[MusicKit.getInstance().repeatMode] };
   }
 
@@ -314,6 +316,20 @@ export class CapacitorMusicKitWeb
       one: 1,
     } as const;
     MusicKit.getInstance().repeatMode = modeMap[options.mode];
+    return { result: true };
+  }
+
+  async getShuffleMode (): Promise<GetShuffleModeResult> {
+    const modeArray: GetShuffleModeResult["mode"][] = ["off", "songs"];
+    return { mode: modeArray[MusicKit.getInstance().shuffleMode] };
+  }
+
+  async setShuffleMode (options: SetShuffleModeOptions): Promise<ActionResult> {
+    const modeMap = {
+      off: 0,
+      songs: 1,
+    } as const;
+    MusicKit.getInstance().shuffleMode = modeMap[options.mode];
     return { result: true };
   }
 
