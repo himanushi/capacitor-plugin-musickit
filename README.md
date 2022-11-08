@@ -31,6 +31,7 @@ npx cap sync
 * [`getQueueSongs()`](#getqueuesongs)
 * [`getRatings(...)`](#getratings)
 * [`getRepeatMode()`](#getrepeatmode)
+* [`getShuffleMode()`](#getshufflemode)
 * [`hasMusicSubscription()`](#hasmusicsubscription)
 * [`isAuthorized()`](#isauthorized)
 * [`nextPlay()`](#nextplay)
@@ -40,6 +41,7 @@ npx cap sync
 * [`seekToTime(...)`](#seektotime)
 * [`setQueue(...)`](#setqueue)
 * [`setRepeatMode(...)`](#setrepeatmode)
+* [`setShuffleMode(...)`](#setshufflemode)
 * [`stop()`](#stop)
 * [`unauthorize()`](#unauthorize)
 * [Interfaces](#interfaces)
@@ -289,10 +291,21 @@ getRatings(options: GetRatingsOptions) => Promise<RatingsResult>
 ### getRepeatMode()
 
 ```typescript
-getRepeatMode() => Promise<getRepeatModeResult>
+getRepeatMode() => Promise<GetRepeatModeResult>
 ```
 
-**Returns:** <code>Promise&lt;<a href="#getrepeatmoderesult">getRepeatModeResult</a>&gt;</code>
+**Returns:** <code>Promise&lt;<a href="#getrepeatmoderesult">GetRepeatModeResult</a>&gt;</code>
+
+--------------------
+
+
+### getShuffleMode()
+
+```typescript
+getShuffleMode() => Promise<GetShuffleModeResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#getshufflemoderesult">GetShuffleModeResult</a>&gt;</code>
 
 --------------------
 
@@ -412,6 +425,21 @@ setRepeatMode(options: SetRepeatModeOptions) => Promise<ActionResult>
 --------------------
 
 
+### setShuffleMode(...)
+
+```typescript
+setShuffleMode(options: SetShuffleModeOptions) => Promise<ActionResult>
+```
+
+| Param         | Type                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| **`options`** | <code><a href="#setshufflemodeoptions">SetShuffleModeOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
+
+--------------------
+
+
 ### stop()
 
 ```typescript
@@ -507,11 +535,18 @@ unauthorize() => Promise<void>
 | **`items`** | <code>MediaItem[]</code> |
 
 
-#### getRepeatModeResult
+#### GetRepeatModeResult
 
 | Prop       | Type                                  |
 | ---------- | ------------------------------------- |
 | **`mode`** | <code>'none' \| 'one' \| 'all'</code> |
+
+
+#### GetShuffleModeResult
+
+| Prop       | Type                          |
+| ---------- | ----------------------------- |
+| **`mode`** | <code>'off' \| 'songs'</code> |
 
 
 #### PlayOptions
@@ -547,6 +582,13 @@ unauthorize() => Promise<void>
 | Prop       | Type                                  |
 | ---------- | ------------------------------------- |
 | **`mode`** | <code>'none' \| 'one' \| 'all'</code> |
+
+
+#### SetShuffleModeOptions
+
+| Prop       | Type                          |
+| ---------- | ----------------------------- |
+| **`mode`** | <code>'off' \| 'songs'</code> |
 
 
 ### Type Aliases
