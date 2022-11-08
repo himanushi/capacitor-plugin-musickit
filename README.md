@@ -537,16 +537,16 @@ unauthorize() => Promise<void>
 
 #### GetRepeatModeResult
 
-| Prop       | Type                                  |
-| ---------- | ------------------------------------- |
-| **`mode`** | <code>'none' \| 'one' \| 'all'</code> |
+| Prop       | Type                                              |
+| ---------- | ------------------------------------------------- |
+| **`mode`** | <code><a href="#repeatmode">RepeatMode</a></code> |
 
 
 #### GetShuffleModeResult
 
-| Prop       | Type                          |
-| ---------- | ----------------------------- |
-| **`mode`** | <code>'off' \| 'songs'</code> |
+| Prop       | Type                                                |
+| ---------- | --------------------------------------------------- |
+| **`mode`** | <code><a href="#shufflemode">ShuffleMode</a></code> |
 
 
 #### PlayOptions
@@ -579,16 +579,16 @@ unauthorize() => Promise<void>
 
 #### SetRepeatModeOptions
 
-| Prop       | Type                                  |
-| ---------- | ------------------------------------- |
-| **`mode`** | <code>'none' \| 'one' \| 'all'</code> |
+| Prop       | Type                                              |
+| ---------- | ------------------------------------------------- |
+| **`mode`** | <code><a href="#repeatmode">RepeatMode</a></code> |
 
 
 #### SetShuffleModeOptions
 
-| Prop       | Type                          |
-| ---------- | ----------------------------- |
-| **`mode`** | <code>'off' \| 'songs'</code> |
+| Prop       | Type                                                |
+| ---------- | --------------------------------------------------- |
+| **`mode`** | <code><a href="#shufflemode">ShuffleMode</a></code> |
 
 
 ### Type Aliases
@@ -692,5 +692,15 @@ unauthorize() => Promise<void>
 #### GetRatingsOptions
 
 <code>{ ids: string[]; type: MusicKit.AppleMusicAPI.RatingType; }</code>
+
+
+#### RepeatMode
+
+<code>"none" | "one" | "all"</code>
+
+
+#### ShuffleMode
+
+<code>"off" | "songs"</code>
 
 </docgen-api>
