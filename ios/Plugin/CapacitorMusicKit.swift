@@ -55,12 +55,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
             }
             return MPRemoteCommandHandlerStatus.success
         }
-        commandCenter.likeCommand.addTarget { (commandEvent) -> MPRemoteCommandHandlerStatus in
-            Task {
-                print("like")
-            }
-            return MPRemoteCommandHandlerStatus.success
-        }
         changeCommandCenterStatus(false)
     }
 
@@ -70,7 +64,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         commandCenter.nextTrackCommand.isEnabled = status
         commandCenter.previousTrackCommand.isEnabled = status
         commandCenter.changePlaybackPositionCommand.isEnabled = status
-        commandCenter.likeCommand.isEnabled = true
     }
 
     @objc public func playbackStateDidChange() -> String? {
@@ -420,7 +413,6 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
 
     @objc func setRepeatMode(_ call: CAPPluginCall) {
         musicKitPlayer.setRepeatMode(call)
-        previewPlayer.setRepeatMode(call)
     }
 
     @objc func setQueue(_ call: CAPPluginCall) async throws {
