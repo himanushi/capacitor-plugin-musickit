@@ -91,20 +91,24 @@ export interface GetCurrentPlaybackTimeResult {
   time: number;
 }
 
+export type RepeatMode = "none" | "one" | "all";
+
 export interface GetRepeatModeResult {
-  mode: "none" | "one" | "all";
+  mode: RepeatMode;
 }
 
 export interface SetRepeatModeOptions {
-  mode: "none" | "one" | "all";
+  mode: RepeatMode;
 }
 
+export type ShuffleMode = "off" | "songs";
+
 export interface GetShuffleModeResult {
-  mode: "off" | "songs";
+  mode: ShuffleMode;
 }
 
 export interface SetShuffleModeOptions {
-  mode: "off" | "songs";
+  mode: ShuffleMode;
 }
 
 export interface SetQueueOptions {
