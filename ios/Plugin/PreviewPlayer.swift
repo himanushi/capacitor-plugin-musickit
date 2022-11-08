@@ -43,12 +43,13 @@ import MusicKit
     }
 
     @objc func getRepeatMode() -> String {
-        // TODO
-        return "none"
-    }
-
-    @objc func setRepeatMode(_ call: CAPPluginCall) {
-        // TODO
+        var mode = "none"
+        if ApplicationMusicPlayer.shared.state.repeatMode == .all {
+            mode = "all"
+        } else if ApplicationMusicPlayer.shared.state.repeatMode == .one {
+            mode = "one"
+        }
+        return mode
     }
 
     public override func observeValue(
@@ -59,7 +60,15 @@ import MusicKit
     ) {
         if keyPath == "currentItem" {
             guard change?[NSKeyValueChangeKey.newKey] is AVPlayerItem else {
-                notifyListeners!("playbackStateDidChange", ["state": "paused"])
+                Task {
+                    try await setQueue(preQueueSongs)
+                    if getRepeatMode() == "all" {
+                        try await play(nil)
+                    } else {
+                        seekToTime(0.0)
+                        notifyListeners!("playbackStateDidChange", ["state": "paused"])
+                    }
+                }
                 return
             }
             if change?[NSKeyValueChangeKey.oldKey] != nil {

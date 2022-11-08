@@ -111,7 +111,7 @@ class Convertor {
         }
         return [
             "data": data.compactMap { $0 },
-            "next": hasNext ? "hasNext" : nil  // TODO,
+            "next": hasNext ? "hasNext" : nil,
         ]
     }
 
@@ -149,7 +149,7 @@ class Convertor {
         }
         return [
             "data": data.compactMap { $0 },
-            "next": hasNext ? "hasNext" : nil  // TODO,
+            "next": hasNext ? "hasNext" : nil,
         ]
     }
 
@@ -194,7 +194,7 @@ class Convertor {
         }
         return [
             "data": data.compactMap { $0 },
-            "next": hasNext ? "hasNext" : nil  // TODO,
+            "next": hasNext ? "hasNext" : nil,
         ]
     }
 
