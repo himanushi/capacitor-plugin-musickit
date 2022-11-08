@@ -285,6 +285,7 @@ declare namespace MusicKit {
    */
   interface LibraryArtists extends Resource {
     attributes: {
+      artwork?: Artwork;
       name: string;
     };
     relationships: {

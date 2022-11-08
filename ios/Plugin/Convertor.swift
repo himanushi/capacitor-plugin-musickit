@@ -4,6 +4,9 @@ import MusicKit
 @available(iOS 16.0, *)
 class Convertor {
     static let baseUrl = "https://api.music.apple.com"
+    static let sSize = 200
+    static let mSize = 400
+    static let lSize = 600
 
     static func getDataRequestJSON(_ url: String) async -> [String: Any] {
         do {
@@ -17,13 +20,15 @@ class Convertor {
         }
     }
 
-    static func isPlayable(_ song: Song) -> Bool {
+    static func toPlayParameters(_ optPlayParameters: PlayParameters?) -> [String: Any]? {
         do {
-            let data = try JSONEncoder().encode(song.playParameters)
-            let playParameters = try JSONSerialization.jsonObject(with: data, options: [])
-            return true
+            guard let playParameters = optPlayParameters else {
+                return nil
+            }
+            let data = try JSONEncoder().encode(playParameters)
+            return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
         } catch {
-            return false
+            return nil
         }
     }
 
@@ -92,6 +97,136 @@ class Convertor {
             "title": song.title,
             "trackNumber": song.trackNumber,
             "type": "songs",
+        ]
+    }
+
+    static func toLibraryArtists(
+        items: MusicItemCollection<Artist>,
+        hasNext: Bool,
+        size: Int? = sSize
+    ) async -> [String: Any] {
+        var data: [[String: Any]?] = []
+        for item in items {
+            data.append(await toLibraryArtist(item: item))
+        }
+        return [
+            "data": data.compactMap { $0 },
+            "next": hasNext ? "hasNext" : nil  // TODO,
+        ]
+    }
+
+    static func toLibraryArtist(
+        item optItem: Artist?,
+        size optSize: Int? = nil
+    ) async -> [String: Any]? {
+        guard let item = optItem else {
+            return nil
+        }
+
+        var artworkUrl: String? = nil
+        if let size = optSize {
+            artworkUrl = await toBase64Image(item.artwork, size)
+        }
+
+        return [
+            "id": item.id.rawValue,
+            "type": "library-artists",
+            "attributes": [
+                "artwork": ["url": artworkUrl],
+                "name": item.name,
+            ],
+        ]
+    }
+
+    static func toLibraryAlbums(
+        items: MusicItemCollection<Album>,
+        hasNext: Bool,
+        size: Int? = sSize
+    ) async -> [String: Any] {
+        var data: [[String: Any]?] = []
+        for item in items {
+            data.append(await toLibraryAlbum(item: item, size: size))
+        }
+        return [
+            "data": data.compactMap { $0 },
+            "next": hasNext ? "hasNext" : nil  // TODO,
+        ]
+    }
+
+    static func toLibraryAlbum(
+        item optItem: Album?,
+        size optSize: Int? = nil
+    ) async -> [String: Any]? {
+        guard let item = optItem else {
+            return nil
+        }
+
+        var artworkUrl: String? = nil
+        if let size = optSize {
+            artworkUrl = await toBase64Image(item.artwork, size)
+        }
+
+        return [
+            "id": item.id.rawValue,
+            "type": "library-albums",
+            "attributes": [
+                "artistName": item.artistName,
+                "artwork": ["url": artworkUrl],
+                "contentRating": item.contentRating == .clean ? "clean" : "explicit",
+                "dateAdded": formatISOString(item.libraryAddedDate),
+                "genreNames": item.genreNames,
+                "name": item.title,
+                "playParams": toPlayParameters(item.playParameters),
+                "releaseDate": formatISOString(item.releaseDate),
+                "trackCount": item.trackCount,
+            ],
+        ]
+    }
+
+    static func toLibrarySongs(
+        items: MusicItemCollection<Song>,
+        hasNext: Bool,
+        size: Int? = sSize
+    ) async -> [String: Any] {
+        var data: [[String: Any]?] = []
+        for item in items {
+            data.append(await toLibrarySong(item: item, size: size))
+        }
+        return [
+            "data": data.compactMap { $0 },
+            "next": hasNext ? "hasNext" : nil  // TODO,
+        ]
+    }
+
+    static func toLibrarySong(
+        item optItem: Song?,
+        size optSize: Int? = nil
+    ) async -> [String: Any]? {
+        guard let item = optItem else {
+            return nil
+        }
+
+        var artworkUrl: String? = nil
+        if let size = optSize {
+            artworkUrl = await toBase64Image(item.artwork, size)
+        }
+
+        return [
+            "id": item.id.rawValue,
+            "type": "library-songs",
+            "attributes": [
+                "albumName": item.albumTitle,
+                "artistName": item.artistName,
+                "artwork": ["url": artworkUrl],
+                "discNumber": item.discNumber,
+                "durationInMillis": Double(item.duration ?? 0) * 1000,
+                "genreNames": item.genreNames,
+                "hasLyrics": item.hasLyrics,
+                "name": item.title,
+                "playParams": toPlayParameters(item.playParameters),
+                "releaseDate": formatISOString(item.releaseDate),
+                "trackNumber": item.trackNumber,
+            ],
         ]
     }
 

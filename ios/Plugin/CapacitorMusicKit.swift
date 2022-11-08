@@ -171,7 +171,107 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         return params
     }
 
-    @objc func getLibraryArtists(_ call: CAPPluginCall) async -> [String: Any] {
+    @objc func getLibraryArtists(_ call: CAPPluginCall) async throws -> [String: Any] {
+        let limit = call.getInt("limit") ?? 1
+        let offset = call.getInt("offset") ?? 0
+        // offline
+        let optIds = call.getArray("ids", String.self)
+        let optAlbumId = call.getString("albumId")
+
+        var hasNext = false
+        var request = MusicLibraryRequest<Artist>()
+        if let ids = optIds {
+            request.filter(matching: \.id, memberOf: ids.map { MusicItemID($0) })
+        }
+        if let albumId = optAlbumId {
+            var albumsRequest = MusicLibraryRequest<Album>()
+            albumsRequest.filter(matching: \.id, equalTo: MusicItemID(albumId))
+            let albumsResponse = try await albumsRequest.response()
+            if let album = albumsResponse.items.first {
+                request.filter(matching: \.name, contains: album.artistName)
+            } else {
+                return [:]
+            }
+        }
+        request.sort(by: \.name, ascending: true)
+        request.limit = limit
+        request.offset = offset
+        let response = try await request.response()
+        if response.items.count == limit {
+            hasNext = true
+        }
+        return await Convertor.toLibraryArtists(
+            items: response.items,
+            hasNext: hasNext
+        )
+    }
+
+    @objc func getLibraryAlbums(_ call: CAPPluginCall) async throws -> [String: Any] {
+        let limit = call.getInt("limit") ?? 1
+        let offset = call.getInt("offset") ?? 0
+        // offline
+        let optIds = call.getArray("ids", String.self)
+
+        var hasNext = false
+        var request = MusicLibraryRequest<Album>()
+        if let ids = optIds {
+            request.filter(matching: \.id, memberOf: ids.map { MusicItemID($0) })
+        }
+        request.sort(by: \.title, ascending: true)
+        request.limit = limit
+        request.offset = offset
+        let response = try await request.response()
+        if response.items.count == limit {
+            hasNext = true
+        }
+        return await Convertor.toLibraryAlbums(
+            items: response.items,
+            hasNext: hasNext,
+            size: (optIds?.count ?? 0) == 1 ? Convertor.lSize : Convertor.sSize
+        )
+    }
+
+    @objc func getLibrarySongs(_ call: CAPPluginCall) async throws -> [String: Any] {
+        let limit = call.getInt("limit") ?? 1
+        let offset = call.getInt("offset") ?? 0
+        // offline
+        let optIds = call.getArray("ids", String.self)
+        let optAlbumId = call.getString("albumId")
+        // online
+        let optCatalogId = call.getString("catalogId")
+        let optPlaylistId = call.getString("playlistId")
+
+        var hasNext = false
+        var request = MusicLibraryRequest<Song>()
+        if let ids = optIds {
+            request.filter(matching: \.id, memberOf: ids.map { MusicItemID($0) })
+        }
+        if let albumId = optAlbumId {
+            var albumsRequest = MusicLibraryRequest<Album>()
+            albumsRequest.filter(matching: \.id, equalTo: MusicItemID(albumId))
+            let albumsResponse = try await albumsRequest.response()
+            if let album = albumsResponse.items.first {
+                request.filter(matching: \.albums, contains: album)
+            } else {
+                return [:]
+            }
+        }
+        request.sort(by: \.discNumber, ascending: true)
+        request.sort(by: \.trackNumber, ascending: true)
+        request.limit = limit
+        request.offset = offset
+        let response = try await request.response()
+        if response.items.count == limit {
+            hasNext = true
+        }
+        return await Convertor.toLibrarySongs(
+            items: response.items,
+            hasNext: hasNext,
+            size: (optIds?.count ?? 0) == 1 ? Convertor.lSize : Convertor.sSize
+        )
+    }
+
+    @objc func getArtists(_ call: CAPPluginCall) async -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
         let ids = call.getArray("ids", String.self)
@@ -195,7 +295,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         return await Convertor.getDataRequestJSON(url)
     }
 
-    @objc func getLibraryAlbums(_ call: CAPPluginCall) async -> [String: Any] {
+    @objc func getAlbums(_ call: CAPPluginCall) async -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
         let ids = call.getArray("ids", String.self)
@@ -222,7 +322,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         return await Convertor.getDataRequestJSON(url)
     }
 
-    @objc func getLibrarySongs(_ call: CAPPluginCall) async -> [String: Any] {
+    @objc func getSongs(_ call: CAPPluginCall) async -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
         let ids = call.getArray("ids", String.self)
