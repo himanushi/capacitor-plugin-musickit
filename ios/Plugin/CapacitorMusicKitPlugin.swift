@@ -69,7 +69,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
 
     @objc func configure(_ call: CAPPluginCall) {
-        call.resolve(["result": true])
+        call.resolve()
     }
 
     @objc func isAuthorized(_ call: CAPPluginCall) {
@@ -84,14 +84,15 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     @objc func authorize(_ call: CAPPluginCall) {
         Task {
-            call.resolve(["result": await musicKit.authorize()])
+            await musicKit.authorize()
+            call.resolve()
         }
     }
 
     @objc func unauthorize(_ call: CAPPluginCall) {
         Task {
             await musicKit.unauthorize()
-            call.resolve(["result": true])
+            call.resolve()
         }
     }
 
@@ -139,7 +140,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     @objc func setRepeatMode(_ call: CAPPluginCall) {
         musicKit.setRepeatMode(call)
-        call.resolve(["result": true])
+        call.resolve()
     }
 
     @objc func getShuffleMode(_ call: CAPPluginCall) {
@@ -148,13 +149,13 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
     @objc func setShuffleMode(_ call: CAPPluginCall) {
         musicKit.setRepeatMode(call)
-        call.resolve(["result": true])
+        call.resolve()
     }
 
     @objc func setQueue(_ call: CAPPluginCall) {
         Task {
             try await musicKit.setQueue(call)
-            call.resolve(["result": true])
+            call.resolve()
         }
     }
 
@@ -203,36 +204,36 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     @objc func play(_ call: CAPPluginCall) {
         Task {
             try await musicKit.play(call)
-            call.resolve(["result": true])
+            call.resolve()
         }
     }
 
     @objc func pause(_ call: CAPPluginCall) {
         musicKit.pause()
-        call.resolve(["result": true])
+        call.resolve()
     }
 
     @objc func stop(_ call: CAPPluginCall) {
         musicKit.stop()
-        call.resolve(["result": true])
+        call.resolve()
     }
 
     @objc func nextPlay(_ call: CAPPluginCall) {
         Task {
             try await musicKit.nextPlay()
-            call.resolve(["result": true])
+            call.resolve()
         }
     }
 
     @objc func previousPlay(_ call: CAPPluginCall) {
         Task {
             try await musicKit.previousPlay()
-            call.resolve(["result": true])
+            call.resolve()
         }
     }
 
     @objc func seekToTime(_ call: CAPPluginCall) {
         musicKit.seekToTime(call)
-        call.resolve(["result": true])
+        call.resolve()
     }
 }

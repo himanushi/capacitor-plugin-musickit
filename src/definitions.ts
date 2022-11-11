@@ -115,10 +115,6 @@ export interface SetQueueOptions {
   ids: string[];
 }
 
-export interface SetQueueResult {
-  items: MusicKit.MediaItem[];
-}
-
 export interface PlayOptions {
   index?: number;
 }
@@ -174,10 +170,10 @@ export interface CapacitorMusicKitPlugin {
     eventName: "authorizationStatusDidChange",
     listenerFunc: AuthorizationStatusDidChangeListener
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
-  addRating(options: AddRatingOptions): Promise<RatingsResult>;
+  addRating(options: AddRatingOptions): Promise<void>;
   authorize(): Promise<void>;
-  configure(options: ConfigureOptions): Promise<ActionResult>;
-  deleteRating(options: DeleteRatingOptions): Promise<RatingsResult>;
+  configure(options: ConfigureOptions): Promise<void>;
+  deleteRating(options: DeleteRatingOptions): Promise<void>;
   echo(options: EchoOptions): Promise<EchoResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
@@ -200,14 +196,14 @@ export interface CapacitorMusicKitPlugin {
   getShuffleMode(): Promise<GetShuffleModeResult>;
   hasMusicSubscription(): Promise<ActionResult>;
   isAuthorized(): Promise<ActionResult>;
-  nextPlay(): Promise<ActionResult>;
-  pause(): Promise<ActionResult>;
-  play(options: PlayOptions): Promise<ActionResult>;
-  previousPlay(): Promise<ActionResult>;
-  seekToTime(options: SeekToTimeOptions): Promise<ActionResult>;
-  setQueue(options: SetQueueOptions): Promise<SetQueueResult>;
-  setRepeatMode(options: SetRepeatModeOptions): Promise<ActionResult>;
-  setShuffleMode(options: SetShuffleModeOptions): Promise<ActionResult>;
-  stop(): Promise<ActionResult>;
+  nextPlay(): Promise<void>;
+  pause(): Promise<void>;
+  play(options: PlayOptions): Promise<void>;
+  previousPlay(): Promise<void>;
+  seekToTime(options: SeekToTimeOptions): Promise<void>;
+  setQueue(options: SetQueueOptions): Promise<void>;
+  setRepeatMode(options: SetRepeatModeOptions): Promise<void>;
+  setShuffleMode(options: SetShuffleModeOptions): Promise<void>;
+  stop(): Promise<void>;
   unauthorize(): Promise<void>;
 }

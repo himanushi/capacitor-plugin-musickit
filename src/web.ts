@@ -1,6 +1,5 @@
 import { WebPlugin } from "@capacitor/core";
 import type {
-  ActionResult,
   AddRatingOptions,
   AuthorizationStatus,
   AuthorizationStatusDidChangeResult,
@@ -31,9 +30,9 @@ import type {
   SetRepeatModeOptions,
   GetLibrarySongsOptions,
   GetLibraryPlaylistsOptions,
-  SetQueueResult,
   GetShuffleModeResult,
   SetShuffleModeOptions,
+  ActionResult,
 } from "./definitions";
 
 export class CapacitorMusicKitWeb
@@ -83,17 +82,17 @@ export class CapacitorMusicKitWeb
     this.notifyListeners("authorizationStatusDidChange", result);
   };
 
-  async configure (options: ConfigureOptions): Promise<ActionResult> {
-    const loaded = await new Promise<boolean>((resolve, reject) => {
+  async configure (options: ConfigureOptions): Promise<void> {
+    const errorMessage = await new Promise<string | null>((resolve, reject) => {
       const script = document.createElement("script");
       script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => reject(false);
+      script.onload = () => resolve(null);
+      script.onerror = (error) => reject(error.toString);
       document.head.appendChild(script);
     });
 
-    if (!loaded) {
-      return { result: false };
+    if (errorMessage) {
+      throw new Error(errorMessage);
     }
 
     const musicKit = await MusicKit.configure(options.config);
@@ -112,8 +111,6 @@ export class CapacitorMusicKitWeb
       "authorizationStatusDidChange",
       this.authorizationStatusDidChange,
     );
-
-    return { result: true };
   }
 
   async isAuthorized (): Promise<ActionResult> {
@@ -252,12 +249,8 @@ export class CapacitorMusicKitWeb
     return response.data;
   }
 
-  async addRating ({
-    type,
-    id,
-    value,
-  }: AddRatingOptions): Promise<RatingsResult> {
-    const response = await MusicKit.getInstance().api.music(
+  async addRating ({ type, id, value }: AddRatingOptions): Promise<void> {
+    await MusicKit.getInstance().api.music(
       `/v1/me/ratings/${type}/${id}` as const,
       {},
       {
@@ -272,20 +265,14 @@ export class CapacitorMusicKitWeb
         },
       },
     );
-
-    return response.data;
   }
 
-  async deleteRating ({
-    type,
-    id,
-  }: DeleteRatingOptions): Promise<RatingsResult> {
-    const response = await MusicKit.getInstance().api.music(
+  async deleteRating ({ type, id }: DeleteRatingOptions): Promise<void> {
+    await MusicKit.getInstance().api.music(
       `/v1/me/ratings/${type}/${id}` as const,
       {},
       { fetchOptions: { method: "DELETE" } },
     );
-    return response.data;
   }
 
   async getCurrentSong (): Promise<GetCurrentSongResult> {
@@ -309,14 +296,13 @@ export class CapacitorMusicKitWeb
     return { mode: modeArray[MusicKit.getInstance().repeatMode] };
   }
 
-  async setRepeatMode (options: SetRepeatModeOptions): Promise<ActionResult> {
+  async setRepeatMode (options: SetRepeatModeOptions): Promise<void> {
     const modeMap = {
       all: 2,
       none: 0,
       one: 1,
     } as const;
     MusicKit.getInstance().repeatMode = modeMap[options.mode];
-    return { result: true };
   }
 
   async getShuffleMode (): Promise<GetShuffleModeResult> {
@@ -324,53 +310,45 @@ export class CapacitorMusicKitWeb
     return { mode: modeArray[MusicKit.getInstance().shuffleMode] };
   }
 
-  async setShuffleMode (options: SetShuffleModeOptions): Promise<ActionResult> {
+  async setShuffleMode (options: SetShuffleModeOptions): Promise<void> {
     const modeMap = {
       off: 0,
       songs: 1,
     } as const;
     MusicKit.getInstance().shuffleMode = modeMap[options.mode];
-    return { result: true };
   }
 
-  async setQueue (options: SetQueueOptions): Promise<SetQueueResult> {
+  async setQueue (options: SetQueueOptions): Promise<void> {
     await MusicKit.getInstance().setQueue({
       songs: options.ids,
     });
-    return { items: MusicKit.getInstance().queue.items };
   }
 
-  async play (options: PlayOptions): Promise<ActionResult> {
+  async play (options: PlayOptions): Promise<void> {
     if (options.index === undefined) {
       await MusicKit.getInstance().play();
     } else {
       await MusicKit.getInstance().changeToMediaAtIndex(options.index);
     }
-    return { result: true };
   }
 
-  async pause (): Promise<ActionResult> {
+  async pause (): Promise<void> {
     await MusicKit.getInstance().pause();
-    return { result: true };
   }
 
-  async stop (): Promise<ActionResult> {
+  async stop (): Promise<void> {
     await MusicKit.getInstance().stop();
-    return { result: true };
   }
 
-  async nextPlay (): Promise<ActionResult> {
+  async nextPlay (): Promise<void> {
     await MusicKit.getInstance().skipToNextItem();
-    return { result: true };
   }
 
-  async previousPlay (): Promise<ActionResult> {
+  async previousPlay (): Promise<void> {
     await MusicKit.getInstance().skipToPreviousItem();
-    return { result: true };
   }
 
-  async seekToTime (options: SeekToTimeOptions): Promise<ActionResult> {
+  async seekToTime (options: SeekToTimeOptions): Promise<void> {
     await MusicKit.getInstance().seekToTime(options.time);
-    return { result: true };
   }
 }
