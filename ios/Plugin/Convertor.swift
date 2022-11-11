@@ -14,7 +14,11 @@ class Convertor {
                 return [:]
             }
             let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response().data
-            return try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+            if data.count > 0 {
+                return try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+            } else {
+                return [:]
+            }
         } catch {
             return [:]
         }

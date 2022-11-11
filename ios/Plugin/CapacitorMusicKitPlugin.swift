@@ -158,6 +158,48 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         }
     }
 
+    @objc func getRatings(_ call: CAPPluginCall) {
+        Task {
+            let type = call.getString("type")!
+            let ids = call.getArray("ids", String.self)!
+            call.resolve(
+                await Convertor.getDataRequestJSON(
+                    "/v1/me/ratings/\(type)?ids=\(ids.joined(separator: "%2C"))"))
+        }
+    }
+
+    @objc func addRating(_ call: CAPPluginCall) {
+        Task {
+            let type = call.getString("type")!
+            let id = call.getString("id")!
+            let value = call.getInt("value")!
+            let url = URL(string: "https://api.music.apple.com/v1/me/ratings/\(type)/\(id)")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "PUT"
+            let body = [
+                "attributes": [
+                    "value": value
+                ],
+                "type": "ratings",
+            ]
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+            try await MusicDataRequest(urlRequest: request).response()
+            call.resolve()
+        }
+    }
+
+    @objc func deleteRating(_ call: CAPPluginCall) {
+        Task {
+            let type = call.getString("type")!
+            let id = call.getString("id")!
+            let url = URL(string: "https://api.music.apple.com/v1/me/ratings/\(type)/\(id)")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "DELETE"
+            try await MusicDataRequest(urlRequest: request).response()
+            call.resolve()
+        }
+    }
+
     @objc func play(_ call: CAPPluginCall) {
         Task {
             try await musicKit.play(call)
