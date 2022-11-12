@@ -103,14 +103,12 @@ addListener(eventName: "authorizationStatusDidChange", listenerFunc: Authorizati
 ### addRating(...)
 
 ```typescript
-addRating(options: AddRatingOptions) => Promise<RatingsResult>
+addRating(options: AddRatingOptions) => Promise<void>
 ```
 
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
 | **`options`** | <code><a href="#addratingoptions">AddRatingOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#ratingsresult">RatingsResult</a>&gt;</code>
 
 --------------------
 
@@ -127,14 +125,12 @@ authorize() => Promise<void>
 ### configure(...)
 
 ```typescript
-configure(options: ConfigureOptions) => Promise<ActionResult>
+configure(options: ConfigureOptions) => Promise<void>
 ```
 
 | Param         | Type                                                          |
 | ------------- | ------------------------------------------------------------- |
 | **`options`** | <code><a href="#configureoptions">ConfigureOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -142,14 +138,12 @@ configure(options: ConfigureOptions) => Promise<ActionResult>
 ### deleteRating(...)
 
 ```typescript
-deleteRating(options: DeleteRatingOptions) => Promise<RatingsResult>
+deleteRating(options: DeleteRatingOptions) => Promise<void>
 ```
 
 | Param         | Type                                                                |
 | ------------- | ------------------------------------------------------------------- |
 | **`options`** | <code><a href="#deleteratingoptions">DeleteRatingOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#ratingsresult">RatingsResult</a>&gt;</code>
 
 --------------------
 
@@ -335,10 +329,8 @@ isAuthorized() => Promise<ActionResult>
 ### nextPlay()
 
 ```typescript
-nextPlay() => Promise<ActionResult>
+nextPlay() => Promise<void>
 ```
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -346,10 +338,8 @@ nextPlay() => Promise<ActionResult>
 ### pause()
 
 ```typescript
-pause() => Promise<ActionResult>
+pause() => Promise<void>
 ```
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -357,14 +347,12 @@ pause() => Promise<ActionResult>
 ### play(...)
 
 ```typescript
-play(options: PlayOptions) => Promise<ActionResult>
+play(options: PlayOptions) => Promise<void>
 ```
 
 | Param         | Type                                                |
 | ------------- | --------------------------------------------------- |
 | **`options`** | <code><a href="#playoptions">PlayOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -372,10 +360,8 @@ play(options: PlayOptions) => Promise<ActionResult>
 ### previousPlay()
 
 ```typescript
-previousPlay() => Promise<ActionResult>
+previousPlay() => Promise<void>
 ```
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -383,14 +369,12 @@ previousPlay() => Promise<ActionResult>
 ### seekToTime(...)
 
 ```typescript
-seekToTime(options: SeekToTimeOptions) => Promise<ActionResult>
+seekToTime(options: SeekToTimeOptions) => Promise<void>
 ```
 
 | Param         | Type                                                            |
 | ------------- | --------------------------------------------------------------- |
 | **`options`** | <code><a href="#seektotimeoptions">SeekToTimeOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -398,14 +382,12 @@ seekToTime(options: SeekToTimeOptions) => Promise<ActionResult>
 ### setQueue(...)
 
 ```typescript
-setQueue(options: SetQueueOptions) => Promise<SetQueueResult>
+setQueue(options: SetQueueOptions) => Promise<void>
 ```
 
 | Param         | Type                                                        |
 | ------------- | ----------------------------------------------------------- |
 | **`options`** | <code><a href="#setqueueoptions">SetQueueOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#setqueueresult">SetQueueResult</a>&gt;</code>
 
 --------------------
 
@@ -413,14 +395,12 @@ setQueue(options: SetQueueOptions) => Promise<SetQueueResult>
 ### setRepeatMode(...)
 
 ```typescript
-setRepeatMode(options: SetRepeatModeOptions) => Promise<ActionResult>
+setRepeatMode(options: SetRepeatModeOptions) => Promise<void>
 ```
 
 | Param         | Type                                                                  |
 | ------------- | --------------------------------------------------------------------- |
 | **`options`** | <code><a href="#setrepeatmodeoptions">SetRepeatModeOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -428,14 +408,12 @@ setRepeatMode(options: SetRepeatModeOptions) => Promise<ActionResult>
 ### setShuffleMode(...)
 
 ```typescript
-setShuffleMode(options: SetShuffleModeOptions) => Promise<ActionResult>
+setShuffleMode(options: SetShuffleModeOptions) => Promise<void>
 ```
 
 | Param         | Type                                                                    |
 | ------------- | ----------------------------------------------------------------------- |
 | **`options`** | <code><a href="#setshufflemodeoptions">SetShuffleModeOptions</a></code> |
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -443,10 +421,8 @@ setShuffleMode(options: SetShuffleModeOptions) => Promise<ActionResult>
 ### stop()
 
 ```typescript
-stop() => Promise<ActionResult>
+stop() => Promise<void>
 ```
-
-**Returns:** <code>Promise&lt;<a href="#actionresult">ActionResult</a>&gt;</code>
 
 --------------------
 
@@ -468,13 +444,6 @@ unauthorize() => Promise<void>
 | Prop         | Type                                      |
 | ------------ | ----------------------------------------- |
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
-
-
-#### ActionResult
-
-| Prop         | Type                 |
-| ------------ | -------------------- |
-| **`result`** | <code>boolean</code> |
 
 
 #### ConfigureOptions
@@ -549,6 +518,13 @@ unauthorize() => Promise<void>
 | **`mode`** | <code><a href="#shufflemode">ShuffleMode</a></code> |
 
 
+#### ActionResult
+
+| Prop         | Type                 |
+| ------------ | -------------------- |
+| **`result`** | <code>boolean</code> |
+
+
 #### PlayOptions
 
 | Prop        | Type                |
@@ -561,13 +537,6 @@ unauthorize() => Promise<void>
 | Prop       | Type                |
 | ---------- | ------------------- |
 | **`time`** | <code>number</code> |
-
-
-#### SetQueueResult
-
-| Prop        | Type                     |
-| ----------- | ------------------------ |
-| **`items`** | <code>MediaItem[]</code> |
 
 
 #### SetQueueOptions
@@ -634,11 +603,6 @@ unauthorize() => Promise<void>
 <code>"unavailable" | "notDetermined" | "denied" | "restricted" | "authorized"</code>
 
 
-#### RatingsResult
-
-<code>MusicKit.Relationship&lt;MusicKit.Ratings&gt;</code>
-
-
 #### AddRatingOptions
 
 <code>{ id: string; type: MusicKit.AppleMusicAPI.RatingType; value: MusicKit.Rating; }</code>
@@ -687,6 +651,11 @@ unauthorize() => Promise<void>
 #### GetLibrarySongsOptions
 
 <code>{ albumId?: string; catalogId?: string; playlistId?: string; } & <a href="#getmultidataoptions">GetMultiDataOptions</a></code>
+
+
+#### RatingsResult
+
+<code>MusicKit.Relationship&lt;MusicKit.Ratings&gt;</code>
 
 
 #### GetRatingsOptions
