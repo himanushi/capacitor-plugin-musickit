@@ -220,7 +220,7 @@ declare namespace MusicKit {
   interface LibraryAlbums extends Resource {
     attributes: {
       artistName: string;
-      artwork: Artwork;
+      artwork?: Artwork;
       contentRating?: ContentRating;
       dateAdded?: string;
       genreNames: string[];
