@@ -99,7 +99,13 @@ import MusicKit
     func setQueue(_ songs: [Song], _ index: Int = 0) async throws {
         currentIndex = index
         preQueueSongs = songs
+        previewPlayer = nil
         let urls = songs.dropFirst(index).map { $0.previewAssets?.first?.url }.compactMap { $0 }
+        
+        guard urls.count > 0 else {
+            return
+        }
+        
         let playerItems = urls.map { AVPlayerItem(url: $0) }
         previewPlayer = AVQueuePlayer(items: playerItems)
         previewPlayer!.addObserver(
@@ -139,6 +145,8 @@ import MusicKit
         }
         if let pPlayer = previewPlayer {
             await pPlayer.play()
+        } else {
+            notifyListeners!("playbackStateDidChange", ["state": "stopped"])
         }
         return
     }

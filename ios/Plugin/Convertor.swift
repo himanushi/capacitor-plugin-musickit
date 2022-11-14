@@ -236,20 +236,27 @@ class Convertor {
 
     static func toBase64Image(_ artwork: MPMediaItemArtwork?, _ size: Int) -> String? {
         if let artworkItem = artwork {
-            let image = artworkItem.image(at: CGSize(width: size, height: size))
-            if let data = image?.jpegData(compressionQuality: 0.1) {
-                return data.base64EncodedString()
+            do {
+                let image = artworkItem.image(at: CGSize(width: size, height: size))
+                if let data = image?.jpegData(compressionQuality: 0.1) {
+                    return data.base64EncodedString()
+                }
+            } catch {
+                return nil
             }
         }
         return nil
     }
 
     static func toBase64Image(_ artwork: Artwork?, _ size: Int) async -> String? {
-        let image = await toImage(artwork, size)
-        if let imageData = image?.jpegData(compressionQuality: 0.1) {
-            return imageData.base64EncodedString()
+        do {
+            let image = await toImage(artwork, size)
+            if let imageData = image?.jpegData(compressionQuality: 0.1) {
+                return imageData.base64EncodedString()
+            }
+        } catch {
+            return nil
         }
-
         return nil
     }
 
