@@ -83,17 +83,13 @@ export class CapacitorMusicKitWeb
   };
 
   async configure (options: ConfigureOptions): Promise<void> {
-    const errorMessage = await new Promise<string | null>((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const script = document.createElement("script");
       script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
-      script.onload = () => resolve(null);
-      script.onerror = (error) => reject(error.toString);
+      script.onload = () => resolve();
+      script.onerror = () => reject("musickit.js loading error");
       document.head.appendChild(script);
     });
-
-    if (errorMessage) {
-      throw new Error(errorMessage);
-    }
 
     const musicKit = await MusicKit.configure(options.config);
 
