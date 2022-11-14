@@ -319,9 +319,13 @@ export class CapacitorMusicKitWeb
   }
 
   async setQueue (options: SetQueueOptions): Promise<void> {
-    await MusicKit.getInstance().setQueue({
-      songs: options.ids,
-    });
+    if (options.ids.length > 0) {
+      await MusicKit.getInstance().setQueue({
+        songs: options.ids,
+      });
+    } else {
+      await MusicKit.getInstance().clearQueue();
+    }
   }
 
   async play (options: PlayOptions): Promise<void> {

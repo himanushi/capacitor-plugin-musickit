@@ -38,6 +38,8 @@ declare namespace MusicKit {
      */
     readonly bitrate: PlaybackBitrate;
 
+    clearQueue(): Promise<void>;
+
     /**
      * The developer token to identify yourself as a trusted developer and
      * member of the Apple Developer Program.
