@@ -151,7 +151,7 @@ import MusicKit
         if let pPlayer = previewPlayer {
             await pPlayer.play()
         } else {
-            notifyListeners!("playbackStateDidChange", ["state": "stopped"])
+            notifyListeners!("playbackStateDidChange", ["state": "completed"])
         }
         return
     }

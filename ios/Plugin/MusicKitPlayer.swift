@@ -100,10 +100,14 @@ import MusicKit
             // Await prepare
             for time in [1, 1, 1] {
                 sleep(UInt32(time))
-                try await ApplicationMusicPlayer.shared.prepareToPlay()
+                do {
+                    try await ApplicationMusicPlayer.shared.prepareToPlay()
+                } catch {}
                 if ApplicationMusicPlayer.shared.isPreparedToPlay {
-                    try await ApplicationMusicPlayer.shared.play()
-                    break
+                    do {
+                        try await ApplicationMusicPlayer.shared.play()
+                        break
+                    } catch {}
                 }
             }
         } else {
@@ -112,8 +116,10 @@ import MusicKit
             for time in [0, 1, 1] {
                 sleep(UInt32(time))
                 if ApplicationMusicPlayer.shared.isPreparedToPlay {
-                    try await ApplicationMusicPlayer.shared.play()
-                    break
+                    do {
+                        try await ApplicationMusicPlayer.shared.play()
+                        break
+                    } catch {}
                 }
             }
         }
