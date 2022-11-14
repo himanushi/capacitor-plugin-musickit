@@ -16,15 +16,18 @@ import MusicKit
     func queueSongs() async -> [[String: Any?]] {
         var songs: [[String: Any?]?] = []
         var count = 0
-        for entry in ApplicationMusicPlayer.shared.queue.entries {
-            let artworkUrl = await Convertor.toBase64Image(preQueueSongs[count].artwork, sSize)
-            songs.append(await Convertor.toMediaItem(item: entry.item, artworkUrl: artworkUrl))
+        for song in preQueueSongs {
+            let artworkUrl = await Convertor.toBase64Image(song.artwork, sSize)
+            songs.append(await Convertor.toMediaItem(item: song, artworkUrl: artworkUrl))
             count += 1
         }
         return songs.compactMap { $0 }
     }
 
     func currentSong() async -> [String: Any?]? {
+        guard preQueueSongs.count > 0 else {
+            return nil
+        }
         return await Convertor.toMediaItem(
             item: ApplicationMusicPlayer.shared.queue.currentEntry?.item, size: lSize)
     }
@@ -78,6 +81,9 @@ import MusicKit
     func setQueue(_ songs: [Song]) async throws {
         preQueueSongs = songs
         ApplicationMusicPlayer.shared.queue = .init(for: songs)
+        guard songs.count > 0 else {
+            return
+        }
         try await ApplicationMusicPlayer.shared.prepareToPlay()
     }
 
