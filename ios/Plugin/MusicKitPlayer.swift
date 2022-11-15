@@ -130,7 +130,6 @@ import MusicKit
     }
 
     @objc func stop() {
-
         ApplicationMusicPlayer.shared.stop()
     }
 
