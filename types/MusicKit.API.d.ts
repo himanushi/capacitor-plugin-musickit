@@ -453,7 +453,7 @@ declare namespace MusicKit {
   type Rating = -1 | 1;
 
   interface Ratings extends Resource {
-    attributes?: {
+    attributes: {
       value: Rating;
     };
     href: string;
