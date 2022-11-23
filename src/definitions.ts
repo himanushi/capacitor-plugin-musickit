@@ -31,6 +31,13 @@ export type GetLibraryArtistsOptions = {
 export type GetLibraryArtistsResult =
   MusicKit.Relationship<MusicKit.LibraryArtists>;
 
+export type GetCatalogAlbumsOptions = {
+  artistId?: string;
+  libraryId?: string;
+  musicVideoId?: string;
+  songId?: string;
+} & GetMultiDataOptions;
+
 export type GetLibraryAlbumsOptions = {
   artistId?: string;
   catalogId?: string;
@@ -38,8 +45,7 @@ export type GetLibraryAlbumsOptions = {
   songId?: string;
 } & GetMultiDataOptions;
 
-export type GetLibraryAlbumsResult =
-  MusicKit.Relationship<MusicKit.LibraryAlbums>;
+export type GetAlbumsResult = MusicKit.Relationship<MusicKit.LibraryAlbums>;
 
 export type GetLibrarySongsOptions = {
   albumId?: string;
@@ -175,12 +181,11 @@ export interface CapacitorMusicKitPlugin {
   configure(options: ConfigureOptions): Promise<void>;
   deleteRating(options: DeleteRatingOptions): Promise<void>;
   echo(options: EchoOptions): Promise<EchoResult>;
+  getCatalogAlbums(options: GetCatalogAlbumsOptions): Promise<GetAlbumsResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
   getCurrentSong(): Promise<GetCurrentSongResult>;
-  getLibraryAlbums(
-    options: GetLibraryAlbumsOptions
-  ): Promise<GetLibraryAlbumsResult>;
+  getLibraryAlbums(options: GetLibraryAlbumsOptions): Promise<GetAlbumsResult>;
   getLibraryArtists(
     options: GetLibraryArtistsOptions
   ): Promise<GetLibraryArtistsResult>;
