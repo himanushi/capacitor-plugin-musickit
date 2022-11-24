@@ -22,6 +22,25 @@ export interface GetMultiDataOptions {
   offset?: number;
 }
 
+export type GetCatalogArtistsOptions = {
+  albumId?: string;
+  libraryId?: string;
+  musicVideoId?: string;
+  songId?: string;
+  songIdForComposers?: string;
+} & GetMultiDataOptions;
+
+export type GetCatalogArtistsResult = MusicKit.Relationship<MusicKit.Artists>;
+
+export type GetCatalogAlbumsOptions = {
+  artistId?: string;
+  libraryId?: string;
+  musicVideoId?: string;
+  songId?: string;
+} & GetMultiDataOptions;
+
+export type GetCatalogAlbumsResult = MusicKit.Relationship<MusicKit.Albums>;
+
 export type GetLibraryArtistsOptions = {
   albumId?: string;
   musicVideoId?: string;
@@ -31,13 +50,6 @@ export type GetLibraryArtistsOptions = {
 export type GetLibraryArtistsResult =
   MusicKit.Relationship<MusicKit.LibraryArtists>;
 
-export type GetCatalogAlbumsOptions = {
-  artistId?: string;
-  libraryId?: string;
-  musicVideoId?: string;
-  songId?: string;
-} & GetMultiDataOptions;
-
 export type GetLibraryAlbumsOptions = {
   artistId?: string;
   catalogId?: string;
@@ -45,7 +57,8 @@ export type GetLibraryAlbumsOptions = {
   songId?: string;
 } & GetMultiDataOptions;
 
-export type GetAlbumsResult = MusicKit.Relationship<MusicKit.LibraryAlbums>;
+export type GetLibraryAlbumsResult =
+  MusicKit.Relationship<MusicKit.LibraryAlbums>;
 
 export type GetLibrarySongsOptions = {
   albumId?: string;
@@ -181,11 +194,18 @@ export interface CapacitorMusicKitPlugin {
   configure(options: ConfigureOptions): Promise<void>;
   deleteRating(options: DeleteRatingOptions): Promise<void>;
   echo(options: EchoOptions): Promise<EchoResult>;
-  getCatalogAlbums(options: GetCatalogAlbumsOptions): Promise<GetAlbumsResult>;
+  getCatalogAlbums(
+    options: GetCatalogAlbumsOptions
+  ): Promise<GetCatalogAlbumsResult>;
+  getCatalogArtists(
+    options: GetCatalogArtistsOptions
+  ): Promise<GetCatalogArtistsResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
   getCurrentSong(): Promise<GetCurrentSongResult>;
-  getLibraryAlbums(options: GetLibraryAlbumsOptions): Promise<GetAlbumsResult>;
+  getLibraryAlbums(
+    options: GetLibraryAlbumsOptions
+  ): Promise<GetLibraryAlbumsResult>;
   getLibraryArtists(
     options: GetLibraryArtistsOptions
   ): Promise<GetLibraryArtistsResult>;

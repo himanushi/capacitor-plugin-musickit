@@ -11,7 +11,6 @@ import type {
   GetCurrentIndexResult,
   GetCurrentPlaybackTimeResult,
   GetCurrentSongResult,
-  GetLibraryAlbumsResult,
   GetLibraryArtistsOptions,
   GetLibraryArtistsResult,
   GetLibraryPlaylistsResult,
@@ -33,6 +32,11 @@ import type {
   GetShuffleModeResult,
   SetShuffleModeOptions,
   ActionResult,
+  GetCatalogAlbumsOptions,
+  GetCatalogAlbumsResult,
+  GetLibraryAlbumsResult,
+  GetCatalogArtistsOptions,
+  GetCatalogArtistsResult,
 } from "./definitions";
 
 export class CapacitorMusicKitWeb
@@ -123,6 +127,85 @@ export class CapacitorMusicKitWeb
 
   async unauthorize (): Promise<void> {
     await MusicKit.getInstance().unauthorize();
+  }
+
+  async getCatalogArtists ({
+    limit = 1,
+    offset = 0,
+    ids,
+    albumId,
+    libraryId,
+    musicVideoId,
+    songId,
+    songIdForComposers,
+  }: GetCatalogArtistsOptions): Promise<GetCatalogArtistsResult> {
+    const urls: MusicKit.AppleMusicAPI.ArtistsUrl[] = [`/v1/catalog/${this.storefront}/artists` as const];
+    albumId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/albums/${albumId}/artists` as const,
+      );
+    libraryId &&
+      urls.push(`/v1/me/library/artists/${libraryId}/catalog` as const);
+    musicVideoId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/music-videos/${musicVideoId}/artists` as const,
+      );
+    songId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/songs/${songId}/artists` as const,
+      );
+    songIdForComposers &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/songs/${songId}/composers` as const,
+      );
+
+    const params = ids ? { ids } : {
+      limit,
+      offset,
+    };
+
+    const response = await MusicKit.getInstance().api.music(
+      urls.reverse()[0],
+      params,
+    );
+    return response.data;
+  }
+
+  async getCatalogAlbums ({
+    limit = 1,
+    offset = 0,
+    ids,
+    artistId,
+    libraryId,
+    musicVideoId,
+    songId,
+  }: GetCatalogAlbumsOptions): Promise<GetCatalogAlbumsResult> {
+    const urls: MusicKit.AppleMusicAPI.AlbumsUrl[] = [`/v1/catalog/${this.storefront}/albums` as const];
+    artistId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/artists/${artistId}/albums` as const,
+      );
+    libraryId &&
+      urls.push(`/v1/me/library/albums/${libraryId}/catalog` as const);
+    musicVideoId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/music-videos/${musicVideoId}/albums` as const,
+      );
+    songId &&
+      urls.push(
+        `/v1/catalog/${this.storefront}/songs/${songId}/albums` as const,
+      );
+
+    const params = ids ? { ids } : {
+      limit,
+      offset,
+    };
+
+    const response = await MusicKit.getInstance().api.music(
+      urls.reverse()[0],
+      params,
+    );
+    return response.data;
   }
 
   async getLibraryArtists ({
