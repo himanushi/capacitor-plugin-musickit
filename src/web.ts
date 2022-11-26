@@ -152,7 +152,6 @@ export class CapacitorMusicKitWeb
     libraryId,
     musicVideoId,
     songId,
-    songIdForComposers,
   }: GetCatalogArtistsOptions): Promise<GetCatalogArtistsResult> {
     const urls: MusicKit.AppleMusicAPI.ArtistsUrl[] = [`/v1/catalog/${this.storefront}/artists` as const];
     albumId &&
@@ -168,10 +167,6 @@ export class CapacitorMusicKitWeb
     songId &&
       urls.push(
         `/v1/catalog/${this.storefront}/songs/${songId}/artists` as const,
-      );
-    songIdForComposers &&
-      urls.push(
-        `/v1/catalog/${this.storefront}/songs/${songId}/composers` as const,
       );
 
     const params = ids ? { ids } : {

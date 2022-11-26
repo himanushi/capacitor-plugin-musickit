@@ -17,10 +17,13 @@ npx cap sync
 * [`addListener('nowPlayingItemDidChange', ...)`](#addlistenernowplayingitemdidchange)
 * [`addListener('authorizationStatusDidChange', ...)`](#addlistenerauthorizationstatusdidchange)
 * [`addRating(...)`](#addrating)
+* [`api(...)`](#api)
 * [`authorize()`](#authorize)
 * [`configure(...)`](#configure)
 * [`deleteRating(...)`](#deleterating)
 * [`echo(...)`](#echo)
+* [`getCatalogAlbums(...)`](#getcatalogalbums)
+* [`getCatalogArtists(...)`](#getcatalogartists)
 * [`getCurrentIndex()`](#getcurrentindex)
 * [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
 * [`getCurrentSong()`](#getcurrentsong)
@@ -113,6 +116,21 @@ addRating(options: AddRatingOptions) => Promise<void>
 --------------------
 
 
+### api(...)
+
+```typescript
+api<T>(options: ApiOptions) => Promise<ApiResult<T>>
+```
+
+| Param         | Type                                              |
+| ------------- | ------------------------------------------------- |
+| **`options`** | <code><a href="#apioptions">ApiOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#apiresult">ApiResult</a>&lt;T&gt;&gt;</code>
+
+--------------------
+
+
 ### authorize()
 
 ```typescript
@@ -159,6 +177,36 @@ echo(options: EchoOptions) => Promise<EchoResult>
 | **`options`** | <code><a href="#echooptions">EchoOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#echoresult">EchoResult</a>&gt;</code>
+
+--------------------
+
+
+### getCatalogAlbums(...)
+
+```typescript
+getCatalogAlbums(options: GetCatalogAlbumsOptions) => Promise<GetCatalogAlbumsResult>
+```
+
+| Param         | Type                                                                        |
+| ------------- | --------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#getcatalogalbumsoptions">GetCatalogAlbumsOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#getcatalogalbumsresult">GetCatalogAlbumsResult</a>&gt;</code>
+
+--------------------
+
+
+### getCatalogArtists(...)
+
+```typescript
+getCatalogArtists(options: GetCatalogArtistsOptions) => Promise<GetCatalogArtistsResult>
+```
+
+| Param         | Type                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| **`options`** | <code><a href="#getcatalogartistsoptions">GetCatalogArtistsOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#getcatalogartistsresult">GetCatalogArtistsResult</a>&gt;</code>
 
 --------------------
 
@@ -467,6 +515,15 @@ unauthorize() => Promise<void>
 | **`value`** | <code>string</code> |
 
 
+#### GetMultiDataOptions
+
+| Prop         | Type                  |
+| ------------ | --------------------- |
+| **`ids`**    | <code>string[]</code> |
+| **`limit`**  | <code>number</code>   |
+| **`offset`** | <code>number</code>   |
+
+
 #### GetCurrentIndexResult
 
 | Prop        | Type                |
@@ -486,15 +543,6 @@ unauthorize() => Promise<void>
 | Prop       | Type                            |
 | ---------- | ------------------------------- |
 | **`item`** | <code>MusicKit.MediaItem</code> |
-
-
-#### GetMultiDataOptions
-
-| Prop         | Type                  |
-| ------------ | --------------------- |
-| **`ids`**    | <code>string[]</code> |
-| **`limit`**  | <code>number</code>   |
-| **`offset`** | <code>number</code>   |
 
 
 #### GetQueueSongsResult
@@ -608,9 +656,39 @@ unauthorize() => Promise<void>
 <code>{ id: string; type: MusicKit.AppleMusicAPI.RatingType; value: MusicKit.Rating; }</code>
 
 
+#### ApiResult
+
+<code>MusicKit.Relationship&lt;T&gt;</code>
+
+
+#### ApiOptions
+
+<code>{ options?: MusicKit.AppleMusicAPI.Options; params?: MusicKit.AppleMusicAPI.Params; url: string; }</code>
+
+
 #### DeleteRatingOptions
 
 <code>{ id: string; type: MusicKit.AppleMusicAPI.RatingType; }</code>
+
+
+#### GetCatalogAlbumsResult
+
+<code>MusicKit.Relationship&lt;MusicKit.Albums&gt;</code>
+
+
+#### GetCatalogAlbumsOptions
+
+<code>{ artistId?: string; libraryId?: string; musicVideoId?: string; songId?: string; } & <a href="#getmultidataoptions">GetMultiDataOptions</a></code>
+
+
+#### GetCatalogArtistsResult
+
+<code>MusicKit.Relationship&lt;MusicKit.Artists&gt;</code>
+
+
+#### GetCatalogArtistsOptions
+
+<code>{ albumId?: string; libraryId?: string; musicVideoId?: string; songId?: string; songIdForComposers?: string; } & <a href="#getmultidataoptions">GetMultiDataOptions</a></code>
 
 
 #### GetLibraryAlbumsResult
