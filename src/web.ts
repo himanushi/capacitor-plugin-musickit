@@ -37,6 +37,8 @@ import type {
   GetLibraryAlbumsResult,
   GetCatalogArtistsOptions,
   GetCatalogArtistsResult,
+  ApiOptions,
+  ApiResult,
 } from "./definitions";
 
 export class CapacitorMusicKitWeb
@@ -127,6 +129,19 @@ export class CapacitorMusicKitWeb
 
   async unauthorize (): Promise<void> {
     await MusicKit.getInstance().unauthorize();
+  }
+
+  async api<T extends any> ({
+    url,
+    params = {},
+    options = {},
+  }: ApiOptions): Promise<ApiResult<T>> {
+    const { data } = await MusicKit.getInstance().api.music(
+      url as any,
+      params,
+      options,
+    );
+    return data as any;
   }
 
   async getCatalogArtists ({

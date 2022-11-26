@@ -22,6 +22,14 @@ export interface GetMultiDataOptions {
   offset?: number;
 }
 
+export type ApiOptions = {
+  options?: MusicKit.AppleMusicAPI.Options;
+  params?: MusicKit.AppleMusicAPI.Params;
+  url: string;
+};
+
+export type ApiResult<T> = MusicKit.Relationship<T>;
+
 export type GetCatalogArtistsOptions = {
   albumId?: string;
   libraryId?: string;
@@ -190,6 +198,7 @@ export interface CapacitorMusicKitPlugin {
     listenerFunc: AuthorizationStatusDidChangeListener
   ): Promise<PluginListenerHandle> & PluginListenerHandle;
   addRating(options: AddRatingOptions): Promise<void>;
+  api<T>(options: ApiOptions): Promise<ApiResult<T>>;
   authorize(): Promise<void>;
   configure(options: ConfigureOptions): Promise<void>;
   deleteRating(options: DeleteRatingOptions): Promise<void>;
