@@ -25,6 +25,7 @@ npx cap sync
 * [`getCatalogAlbums(...)`](#getcatalogalbums)
 * [`getCatalogArtists(...)`](#getcatalogartists)
 * [`getCurrentIndex()`](#getcurrentindex)
+* [`getCurrentPlaybackDuration()`](#getcurrentplaybackduration)
 * [`getCurrentPlaybackTime()`](#getcurrentplaybacktime)
 * [`getCurrentSong()`](#getcurrentsong)
 * [`getLibraryAlbums(...)`](#getlibraryalbums)
@@ -219,6 +220,17 @@ getCurrentIndex() => Promise<GetCurrentIndexResult>
 ```
 
 **Returns:** <code>Promise&lt;<a href="#getcurrentindexresult">GetCurrentIndexResult</a>&gt;</code>
+
+--------------------
+
+
+### getCurrentPlaybackDuration()
+
+```typescript
+getCurrentPlaybackDuration() => Promise<GetCurrentPlaybackTimeResult>
+```
+
+**Returns:** <code>Promise&lt;<a href="#getcurrentplaybacktimeresult">GetCurrentPlaybackTimeResult</a>&gt;</code>
 
 --------------------
 
