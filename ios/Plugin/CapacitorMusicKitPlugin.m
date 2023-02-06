@@ -10,6 +10,7 @@ CAP_PLUGIN(CapacitorMusicKitPlugin, "CapacitorMusicKit",
            CAP_PLUGIN_METHOD(hasMusicSubscription, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(authorize, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(unauthorize, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(api, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getLibraryArtists, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getLibraryAlbums, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getLibrarySongs, CAPPluginReturnPromise);

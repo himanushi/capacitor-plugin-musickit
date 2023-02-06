@@ -95,6 +95,12 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             call.resolve()
         }
     }
+    
+    @objc func api(_ call: CAPPluginCall) {
+        Task {
+            call.resolve(try await musicKit.api(call))
+        }
+    }
 
     @objc func getLibraryArtists(_ call: CAPPluginCall) {
         Task {

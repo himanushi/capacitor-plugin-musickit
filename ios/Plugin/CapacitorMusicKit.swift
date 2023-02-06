@@ -163,6 +163,11 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
         return params
     }
+    
+    @objc func api(_ call: CAPPluginCall) async throws -> [String: Any] {
+        let url = call.getString("url")!
+        return await Convertor.getDataRequestJSON(url)
+    }
 
     @objc func getLibraryArtists(_ call: CAPPluginCall) async throws -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
