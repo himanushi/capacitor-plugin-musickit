@@ -45,6 +45,7 @@ npx cap sync
 * [`setQueue(...)`](#setqueue)
 * [`setRepeatMode(...)`](#setrepeatmode)
 * [`setShuffleMode(...)`](#setshufflemode)
+* [`setSong(...)`](#setsong)
 * [`stop()`](#stop)
 * [`unauthorize()`](#unauthorize)
 * [Interfaces](#interfaces)
@@ -466,6 +467,21 @@ setShuffleMode(options: SetShuffleModeOptions) => Promise<void>
 --------------------
 
 
+### setSong(...)
+
+```typescript
+setSong(options: SetSongOptions) => Promise<SetSongResult>
+```
+
+| Param         | Type                                                      |
+| ------------- | --------------------------------------------------------- |
+| **`options`** | <code><a href="#setsongoptions">SetSongOptions</a></code> |
+
+**Returns:** <code>Promise&lt;<a href="#setsongresult">SetSongResult</a>&gt;</code>
+
+--------------------
+
+
 ### stop()
 
 ```typescript
@@ -606,6 +622,27 @@ unauthorize() => Promise<void>
 | Prop       | Type                                                |
 | ---------- | --------------------------------------------------- |
 | **`mode`** | <code><a href="#shufflemode">ShuffleMode</a></code> |
+
+
+#### SetSongResult
+
+| Prop                | Type                 |
+| ------------------- | -------------------- |
+| **`albumTitle`**    | <code>string</code>  |
+| **`librarySongId`** | <code>string</code>  |
+| **`result`**        | <code>boolean</code> |
+
+
+#### SetSongOptions
+
+| Prop                | Type                 |
+| ------------------- | -------------------- |
+| **`albumTitle`**    | <code>string</code>  |
+| **`forcePreview`**  | <code>boolean</code> |
+| **`librarySongId`** | <code>string</code>  |
+| **`previewUrl`**    | <code>string</code>  |
+| **`songId`**        | <code>string</code>  |
+| **`songTitle`**     | <code>string</code>  |
 
 
 ### Type Aliases
