@@ -380,7 +380,7 @@ export class CapacitorMusicKitWeb
     return { index: MusicKit.getInstance().nowPlayingItemIndex };
   }
 
-  async currentPlaybackDuration (): Promise<GetCurrentPlaybackDurationResult> {
+  async getCurrentPlaybackDuration (): Promise<GetCurrentPlaybackDurationResult> {
     let time = 0;
     if (this.player) {
       time = this.player.duration();

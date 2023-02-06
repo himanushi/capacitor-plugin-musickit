@@ -229,6 +229,7 @@ export interface CapacitorMusicKitPlugin {
     options: GetCatalogArtistsOptions
   ): Promise<GetCatalogArtistsResult>;
   getCurrentIndex(): Promise<GetCurrentIndexResult>;
+  getCurrentPlaybackDuration(): Promise<GetCurrentPlaybackTimeResult>;
   getCurrentPlaybackTime(): Promise<GetCurrentPlaybackTimeResult>;
   getCurrentSong(): Promise<GetCurrentSongResult>;
   getLibraryAlbums(
