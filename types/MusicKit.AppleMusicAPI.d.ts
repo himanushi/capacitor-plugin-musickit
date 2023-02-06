@@ -67,6 +67,8 @@ declare namespace MusicKit {
       | `/v1/catalog/${string}/playlists/${string}/library`
       | "/v1/me/library/playlists";
 
+    type SearchLibrarySongsUrl = "/v1/me/library/search?types=library-songs";
+
     type RatingCategoryType = "artists" | "albums" | "songs" | "playlists";
     type RatingType = RatingCategoryType | `library-${RatingCategoryType}`;
 
@@ -165,5 +167,15 @@ declare namespace MusicKit {
       params?: Params,
       options?: Options
     ): Promise<Response<Ratings>>;
+
+    function music(
+      url: SearchLibrarySongsUrl,
+      params?: Params,
+      options?: Options
+    ): Promise<SearchLibrarySongsResponse>;
+
+    interface SearchLibrarySongsResponse {
+      data: { results: { "library-songs": Relationship<LibrarySongs> } };
+    }
   }
 }

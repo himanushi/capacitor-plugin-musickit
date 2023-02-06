@@ -54,6 +54,7 @@
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
     "@trivago/prettier-plugin-sort-imports": "^3.4.0",
+    "@types/howler": "^2.2.3",
     "eslint": "^7.11.0",
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "eslint-plugin-typescript-sort-keys": "^2.1.0",
@@ -74,5 +75,8 @@
     "android": {
       "src": "android"
     }
+  },
+  "dependencies": {
+    "howler": "^2.2.3"
   }
 }

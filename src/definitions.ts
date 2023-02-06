@@ -114,6 +114,10 @@ export interface GetCurrentIndexResult {
   index: number;
 }
 
+export interface GetCurrentPlaybackDurationResult {
+  time: number;
+}
+
 export interface GetCurrentPlaybackTimeResult {
   time: number;
 }
@@ -126,6 +130,21 @@ export interface GetRepeatModeResult {
 
 export interface SetRepeatModeOptions {
   mode: RepeatMode;
+}
+
+export interface SetSongOptions {
+  albumTitle?: string;
+  forcePreview?: boolean;
+  librarySongId?: string;
+  previewUrl?: string;
+  songId: string;
+  songTitle?: string;
+}
+
+export interface SetSongResult {
+  albumTitle?: string;
+  librarySongId?: string;
+  result: boolean;
 }
 
 export type ShuffleMode = "off" | "songs";
@@ -238,6 +257,7 @@ export interface CapacitorMusicKitPlugin {
   setQueue(options: SetQueueOptions): Promise<void>;
   setRepeatMode(options: SetRepeatModeOptions): Promise<void>;
   setShuffleMode(options: SetShuffleModeOptions): Promise<void>;
+  setSong(options: SetSongOptions): Promise<SetSongResult>;
   stop(): Promise<void>;
   unauthorize(): Promise<void>;
 }

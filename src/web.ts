@@ -1,4 +1,5 @@
 import { WebPlugin } from "@capacitor/core";
+import { Howl } from "howler";
 import type {
   AddRatingOptions,
   AuthorizationStatus,
@@ -39,6 +40,9 @@ import type {
   GetCatalogArtistsResult,
   ApiOptions,
   ApiResult,
+  GetCurrentPlaybackDurationResult,
+  SetSongOptions,
+  SetSongResult,
 } from "./definitions";
 
 export class CapacitorMusicKitWeb
@@ -376,8 +380,24 @@ export class CapacitorMusicKitWeb
     return { index: MusicKit.getInstance().nowPlayingItemIndex };
   }
 
+  async currentPlaybackDuration (): Promise<GetCurrentPlaybackDurationResult> {
+    let time = 0;
+    if (this.player) {
+      time = this.player.duration();
+    } else {
+      time = await MusicKit.getInstance().currentPlaybackDuration;
+    }
+    return { time };
+  }
+
   async getCurrentPlaybackTime (): Promise<GetCurrentPlaybackTimeResult> {
-    return { time: MusicKit.getInstance().currentPlaybackTime };
+    let time = 0;
+    if (this.player) {
+      time = this.player.seek() as number;
+    } else {
+      time = MusicKit.getInstance().currentPlaybackTime;
+    }
+    return { time };
   }
 
   async getRepeatMode (): Promise<GetRepeatModeResult> {
@@ -419,18 +439,30 @@ export class CapacitorMusicKitWeb
 
   async play (options: PlayOptions): Promise<void> {
     if (options.index === undefined) {
-      await MusicKit.getInstance().play();
+      if (this.player) {
+        this.player.play();
+      } else {
+        await MusicKit.getInstance().play();
+      }
     } else {
       await MusicKit.getInstance().changeToMediaAtIndex(options.index);
     }
   }
 
   async pause (): Promise<void> {
-    await MusicKit.getInstance().pause();
+    if (this.player) {
+      this.player.pause();
+    } else {
+      await MusicKit.getInstance().pause();
+    }
   }
 
   async stop (): Promise<void> {
-    await MusicKit.getInstance().stop();
+    if (this.player) {
+      this.player.stop();
+    } else {
+      await MusicKit.getInstance().stop();
+    }
   }
 
   async nextPlay (): Promise<void> {
@@ -442,6 +474,269 @@ export class CapacitorMusicKitWeb
   }
 
   async seekToTime (options: SeekToTimeOptions): Promise<void> {
-    await MusicKit.getInstance().seekToTime(options.time);
+    if (this.player) {
+      this.player.seek(options.time);
+    } else {
+      MusicKit.getInstance().seekToTime(options.time);
+    }
+  }
+
+  player: Howl | undefined;
+
+  defaultVolume = 1.0;
+
+  fadeoutId: NodeJS.Timeout | undefined;
+
+  resetFadeoutId (): void {
+    if (this.fadeoutId !== undefined) {
+      clearTimeout(this.fadeoutId);
+      this.fadeoutId = undefined;
+    }
+  }
+
+  async resetMusicKit (): Promise<void> {
+    MusicKit.getInstance().volume = this.defaultVolume;
+    await MusicKit.getInstance().stop();
+    await MusicKit.getInstance().setQueue({ songs: [] });
+  }
+
+  async resetPreviewPlayer (): Promise<void> {
+    this.resetFadeoutId();
+    if (this.player) {
+      this.player.stop();
+      this.player.off("play");
+      this.player.off("pause");
+      this.player.off("end");
+      this.player.off("stop");
+      this.player = undefined;
+    }
+  }
+
+  async reset (): Promise<void> {
+    await this.resetMusicKit();
+    this.resetPreviewPlayer();
+  }
+
+  async setSong (options: SetSongOptions): Promise<SetSongResult> {
+    const replaceName = (name: string) =>
+      // 名前が長すぎる場合は検索で引っかからないのでなるべく短い名前にする
+      // eslint-disable-next-line prefer-named-capture-group
+      name.replace(/(?!^)(\[|\(|-|:|〜|~|,).*/gu, "");
+    const getLibrarySong = async (name: string, songId: string) => {
+      const endpoint = `/v1/me/library/search?types=library-songs&term=${replaceName(
+        name,
+      )}`;
+      return await getLoopLibrarySong(endpoint, songId);
+    };
+
+    const searchLibrarySongs = async (
+      endpoint: MusicKit.AppleMusicAPI.SearchLibrarySongsUrl,
+    ) => await MusicKit.getInstance().api.music(endpoint);
+
+    const getLoopLibrarySong = async (
+      endpoint: string,
+      songId: string,
+    ): Promise<MusicKit.LibrarySongs | null> => {
+      const response = await searchLibrarySongs(
+        `${endpoint}&limit=25` as MusicKit.AppleMusicAPI.SearchLibrarySongsUrl,
+      );
+
+      if (!("results" in response.data)) {
+        return null;
+      }
+
+      const track = response.data.results["library-songs"]?.data.find(
+        (trk) => trk.attributes.playParams?.purchasedId === options.songId,
+      );
+
+      if (track) {
+        return track;
+      }
+
+      if (response.data.results["library-songs"]?.next) {
+        return await getLoopLibrarySong(
+          response.data.results["library-songs"]?.next,
+          songId,
+        );
+      }
+
+      return null;
+    };
+
+    try {
+      await this.reset();
+
+      // ライブラリ参照権限がない場合はプレビュー再生
+      // または
+      // 強制的にプレビュー再生
+      if (!(await this.isAuthorized()).result || options.forcePreview) {
+        if (options.previewUrl) {
+          this.resetPreviewPlayer();
+          if (options.forcePreview) {
+            console.log(
+              "🎵 ------ force preview ---------",
+              options.previewUrl,
+            );
+          } else {
+            console.log(
+              "🎵 ------ unAuth preview ---------",
+              options.previewUrl,
+            );
+          }
+          this.setPlayer(options.previewUrl);
+          return { result: true };
+        }
+        return { result: false };
+      }
+
+      // ライブラリIDが存在する場合はライブラリの曲を再生
+      if (options.librarySongId) {
+        console.log("🎵 ------ iTunes Cache ---------");
+        await MusicKit.getInstance().setQueue({
+          songs: [options.librarySongId],
+        });
+        return {
+          librarySongId: options.librarySongId,
+          result: true,
+        };
+      }
+
+      const catalogResult = await MusicKit.getInstance().api.music(
+        `v1/catalog/jp/songs/${options.songId}` as MusicKit.AppleMusicAPI.SongsUrl,
+      );
+
+      if (!("data" in catalogResult.data)) {
+        return { result: false };
+      }
+
+      const track = catalogResult.data.data[0];
+      if (!track) {
+        return { result: false };
+      }
+
+      const playable = Boolean(track.attributes.playParams);
+      if (playable) {
+        console.log("🎵 ------ Apple Music ---------");
+        await MusicKit.getInstance().setQueue({ songs: [options.songId] });
+      } else {
+        const purchasedTrack = await getLibrarySong(
+          options.songTitle ?? track.attributes.name,
+          options.songId,
+        );
+        const previewUrl = track.attributes.previews[0]?.url;
+
+        if (purchasedTrack) {
+          console.log("🎵 ------ iTunes ---------");
+          await MusicKit.getInstance().setQueue({ songs: [purchasedTrack.id] });
+          return {
+            albumTitle: purchasedTrack.attributes.albumName,
+            librarySongId: purchasedTrack.id,
+            result: true,
+          };
+        } else if (previewUrl) {
+          console.log("🎵 ------ preview ---------", previewUrl);
+          this.setPlayer(previewUrl);
+        }
+      }
+    } catch (error) {
+      try {
+        // Apple ID が 404 の場合
+        console.log(error);
+
+        if (!options.songTitle) {
+          return { result: false };
+        }
+
+        const purchasedTrack = await getLibrarySong(
+          options.songTitle,
+          options.songId,
+        );
+        const previewUrl = options.previewUrl;
+
+        if (purchasedTrack) {
+          console.log("🎵 ------ iTunes ---------");
+          await MusicKit.getInstance().setQueue({ songs: [purchasedTrack.id] });
+          return {
+            albumTitle: purchasedTrack.attributes.albumName,
+            librarySongId: purchasedTrack.id,
+            result: true,
+          };
+        } else if (previewUrl) {
+          console.log("🎵 ------ preview ---------", previewUrl);
+          this.setPlayer(previewUrl);
+        }
+      } catch (error2) {
+        console.log(error2);
+        return { result: false };
+      }
+    }
+    return { result: true };
+  }
+
+  setPlayer (previewUrl: string): void {
+    this.player = new Howl({
+      autoplay: false,
+      html5: true,
+      preload: false,
+      src: previewUrl,
+      volume: 0,
+    });
+
+    const fadeouttime = 2000;
+
+    const fadeIn = () => {
+      if (!this.player) {
+        return;
+      }
+
+      if (this.player.volume() === 0) {
+        this.player.fade(0, this.defaultVolume, fadeouttime);
+      } else {
+        this.player.volume(this.defaultVolume);
+      }
+    };
+
+    const fadeOut = () => {
+      if (!this.player || this.fadeoutId !== undefined) {
+        return;
+      }
+
+      const seek = this.player.seek() as number;
+
+      const time = (this.player.duration() - seek) as number;
+
+      const ms = time * 1000;
+
+      const timeout = ms - fadeouttime;
+
+      this.fadeoutId = setTimeout(() => {
+        if (!this.player) {
+          return;
+        }
+        this.player.fade(this.defaultVolume, 0, fadeouttime);
+      }, timeout);
+    };
+
+    this.player.on("play", () => {
+      fadeIn();
+      fadeOut();
+      this.notifyListeners("playbackStateDidChange", { result: "playing" });
+    });
+    this.player.on("pause", () => {
+      this.resetFadeoutId();
+      this.notifyListeners("playbackStateDidChange", { result: "paused" });
+    });
+    this.player.on("end", () => {
+      this.resetFadeoutId();
+      this.notifyListeners("playbackStateDidChange", { result: "completed" });
+    });
+    this.player.on("stop", () => {
+      this.resetFadeoutId();
+      this.notifyListeners("playbackStateDidChange", { result: "stopped" });
+    });
+    this.player.on("seek", () => {
+      this.resetFadeoutId();
+      fadeOut();
+    });
   }
 }
