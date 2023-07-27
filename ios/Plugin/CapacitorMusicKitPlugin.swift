@@ -98,7 +98,11 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     
     @objc func api(_ call: CAPPluginCall) {
         Task {
-            call.resolve(try await musicKit.api(call))
+            do {
+                call.resolve(try await musicKit.api(call))
+            } catch {
+                call.reject("error")
+            }
         }
     }
 
@@ -170,8 +174,10 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             let type = call.getString("type")!
             let ids = call.getArray("ids", String.self)!
             call.resolve(
-                await Convertor.getDataRequestJSON(
-                    "/v1/me/ratings/\(type)?ids=\(ids.joined(separator: "%2C"))"))
+                try await Convertor.getDataRequestJSON(
+                    "/v1/me/ratings/\(type)",
+                    params: ["ids": ids.joined(separator: "%2C")]
+                ))
         }
     }
 

@@ -164,12 +164,22 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         return params
     }
     
+    func getParams(from call: CAPPluginCall) -> [String: String] {
+        let paramsObject = call.getObject("params") ?? [:]
+        var params: [String: String] = [:]
+        for (key, value) in paramsObject {
+            params[key] = String(describing: value)
+        }
+        return params
+    }
+    
     @objc func api(_ call: CAPPluginCall) async throws -> [String: Any] {
         let url = call.getString("url")!
-        return await Convertor.getDataRequestJSON(url)
+        let params = getParams(from: call)
+        return try await Convertor.getDataRequestJSON(url, params: params)
     }
 
-    @objc func getLibraryArtists(_ call: CAPPluginCall) async -> [String: Any] {
+    @objc func getLibraryArtists(_ call: CAPPluginCall) async throws -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
         let ids = call.getArray("ids", String.self)
@@ -190,10 +200,10 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         url = "\(url)\(params)"
-        return await Convertor.getDataRequestJSON(url)
+        return try await Convertor.getDataRequestJSON(url)
     }
 
-    @objc func getLibraryAlbums(_ call: CAPPluginCall) async -> [String: Any] {
+    @objc func getLibraryAlbums(_ call: CAPPluginCall) async throws -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
         let ids = call.getArray("ids", String.self)
@@ -217,10 +227,10 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         url = "\(url)\(params)"
-        return await Convertor.getDataRequestJSON(url)
+        return try await Convertor.getDataRequestJSON(url)
     }
     
-    @objc func getLibrarySongs(_ call: CAPPluginCall) async -> [String: Any] {
+    @objc func getLibrarySongs(_ call: CAPPluginCall) async throws -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
         let ids = call.getArray("ids", String.self)
@@ -241,10 +251,10 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         url = "\(url)\(params)"
-        return await Convertor.getDataRequestJSON(url)
+        return try await Convertor.getDataRequestJSON(url)
     }
     
-    @objc func getLibraryPlaylists(_ call: CAPPluginCall) async -> [String: Any] {
+    @objc func getLibraryPlaylists(_ call: CAPPluginCall) async throws -> [String: Any] {
         let limit = call.getInt("limit") ?? 1
         let offset = call.getInt("offset") ?? 0
         let ids = call.getArray("ids", String.self)
@@ -259,7 +269,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         }
 
         url = "\(url)\(params)"
-        return await Convertor.getDataRequestJSON(url)
+        return try await Convertor.getDataRequestJSON(url)
     }
 
     func selectSongs(_ ids: [String]) async throws -> [Song] {

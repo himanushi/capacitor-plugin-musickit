@@ -8,18 +8,24 @@ class Convertor {
     static let mSize = 400
     static let lSize = 600
 
-    static func getDataRequestJSON(_ url: String) async -> [String: Any] {
-        do {
-            guard let url = URL(string: "\(baseUrl)\(url)") else {
-                return [:]
-            }
-            let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response().data
-            if data.count > 0 {
-                return try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-            } else {
-                return [:]
-            }
-        } catch {
+    static func getDataRequestJSON(_ url: String, params: [String: String] = [:]) async throws -> [String: Any] {
+        print("getDataRequestJSON1")
+        print("\(baseUrl)\(url)")
+
+        var urlComponents = URLComponents(string: "\(baseUrl)\(url)")
+        urlComponents?.queryItems = params.map { URLQueryItem(name: $0.key, value: $0.value) }
+
+        guard let url = urlComponents?.url else {
+            return [:]
+        }
+
+        print("getDataRequestJSON2")
+        let data = try await MusicDataRequest(urlRequest: URLRequest(url: url)).response().data
+        print("getDataRequestJSON3")
+        
+        if data.count > 0 {
+            return try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+        } else {
             return [:]
         }
     }
