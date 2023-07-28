@@ -707,7 +707,7 @@ unauthorize() => Promise<void>
 
 #### ApiResult
 
-<code>MusicKit.Relationship&lt;T&gt;</code>
+<code>MusicKit.Relationship&lt;T&gt; | MusicKit.SearchRelationship</code>
 
 
 #### ApiOptions
