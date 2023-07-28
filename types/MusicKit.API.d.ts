@@ -43,6 +43,21 @@ declare namespace MusicKit {
     next?: string;
   }
 
+  interface SearchRelationship {
+    meta: { results: { order: string[] } };
+    results: {
+      albums?: Relationship<Albums>;
+      artists?: Relationship<Artists>;
+      curators?: Relationship<Curators>;
+      "library-albums"?: Relationship<LibraryAlbums>;
+      "library-artists"?: Relationship<LibraryArtists>;
+      "library-playlists"?: Relationship<LibraryAlbums>;
+      "library-songs"?: Relationship<LibraryAlbums>;
+      playlists?: Relationship<Playlists>;
+      songs?: Relationship<Songs>;
+    };
+  }
+
   /**
    * A to-one or to-many relationship view from one resource object to others representing interesting associations.
    * https://developer.apple.com/documentation/applemusicapi/view

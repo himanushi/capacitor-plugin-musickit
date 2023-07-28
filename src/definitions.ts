@@ -28,7 +28,9 @@ export type ApiOptions = {
   url: string;
 };
 
-export type ApiResult<T> = MusicKit.Relationship<T>;
+export type ApiResult<T> =
+  | MusicKit.Relationship<T>
+  | MusicKit.SearchRelationship;
 
 export type GetCatalogArtistsOptions = {
   albumId?: string;
