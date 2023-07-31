@@ -58,6 +58,16 @@ import MusicKit
         change: [NSKeyValueChangeKey: Any]?,
         context: UnsafeMutableRawPointer?
     ) {
+        if keyPath == "rate", let player = object as? AVPlayer, let item = player.currentItem {
+            MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.currentTime().seconds
+            if player.rate == 1 {
+                MPNowPlayingInfoCenter.default().playbackState = .playing
+                notifyListeners!("playbackStateDidChange", ["result": "playing"])
+            } else {
+                MPNowPlayingInfoCenter.default().playbackState = .paused
+                notifyListeners!("playbackStateDidChange", ["result": "paused"])
+            }
+        }
         if keyPath == "currentItem" {
             guard change?[NSKeyValueChangeKey.newKey] is AVPlayerItem else {
                 Task {
@@ -79,19 +89,6 @@ import MusicKit
                 notifyListeners!(
                     "nowPlayingItemDidChange",
                     ["item": await currentSong() as Any, "index": currentIndex])
-            }
-        }
-        if keyPath == "rate", let player = object as? AVQueuePlayer {
-            Task {
-                MPNowPlayingInfoCenter.default().nowPlayingInfo?[
-                    MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.currentTime().seconds
-                if await player.rate == 1 {
-                    MPNowPlayingInfoCenter.default().playbackState = .playing
-                    notifyListeners!("playbackStateDidChange", ["state": "playing"])
-                } else {
-                    MPNowPlayingInfoCenter.default().playbackState = .paused
-                    notifyListeners!("playbackStateDidChange", ["state": "paused"])
-                }
             }
         }
     }

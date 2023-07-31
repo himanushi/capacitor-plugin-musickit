@@ -18,7 +18,6 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
         do {
             try audioSession.setCategory(.playback, mode: .default)
             try audioSession.setActive(true)
-            UIApplication.shared.beginReceivingRemoteControlEvents()
         } catch {
             print(error)
         }
@@ -41,6 +40,17 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
             name: UIApplication.didBecomeActiveNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(playerDidFinishPlaying),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: nil
+        )
+    }
+
+    @objc func playerDidFinishPlaying(note: NSNotification) {
+        MPNowPlayingInfoCenter.default().playbackState = .paused
+        notifyListeners("playbackStateDidChange", data: ["result": "completed"])
     }
 
     @objc private func playbackStateDidChange() {
