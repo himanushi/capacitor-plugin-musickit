@@ -66,22 +66,33 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         commandCenter.changePlaybackPositionCommand.isEnabled = status
     }
 
+    var prevPlaybackState: MPMusicPlaybackState = .stopped
+    var started = false
     @objc public func playbackStateDidChange() -> String? {
         var result: String? = nil
+        
+        let currentDuration =
+            MPMusicPlayerController.applicationMusicPlayer.nowPlayingItem?.playbackDuration ?? 0.0
 
-        if isPreview {
-            return result
-        }
-
-        if player.playbackState == .playing {
+        // 曲が終わる3秒前に一時停止をした場合は曲が再生終了したとみなす
+        if started && player.playbackState == .paused && prevPlaybackState == .playing
+            && player.currentPlaybackTime + 3 >= currentDuration
+        {
+            result = "completed"
+            prevPlaybackState = .stopped
+            started = false
+        } else if player.playbackState == .playing && prevPlaybackState != .playing {
             result = "playing"
-        } else if player.playbackState == .paused {
+            started = true
+        } else if player.playbackState == .paused && prevPlaybackState != .paused {
             result = "paused"
-        } else if player.playbackState == .stopped {
+        } else if player.playbackState == .stopped && prevPlaybackState != .stopped {
             result = "stopped"
-        } else if player.playbackState == .interrupted {
+        } else if player.playbackState == .interrupted && prevPlaybackState != .interrupted {
             result = "paused"
         }
+
+        prevPlaybackState = player.playbackState
 
         return result
     }
