@@ -160,21 +160,22 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
         await UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
     }
 
-    func buildParams(_ optIds: [String]?, _ optLimit: Int?, _ optOffset: Int?) -> String {
-        var params = ""
+    func buildParams(_ optIds: [String]?, _ optLimit: Int?, _ optOffset: Int?) -> [String: String] {
+        var params: [String: String] = [:]
+
         if let ids = optIds {
-            params = "?ids=\(ids.joined(separator: "%2C"))"
+            params["ids"] = ids.joined(separator: "%2C")
         } else {
             if let limit = optLimit {
-                params = "?limit=\(limit)&"
+                params["limit"] = String(limit)
             }
             if let offset = optOffset {
-                params += "offset=\(offset)&"
+                params["offset"] = String(offset)
             }
         }
         return params
     }
-    
+
     func getParams(from call: CAPPluginCall) -> [String: String] {
         let paramsObject = call.getObject("params") ?? [:]
         var params: [String: String] = [:]
@@ -210,8 +211,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
             url = "/v1/me/library/music-videos/\(musicVideoId)/artists"
         }
 
-        url = "\(url)\(params)"
-        return try await Convertor.getDataRequestJSON(url)
+        return try await Convertor.getDataRequestJSON(url, params: params)
     }
 
     @objc func getLibraryAlbums(_ call: CAPPluginCall) async throws -> [String: Any] {
@@ -237,8 +237,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
             url = "/v1/me/library/music-videos/\(musicVideoId)/albums"
         }
 
-        url = "\(url)\(params)"
-        return try await Convertor.getDataRequestJSON(url)
+        return try await Convertor.getDataRequestJSON(url, params: params)
     }
     
     @objc func getLibrarySongs(_ call: CAPPluginCall) async throws -> [String: Any] {
@@ -261,8 +260,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
             url = "/v1/me/library/playlists/\(playlistId)/tracks"
         }
 
-        url = "\(url)\(params)"
-        return try await Convertor.getDataRequestJSON(url)
+        return try await Convertor.getDataRequestJSON(url, params: params)
     }
     
     @objc func getLibraryPlaylists(_ call: CAPPluginCall) async throws -> [String: Any] {
@@ -279,8 +277,7 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
             url = "/v1/catalog/\(storefront)/playlists/\(catalogId)/library"
         }
 
-        url = "\(url)\(params)"
-        return try await Convertor.getDataRequestJSON(url)
+        return try await Convertor.getDataRequestJSON(url, params: params)
     }
 
     func selectSongs(_ ids: [String]) async throws -> [Song] {
