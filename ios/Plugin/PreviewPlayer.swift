@@ -62,10 +62,10 @@ import MusicKit
             MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.currentTime().seconds
             if player.rate == 1 {
                 MPNowPlayingInfoCenter.default().playbackState = .playing
-                notifyListeners!("playbackStateDidChange", ["result": "playing"])
+                notifyListeners!("playbackStateDidChange", ["state": "playing"])
             } else {
                 MPNowPlayingInfoCenter.default().playbackState = .paused
-                notifyListeners!("playbackStateDidChange", ["result": "paused"])
+                notifyListeners!("playbackStateDidChange", ["state": "paused"])
             }
         }
         if keyPath == "currentItem" {

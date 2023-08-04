@@ -49,8 +49,7 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     }
 
     @objc func playerDidFinishPlaying(note: NSNotification) {
-        MPNowPlayingInfoCenter.default().playbackState = .paused
-        notifyListeners("playbackStateDidChange", data: ["result": "completed"])
+        notifyListeners("playbackStateDidChange", data: ["state": "completed"])
     }
 
     @objc private func playbackStateDidChange() {
