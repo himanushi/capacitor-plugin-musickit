@@ -88,8 +88,9 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
             result = "paused"
         } else if player.playbackState == .stopped && prevPlaybackState != .stopped {
             result = "stopped"
-        } else if player.playbackState == .interrupted && prevPlaybackState != .interrupted {
-            result = "paused"
+//      以下は プレビュー時に completed した後に paused してしまうためコメントアウト
+//        } else if player.playbackState == .interrupted && prevPlaybackState != .interrupted {
+//            result = "paused"
         }
 
         prevPlaybackState = player.playbackState
