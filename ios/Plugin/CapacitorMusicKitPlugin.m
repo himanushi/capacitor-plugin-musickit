@@ -18,6 +18,7 @@ CAP_PLUGIN(CapacitorMusicKitPlugin, "CapacitorMusicKit",
            CAP_PLUGIN_METHOD(getCurrentSong, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getQueueSongs, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getCurrentIndex, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(getCurrentPlaybackDuration, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getCurrentPlaybackTime, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(getRepeatMode, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(setRepeatMode, CAPPluginReturnPromise);

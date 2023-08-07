@@ -35,9 +35,13 @@ import MusicKit
     @objc func getCurrentIndex() -> Int {
         return player.indexOfNowPlayingItem
     }
-
+    
     @objc func getCurrentPlaybackTime() -> Double {
         return ApplicationMusicPlayer.shared.playbackTime
+    }
+    
+    @objc func getCurrentPlaybackTime() -> Double {
+        return ApplicationMusicPlayer.shared.duration
     }
 
     @objc func getRepeatMode() -> String {

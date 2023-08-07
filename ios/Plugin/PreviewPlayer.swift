@@ -34,10 +34,17 @@ import MusicKit
     @objc func getCurrentIndex() -> Int {
         return currentIndex
     }
-
+    
     @objc func getCurrentPlaybackTime() -> Double {
         if let player = previewPlayer {
             return Double(CMTimeGetSeconds(player.currentTime()))
+        }
+        return 0.0
+    }
+    
+    @objc func getCurrentPlaybackDuration() -> Double {
+        if let player = previewPlayer {
+            return Double(CMTimeGetSeconds(player.currentItem?.duration))
         }
         return 0.0
     }

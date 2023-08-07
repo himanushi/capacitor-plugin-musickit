@@ -148,7 +148,11 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
     @objc func getCurrentIndex(_ call: CAPPluginCall) {
         call.resolve(["index": musicKit.getCurrentIndex()])
     }
-
+    
+    @objc func getCurrentPlaybackDuration(_ call: CAPPluginCall) {
+        call.resolve(["time": musicKit.getCurrentPlaybackDuration()])
+    }
+    
     @objc func getCurrentPlaybackTime(_ call: CAPPluginCall) {
         call.resolve(["time": musicKit.getCurrentPlaybackTime()])
     }

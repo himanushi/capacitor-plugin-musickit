@@ -336,12 +336,20 @@ typealias NotifyListeners = ((String, [String: Any]?) -> Void)
             return musicKitPlayer.getCurrentIndex()
         }
     }
-
+    
     @objc func getCurrentPlaybackTime() -> Double {
         if isPreview {
             return previewPlayer.getCurrentPlaybackTime()
         } else {
             return musicKitPlayer.getCurrentPlaybackTime()
+        }
+    }
+    
+    @objc func getCurrentPlaybackDuration() -> Double {
+        if isPreview {
+            return previewPlayer.getCurrentPlaybackDuration()
+        } else {
+            return musicKitPlayer.getCurrentPlaybackDuration()
         }
     }
 
