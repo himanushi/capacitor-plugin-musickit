@@ -16,7 +16,10 @@ public class CapacitorMusicKitPlugin: CAPPlugin {
 
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playback, mode: .default)
+            // AVPlayer をサイレントモードとバックグラウンドで再生する
+            // interruptSpokenAudioAndMixWithOthers にしておかないと、 Apple Music サブスクを再生した後にプレビュー再生ができない
+            // TODO: interruptSpokenAudioAndMixWithOthers を設定すると AVPlayer による MPRemoteCommandCenter が有効にならないのでどうにかすること
+            try audioSession.setCategory(.playback, mode: .default, options: [.interruptSpokenAudioAndMixWithOthers])
             try audioSession.setActive(true)
         } catch {
             print(error)
